@@ -360,8 +360,119 @@ class LexicalAnalyzer {
             return Token(Not_Valid, line_number);
         }
 
-//         Token is_keyword(int &index, std::string &line) {
-//         }
+        Token is_keyword(int &index, std::string &line) {
+            int len = (int)line.size();
+            int state = 0, perv_index = index;
+
+            std::string key_words[];
+
+            while (index < len) {
+                if (state == 0) {
+
+                    if (line[index] == 'b') {
+                        state = 1;
+                    }
+                    else if (line[index] == 'c') {
+
+                    }
+                    else if (line[index] == 'e') {
+
+                    }
+                    else if (line[index] == 'f') {
+
+                    }
+                    else if (line[index] == 'i') {
+
+                    }
+                    else if (line[index] == 'p') {
+
+                    }
+                    else if (line[index] == 'r') {
+
+                    }
+                    else if (line[index] == 't') {
+
+                    }
+                    else {
+                        state = 100;
+                    }
+                }
+                else if (state == 1) {
+                    else if (line[index] == 'o') {
+                        state = 2;
+                    }
+                    else if (line[index] == 'r') {
+                        state = 5;
+                    }
+                    else {
+                        stase = 100;
+                    }
+                }
+                else if (state == 2) {
+                    else if (line[index] == 'o') {
+                        state = 3;
+                    }
+                    else {
+                        stase = 100;
+                    }
+                }
+                else if (state == 3) {
+                    else if (line[index] == 'l') {
+                        state = 4;
+                    }
+                    else {
+                        stase = 100;
+                    }
+                }
+                else if (state == 4) {
+                    // final bool
+                }
+                else if (state == 5) {
+                    else if (line[index] == 'r') {
+                        state = 6;
+                    }
+                    else {
+                        stase = 100;
+                    }
+                }
+                else if (state == 6) {
+                    else if (line[index] == 'e') {
+                        state = 7;
+                    }
+                    else {
+                        stase = 100;
+                    }
+                }
+                else if (state == 7) {
+                    else if (line[index] == 'a') {
+                        state = 8;
+                    }
+                    else {
+                        stase = 100;
+                    }
+                }
+                else if (state == 8) {
+                    else if (line[index] == 'k') {
+                        state = 9;
+                    }
+                    else {
+                        stase = 100;
+                    }
+                }
+                else if (state == 9) {
+                    // final break
+                }
+                else if (state == 3) {
+                    index = perv_index;
+                    Token token(Not_Valid, line_number);
+                    return token;
+                }
+                index++;
+            }
+            
+            index = perv_index;
+            return Token(Not_Valid, line_number);
+        }
 //         Token is_decimal(int index, std::string &line) {
 //             return Token();
 //         }
