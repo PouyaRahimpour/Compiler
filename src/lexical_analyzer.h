@@ -7,6 +7,23 @@
 #define FAILIURE 1
 #define FILE_ERROR 2
 
+#define NUM_KEYWORDS 12
+
+std::string key_words[NUM_KEYWORDS] = {
+    "bool",
+    "break",
+    "char",
+    "continue",
+    "else",
+    "false",
+    "for",
+    "if",
+    "int",
+    "print",
+    "return",
+    "true"
+};
+
 enum token_type {
     T_Bool,
     T_Break,

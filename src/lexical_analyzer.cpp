@@ -1,6 +1,7 @@
 #include"lexical_analyzer.h"
 
 // TODO namespace
+// TODO reutrn Token()
 bool isspace(const char &ch) {
     char spaces[] = {' ', '\t'};
     for (auto &sp: spaces) {
@@ -341,17 +342,14 @@ class LexicalAnalyzer {
                     }
                 }
                 else if (state == 28) {
-                    Token token(T_ROp_GE, line_number);
-                    return token;
+                    return Token(T_ROp_GE, line_number);
                 }
                 else if (state == 29) {
-                    Token token(T_ROp_G, line_number);
-                    return token;
+                    return Token(T_ROp_G, line_number);
                 }
                 else if (state == 30) {
                     index = perv_index;
-                    Token token(Not_Valid, line_number);
-                    return token;
+                    return Token(Not_Valid, line_number);
                 }
                 index++;
             }
@@ -360,116 +358,64 @@ class LexicalAnalyzer {
             return Token(Not_Valid, line_number);
         }
 
-        Token is_keyword(int &index, std::string &line) {
+        Token is_keyword(int &index, const std::string &line, const int &line_number) {
             int len = (int)line.size();
             int state = 0, perv_index = index;
 
-            std::string key_words[];
-
             while (index < len) {
                 if (state == 0) {
-
-                    if (line[index] == 'b') {
-                        state = 1;
-                    }
-                    else if (line[index] == 'c') {
-
-                    }
-                    else if (line[index] == 'e') {
-
-                    }
-                    else if (line[index] == 'f') {
-
-                    }
-                    else if (line[index] == 'i') {
-
-                    }
-                    else if (line[index] == 'p') {
-
-                    }
-                    else if (line[index] == 'r') {
-
-                    }
-                    else if (line[index] == 't') {
-
-                    }
-                    else {
-                        state = 100;
+                    state = 13;
+                    for (int i = 0; i < NUM_KEYWORDS; i++) {
+                        int sz = (int)key_words[i].size();
+                        if (line.std::string::substr(index, sz) == key_words[i]) {
+                            index += sz;
+                            state = i + 1;
+                            break;
+                        }
                     }
                 }
                 else if (state == 1) {
-                    else if (line[index] == 'o') {
-                        state = 2;
-                    }
-                    else if (line[index] == 'r') {
-                        state = 5;
-                    }
-                    else {
-                        stase = 100;
-                    }
+                    return Token(T_Bool, line_number);
                 }
                 else if (state == 2) {
-                    else if (line[index] == 'o') {
-                        state = 3;
-                    }
-                    else {
-                        stase = 100;
-                    }
+                    return Token(T_Break, line_number);
                 }
                 else if (state == 3) {
-                    else if (line[index] == 'l') {
-                        state = 4;
-                    }
-                    else {
-                        stase = 100;
-                    }
+                    return Token(T_Char, line_number);
                 }
                 else if (state == 4) {
-                    // final bool
+                    return Token(T_Continue, line_number);
                 }
                 else if (state == 5) {
-                    else if (line[index] == 'r') {
-                        state = 6;
-                    }
-                    else {
-                        stase = 100;
-                    }
+                    return Token(T_Else, line_number);
                 }
                 else if (state == 6) {
-                    else if (line[index] == 'e') {
-                        state = 7;
-                    }
-                    else {
-                        stase = 100;
-                    }
+                    return Token(T_False, line_number);
                 }
                 else if (state == 7) {
-                    else if (line[index] == 'a') {
-                        state = 8;
-                    }
-                    else {
-                        stase = 100;
-                    }
+                    return Token(T_For, line_number);
                 }
                 else if (state == 8) {
-                    else if (line[index] == 'k') {
-                        state = 9;
-                    }
-                    else {
-                        stase = 100;
-                    }
+                    return Token(T_If, line_number);
                 }
                 else if (state == 9) {
-                    // final break
+                    return Token(T_Int, line_number);
                 }
-                else if (state == 3) {
+                else if (state == 10) {
+                    return Token(T_Print, line_number);
+                }
+                else if (state == 11) {
+                    return Token(T_Return, line_number);
+                }
+                else if (state == 12) {
+                    return Token(T_True, line_number);
+                }
+                else if (state == 13) {
                     index = perv_index;
-                    Token token(Not_Valid, line_number);
-                    return token;
+                    return Token(Not_Valid, line_number);
                 }
-                index++;
             }
-            
+
             index = perv_index;
             return Token(Not_Valid, line_number);
         }
