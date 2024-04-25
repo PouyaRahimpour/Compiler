@@ -514,14 +514,149 @@ class LexicalAnalyzer {
             index = perv_index;
             return Token(Not_Valid, line_number);
         }
-        Token is_id(int index, std::string &line) {
+
+        Token is_id(int &index, const std::string &line, const int &line_number) {
+            int len = (int)line.size();
+            int state = 0, perv_index = index;
+            std::string content = "";
+
+            while (index < len) {
+                if (state == 0) {
+                    if (std::isalpha(line[index]) || line[index] == '_') {
+                        content += line[index];
+                        state = 1;
+                    }
+                    else {
+                        state = 3;
+                    }
+                }
+                else if (state == 1) {
+                    if (std::isalnum(line[index]) || line[index] == '_') {
+                        content += line[index];
+                        state = 1;
+                    }
+                    else {
+                        state = 2;
+                    }
+                }
+                else if (state == 2) {
+                    Token token(T_Id, line_number);
+                    token.set_content(content);
+                    return token;
+                }
+                else if (state == 3) {
+                    index = perv_index;
+                    return Token(Not_Valid, line_number);
+                }
+                index++;
+            }
+
+            index = perv_index;
+            return Token(Not_Valid, line_number);
+
         }
-//         Token is_string(int index, std::string &line) {
-//             return Token();
-//         }
-//         Token is_character(int index, std::string &line) {
-//             return Token();
-//         }
+        Token is_string(int &index, const std::string &line, const int &line_number) {
+            int len = (int)line.size();
+            int state = 0, perv_index = index;
+            std::string content = "";
+
+            while (index < len) {
+                if (state == 0) {
+                    if (line[index] == '"') {
+                        state = 1;
+                    }
+                    else {
+                        state = 4;
+                    }
+                }
+                else if (state == 1) {
+                    if (line[index] == '\\') {
+                        state = 2;
+                    }
+                    else if (line[index] == '"') {
+                        state = 3;
+                    } 
+                    else {
+                        state = 1;
+                        content += line[index];
+                    }
+                }
+                else if (state == 2) {
+                    state = 1;
+                }
+                else if (state == 3) {
+                    Token token(T_String, line_number);
+                    token.set_content(content);
+                    return token;
+                }
+                else if (state == 4) {
+                    index = perv_index;
+                    return Token(Not_Valid, line_number);
+                }
+                index++;
+            }
+
+            index = perv_index;
+            return Token(Not_Valid, line_number);
+        }
+        Token is_character(int &index, const std::string &line, const int &line_number) {
+            int len = (int)line.size();
+            int state = 0, perv_index = index;
+            std::string content = "";
+
+            while (index < len) {
+                if (state == 0) {
+                    if (line[index] == '\'') {
+                        state = 1;
+                    }
+                    else {
+                        state = 6;
+                    }
+                }
+                else if (state == 1) {
+                    if (line[index] == '\\') {
+                        state = 2;
+                    }
+                    else {
+                        state = 5;
+                    }
+                }
+                else if (state == 2) {
+                    state = 3;
+                    content += line[index];
+                }
+                else if (state == 3) {
+                    if (line[index] == '\'') {
+                        state = 4;
+                    }
+                    else {
+                        state = 6;
+                    }
+                }
+                else if (state == 4) {
+                    Token token(T_Character, line_number);
+                    token.set_content(content);
+                    return token;
+                }
+                else if (state == 5) {
+                    if (line[index] == '\'') {
+                        state = 4;
+                    }
+                    else {
+                        state = 6;
+                    }
+                }
+                else if (state == 6) {
+                    index = perv_index;
+                    return Token(Not_Valid, line_number);
+                }
+                index++;
+            }
+
+            index = perv_index;
+            return Token(Not_Valid, line_number);
+        }
+
         void extract(std::string &line) {
             static int line_number = 0;
             line_number++;
@@ -535,53 +670,53 @@ class LexicalAnalyzer {
                     continue;
                 }
 
-//                 token = is_comment(index, line);
-//                 if (token.get_type() != Not_Valid) {
-//                     tokens.push_back(token);
-//                     continue;
-//                 }
-// 
-//                 token = is_operator(index, line);
-//                 if (token.get_type() != Not_Valid) {
-//                     tokens.push_back(token);
-//                     continue;
-//                 }
-// 
-//                 token = is_keyword(index, line);
-//                 if (token.get_type() != Not_Valid) {
-//                     tokens.push_back(token);
-//                     continue;
-//                 }
-//                 
-//                 token = is_decimal(index, line);
-//                 if (token.get_type() != Not_Valid) {
-//                     tokens.push_back(token);
-//                     continue;
-//                 }
-// 
-//                 token = is_hexadecimal(index, line);
-//                 if (token.get_type() != Not_Valid) {
-//                     tokens.push_back(token);
-//                     continue;
-//                 }
-// 
-//                 token = is_id(index, line);
-//                 if (token.get_type() != Not_Valid) {
-//                     tokens.push_back(token);
-//                     continue;
-//                 }
-// 
-//                 token = is_string(index, line);
-//                 if (token.get_type() != Not_Valid) {
-//                     tokens.push_back(token);
-//                     continue;
-//                 }
-// 
-//                 token = is_character(index, line);
-//                 if (token.get_type() != Not_Valid) {
-//                     tokens.push_back(token);
-//                     continue;
-//                 }
+                token = is_comment(index, line, line_number);
+                if (token.get_type() != Not_Valid) {
+                    tokens.push_back(token);
+                    continue;
+                }
+
+                token = is_operator(index, line, line_number);
+                if (token.get_type() != Not_Valid) {
+                    tokens.push_back(token);
+                    continue;
+                }
+
+                token = is_keyword(index, line, line_number);
+                if (token.get_type() != Not_Valid) {
+                    tokens.push_back(token);
+                    continue;
+                }
+                
+                token = is_decimal(index, line, line_number);
+                if (token.get_type() != Not_Valid) {
+                    tokens.push_back(token);
+                    continue;
+                }
+
+                token = is_hexadecimal(index, line, line_number);
+                if (token.get_type() != Not_Valid) {
+                    tokens.push_back(token);
+                    continue;
+                }
+
+                token = is_id(index, line, line_number);
+                if (token.get_type() != Not_Valid) {
+                    tokens.push_back(token);
+                    continue;
+                }
+
+                token = is_string(index, line, line_number);
+                if (token.get_type() != Not_Valid) {
+                    tokens.push_back(token);
+                    continue;
+                }
+
+                token = is_character(index, line, line_number);
+                if (token.get_type() != Not_Valid) {
+                    tokens.push_back(token);
+                    continue;
+                }
             }
 
         }
