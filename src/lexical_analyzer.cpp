@@ -2,6 +2,7 @@
 
 // TODO namespace
 // TODO reutrn Token()
+// TODO default string value for constructor?
 bool isspace(const char &ch) {
     char spaces[] = {' ', '\t'};
     for (auto &sp: spaces) {
@@ -419,15 +420,102 @@ class LexicalAnalyzer {
             index = perv_index;
             return Token(Not_Valid, line_number);
         }
-//         Token is_decimal(int index, std::string &line) {
-//             return Token();
-//         }
-//         Token is_hexadecimal(int index, std::string &line) {
-//             return Token();
-//         }
-//         Token is_id(int index, std::string &line) {
-//             return Token();
-//         }
+        Token is_decimal(int &index, const std::string &line, const int &line_number) {
+            int len = (int)line.size();
+            int state = 0, perv_index = index;
+            std::string content = "";
+
+            while (index < len) {
+                if (state == 0) {
+                    if (std::isdigit(line[index])) {
+                        state = 1;
+                        content += line[index];
+                    }
+                    else {
+                        state = 3;
+                    }
+                }
+                else if (state == 1) {
+                    if (std::isdigit(line[index])) {
+                        state = 1;
+                        content += line[index];
+                    }
+                    else {
+                        state = 2;
+                    }
+                }
+                else if (state == 2) {
+                    Token token(T_Decimal, line_number);
+                    token.set_content(content);
+                    return token;
+                }
+                else if (state == 3) {
+                    index = perv_index;
+                    return Token(Not_Valid, line_number);
+                }
+                index++;
+            }
+
+            index = perv_index;
+            return Token(Not_Valid, line_number);
+        }
+        Token is_hexadecimal(int &index, const std::string &line, const int &line_number) {
+            int len = (int)line.size();
+            int state = 0, perv_index = index;
+            std::string content = "";
+
+            while (index < len) {
+                if (state == 0) {
+                    if (line[index] == '0') {
+                        state = 1;
+                    }
+                    else {
+                        state = 5;
+                    }
+                }
+                else if (state == 1) {
+                    if (std::tolower(line[index]) == 'x') {
+                        state = 2;
+                    }
+                    else {
+                        state = 5;
+                    }
+                }
+                if (state == 2) {
+                    if (std::isxdigit(line[index])) {
+                        state = 3;
+                        content += line[index];
+                    }
+                    else {
+                        state = 5;
+                    }
+                }
+                else if (state == 3) {
+                    if (std::isdigit(line[index])) {
+                        state = 3;
+                        content += line[index];
+                    }
+                    else {
+                        state = 4;
+                    }
+                }
+                else if (state == 4) {
+                    Token token(T_Hexadecimal, line_number);
+                    token.set_content(content);
+                    return token;
+                }
+                else if (state == 5) {
+                    index = perv_index;
+                    return Token(Not_Valid, line_number);
+                }
+                index++;
+            }
+
+            index = perv_index;
+            return Token(Not_Valid, line_number);
+        }
+        Token is_id(int index, std::string &line) {
+        }
 //         Token is_string(int index, std::string &line) {
 //             return Token();
 //         }
