@@ -1,10 +1,12 @@
 #include"lexical_analyzer.h"
 
-// TODO namespace
 // TODO reutrn Token()
 // TODO default string value for constructor?
+// TODO Not_Valid -> Invalid
+// TODO beatiful output
+// TODO ask TA for #no char
+
 bool isspace(const char &ch) {
-    char spaces[] = {' ', '\t'};
     for (auto &sp: spaces) {
         if (ch == sp) {
             return true;
@@ -47,8 +49,10 @@ class Token {
         }
 
         std::string toString() const {
-            // TODO to_string for type
-            return "< content:" + content + ", type: " + std::to_string(type) + ", line#: " + std::to_string(line_number) + " >";
+            if (content == "") {
+                return "< type: " + type_to_string[type] + ", line#: " + std::to_string(line_number) + " >";
+            }
+            return "< type: " + type_to_string[type] + ", line#: " + std::to_string(line_number) + ", content: " + content + " >";
         }
         friend std::ostream& operator<<(std::ostream &out, const Token &token) {
             return out << token.toString();
@@ -61,11 +65,6 @@ class LexicalAnalyzer {
         std::ifstream in;
         std::ofstream out;
         std::vector<Token> tokens;
-
-        LexicalAnalyzer(std::string input_file, std::string output_file) {
-            in_address = input_file;
-            out_address = output_file;
-        }
 
         Token is_space(int &index, const std::string &line, const int &line_number) {
             int len = (int)line.size();
@@ -83,6 +82,7 @@ class LexicalAnalyzer {
                 else if (state == 1) {
                     if (!isspace(line[index])) {
                         state = 2;
+                        continue;
                     }
                 }
                 else if (state == 2) {
@@ -101,9 +101,11 @@ class LexicalAnalyzer {
             return Token(Not_Valid, line_number);
         }
 
-        Token is_comment(int index, const std::string &line, const int &line_number) {
+        Token is_comment(int &index, const std::string &line, const int &line_number) {
             int len = (int)line.size();
             int state = 0, perv_index = index;
+
+            std::string content = "";
 
             while (index < len) {
                 if (state == 0) {
@@ -123,12 +125,15 @@ class LexicalAnalyzer {
                     }
                 }
                 else if (state == 2) {
-                    if (line[index] == '\n') {
+                    if (line[index] == '\n' || line[index] == 13) {
                         state = 3;
+                        continue;
                     }
+                    content += line[index];
                 }
                 else if (state == 3) {
                     Token token(T_Comment, line_number);
+                    token.set_content(content);
                     return token;
                 }
                 else if (state == 4) {
@@ -143,7 +148,7 @@ class LexicalAnalyzer {
             return Token(Not_Valid, line_number);
         }
 
-        Token is_operator(int index, const std::string &line, const int &line_number) {
+        Token is_operator(int &index, const std::string &line, const int &line_number) {
             int len = (int)line.size();
             int state = 0, perv_index = index;
 
@@ -292,6 +297,7 @@ class LexicalAnalyzer {
                     }
                     else {
                         state = 20;
+                        continue;
                     }
                 }
                 else if (state == 19) {
@@ -308,6 +314,7 @@ class LexicalAnalyzer {
                     }
                     else {
                         state = 23;
+                        continue;
                     }
                 }
                 else if (state == 22) {
@@ -324,6 +331,7 @@ class LexicalAnalyzer {
                     }
                     else {
                         state = 26;
+                        continue;
                     }
                 }
                 else if (state == 25) {
@@ -340,6 +348,7 @@ class LexicalAnalyzer {
                     }
                     else {
                         state = 29;
+                        continue;
                     }
                 }
                 else if (state == 28) {
@@ -420,6 +429,7 @@ class LexicalAnalyzer {
             index = perv_index;
             return Token(Not_Valid, line_number);
         }
+
         Token is_decimal(int &index, const std::string &line, const int &line_number) {
             int len = (int)line.size();
             int state = 0, perv_index = index;
@@ -442,6 +452,7 @@ class LexicalAnalyzer {
                     }
                     else {
                         state = 2;
+                        continue;
                     }
                 }
                 else if (state == 2) {
@@ -462,6 +473,7 @@ class LexicalAnalyzer {
         Token is_hexadecimal(int &index, const std::string &line, const int &line_number) {
             int len = (int)line.size();
             int state = 0, perv_index = index;
+
             std::string content = "";
 
             while (index < len) {
@@ -481,7 +493,7 @@ class LexicalAnalyzer {
                         state = 5;
                     }
                 }
-                if (state == 2) {
+                else if (state == 2) {
                     if (std::isxdigit(line[index])) {
                         state = 3;
                         content += line[index];
@@ -491,12 +503,13 @@ class LexicalAnalyzer {
                     }
                 }
                 else if (state == 3) {
-                    if (std::isdigit(line[index])) {
+                    if (std::isxdigit(line[index])) {
                         state = 3;
                         content += line[index];
                     }
                     else {
                         state = 4;
+                        continue;
                     }
                 }
                 else if (state == 4) {
@@ -537,6 +550,7 @@ class LexicalAnalyzer {
                     }
                     else {
                         state = 2;
+                        continue;
                     }
                 }
                 else if (state == 2) {
@@ -583,6 +597,7 @@ class LexicalAnalyzer {
                 }
                 else if (state == 2) {
                     state = 1;
+                    content += line[index];
                 }
                 else if (state == 3) {
                     Token token(T_String, line_number);
@@ -599,6 +614,7 @@ class LexicalAnalyzer {
             index = perv_index;
             return Token(Not_Valid, line_number);
         }
+
         Token is_character(int &index, const std::string &line, const int &line_number) {
             int len = (int)line.size();
             int state = 0, perv_index = index;
@@ -688,13 +704,13 @@ class LexicalAnalyzer {
                     continue;
                 }
                 
-                token = is_decimal(index, line, line_number);
+                token = is_hexadecimal(index, line, line_number);
                 if (token.get_type() != Not_Valid) {
                     tokens.push_back(token);
                     continue;
                 }
 
-                token = is_hexadecimal(index, line, line_number);
+                token = is_decimal(index, line, line_number);
                 if (token.get_type() != Not_Valid) {
                     tokens.push_back(token);
                     continue;
@@ -717,9 +733,11 @@ class LexicalAnalyzer {
                     tokens.push_back(token);
                     continue;
                 }
-            }
 
+                index++;
+            }
         }
+
         void read_tokens() {
             in.open(in_address);
             if (!in.is_open()) {
@@ -741,12 +759,17 @@ class LexicalAnalyzer {
                 exit(FILE_ERROR);
             }
             for (Token token: tokens) {
-                out << token;
+                out << token << '\n';
             }
             out.close();
         }
 
     public:
+        LexicalAnalyzer(std::string input_file, std::string output_file) {
+            in_address = input_file;
+            out_address = output_file;
+        }
+
         void start() {
             read_tokens();
             write_tokens();
