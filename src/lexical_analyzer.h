@@ -7,8 +7,6 @@
 #define FAILIURE 1
 #define FILE_ERROR 2
 
-char spaces = [' ', '\t', '\n'];
-
 enum token_type {
     T_Bool,
     T_Break,
