@@ -1,6 +1,5 @@
 #include"lexical_analyzer.h"
 
-// TODO default string value for constructor?
 // TODO beatiful output
 
 bool isspace(const char &ch) {
@@ -20,8 +19,8 @@ class Token {
         int line_number;
 
     public:
-        Token (token_type _type, int _line_number) {
-            content = "";
+        Token (token_type _type, int _line_number, std::string _content = "") {
+            content = _content;
             type = _type;
             line_number = _line_number;
         }
@@ -130,9 +129,7 @@ class LexicalAnalyzer {
                     content += line[index];
                 }
                 else if (state == 3) {
-                    Token token(T_Comment, line_number);
-                    token.set_content(content);
-                    return token;
+                    return Token(T_Comment, line_number, content);
                 }
                 else if (state == 4) {
                     index = perv_index;
@@ -432,9 +429,7 @@ class LexicalAnalyzer {
                     }
                 }
                 else if (state == 2) {
-                    Token token(T_Decimal, line_number);
-                    token.set_content(content);
-                    return token;
+                    return Token(T_Decimal, line_number, content);
                 }
                 else if (state == 3) {
                     index = perv_index;
@@ -446,6 +441,7 @@ class LexicalAnalyzer {
             index = perv_index;
             return Token(Invalid, line_number);
         }
+
         Token is_hexadecimal(int &index, const std::string &line, const int &line_number) {
             int len = (int)line.size();
             int state = 0, perv_index = index;
@@ -489,9 +485,7 @@ class LexicalAnalyzer {
                     }
                 }
                 else if (state == 4) {
-                    Token token(T_Hexadecimal, line_number);
-                    token.set_content(content);
-                    return token;
+                    return Token(T_Hexadecimal, line_number, content);
                 }
                 else if (state == 5) {
                     index = perv_index;
@@ -530,9 +524,7 @@ class LexicalAnalyzer {
                     }
                 }
                 else if (state == 2) {
-                    Token token(T_Id, line_number);
-                    token.set_content(content);
-                    return token;
+                    return Token(T_Id, line_number, content);
                 }
                 else if (state == 3) {
                     index = perv_index;
@@ -545,6 +537,7 @@ class LexicalAnalyzer {
             return Token(Invalid, line_number);
 
         }
+
         Token is_string(int &index, const std::string &line, const int &line_number) {
             int len = (int)line.size();
             int state = 0, perv_index = index;
@@ -576,9 +569,7 @@ class LexicalAnalyzer {
                     content += line[index];
                 }
                 else if (state == 3) {
-                    Token token(T_String, line_number);
-                    token.set_content(content);
-                    return token;
+                    return Token(T_String, line_number, content);
                 }
                 else if (state == 4) {
                     index = perv_index;
@@ -626,9 +617,7 @@ class LexicalAnalyzer {
                     }
                 }
                 else if (state == 4) {
-                    Token token(T_Character, line_number);
-                    token.set_content(content);
-                    return token;
+                    return Token(T_Character, line_number, content);
                 }
                 else if (state == 5) {
                     if (line[index] == '\'') {
