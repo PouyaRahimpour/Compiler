@@ -1,10 +1,7 @@
 #include"lexical_analyzer.h"
 
-// TODO reutrn Token()
 // TODO default string value for constructor?
-// TODO Not_Valid -> Invalid
 // TODO beatiful output
-// TODO ask TA for #no char
 
 bool isspace(const char &ch) {
     for (auto &sp: spaces) {
@@ -80,25 +77,26 @@ class LexicalAnalyzer {
                     }
                 }
                 else if (state == 1) {
-                    if (!isspace(line[index])) {
+                    if (line[index] == '\n') {
+                        state = 2;
+                    }
+                    else if (!isspace(line[index])) {
                         state = 2;
                         continue;
                     }
                 }
                 else if (state == 2) {
-                    Token token(T_Whitespace, line_number);
-                    return token;
+                    return Token(T_Whitespace, line_number);
                 }
                 else if (state == 3) {
                     index = perv_index;
-                    Token token(Not_Valid, line_number);
-                    return token;
+                    return Token(Invalid, line_number);
                 }
                 index++;
             }
             
             index = perv_index;
-            return Token(Not_Valid, line_number);
+            return Token(Invalid, line_number);
         }
 
         Token is_comment(int &index, const std::string &line, const int &line_number) {
@@ -138,14 +136,13 @@ class LexicalAnalyzer {
                 }
                 else if (state == 4) {
                     index = perv_index;
-                    Token token(Not_Valid, line_number);
-                    return token;
+                    return Token(Invalid, line_number);
                 }
                 index++;
             }
             
             index = perv_index;
-            return Token(Not_Valid, line_number);
+            return Token(Invalid, line_number);
         }
 
         Token is_operator(int &index, const std::string &line, const int &line_number) {
@@ -216,56 +213,43 @@ class LexicalAnalyzer {
                     }
                 }
                 else if (state == 1) {
-                    Token token(T_LP, line_number);
-                    return token;
+                    return Token(T_LP, line_number);
                 }
                 else if (state == 2) {
-                    Token token(T_RP, line_number);
-                    return token;
+                    return Token(T_RP, line_number);
                 }
                 else if (state == 3) {
-                    Token token(T_LB, line_number);
-                    return token;
+                    return Token(T_LB, line_number);
                 }
                 else if (state == 4) {
-                    Token token(T_RB, line_number);
-                    return token;
+                    return Token(T_RB, line_number);
                 }
                 else if (state == 5) {
-                    Token token(T_LC, line_number);
-                    return token;
+                    return Token(T_LC, line_number);
                 }
                 else if (state == 6) {
-                    Token token(T_RC, line_number);
-                    return token;
+                    return Token(T_RC, line_number);
                 }
                 else if (state == 7) {
-                    Token token(T_Comma, line_number);
-                    return token;
+                    return Token(T_Comma, line_number);
                 }
                 else if (state == 8) {
-                    Token token(T_Semicolon, line_number);
-                    return token;
+                    return Token(T_Semicolon, line_number);
                 }
                 else if (state == 9) {
-                    Token token(T_AOp_PL, line_number);
-                    return token;
+                    return Token(T_AOp_PL, line_number);
                 }
                 else if (state == 10) {
-                    Token token(T_AOp_MN, line_number);
-                    return token;
+                    return Token(T_AOp_MN, line_number);
                 }
                 else if (state == 11) {
-                    Token token(T_AOp_ML, line_number);
-                    return token;
+                    return Token(T_AOp_ML, line_number);
                 }
                 else if (state == 12) {
-                    Token token(T_AOp_DV, line_number);
-                    return token;
+                    return Token(T_AOp_DV, line_number);
                 }
                 else if (state == 13) {
-                    Token token(T_AOp_RM, line_number);
-                    return token;
+                    return Token(T_AOp_RM, line_number);
                 }
                 else if (state == 14) {
                     if (line[index] == '&') {
@@ -276,8 +260,7 @@ class LexicalAnalyzer {
                     }
                 }
                 else if (state == 15) {
-                    Token token(T_LOp_AND, line_number);
-                    return token;
+                    return Token(T_LOp_AND, line_number);
                 }
                 else if (state == 16) {
                     if (line[index] == '|') {
@@ -288,8 +271,7 @@ class LexicalAnalyzer {
                     }
                 }
                 else if (state == 17) {
-                    Token token(T_LOp_OR, line_number);
-                    return token;
+                    return Token(T_LOp_OR, line_number);
                 }
                 else if (state == 18) {
                     if (line[index] == '=') {
@@ -301,12 +283,10 @@ class LexicalAnalyzer {
                     }
                 }
                 else if (state == 19) {
-                    Token token(T_ROp_E, line_number);
-                    return token;
+                    return Token(T_ROp_E, line_number);
                 }
                 else if (state == 20) {
-                    Token token(T_Assign, line_number);
-                    return token;
+                    return Token(T_Assign, line_number);
                 }
                 else if (state == 21) {
                     if (line[index] == '=') {
@@ -318,12 +298,10 @@ class LexicalAnalyzer {
                     }
                 }
                 else if (state == 22) {
-                    Token token(T_ROp_NE, line_number);
-                    return token;
+                    return Token(T_ROp_NE, line_number);
                 }
                 else if (state == 23) {
-                    Token token(T_LOp_NOT, line_number);
-                    return token;
+                    return Token(T_LOp_NOT, line_number);
                 }
                 else if (state == 24) {
                     if (line[index] == '=') {
@@ -335,12 +313,10 @@ class LexicalAnalyzer {
                     }
                 }
                 else if (state == 25) {
-                    Token token(T_ROp_LE, line_number);
-                    return token;
+                    return Token(T_ROp_LE, line_number);
                 }
                 else if (state == 26) {
-                    Token token(T_ROp_L, line_number);
-                    return token;
+                    return Token(T_ROp_L, line_number);
                 }
                 else if (state == 27) {
                     if (line[index] == '=') {
@@ -359,13 +335,13 @@ class LexicalAnalyzer {
                 }
                 else if (state == 30) {
                     index = perv_index;
-                    return Token(Not_Valid, line_number);
+                    return Token(Invalid, line_number);
                 }
                 index++;
             }
             
             index = perv_index;
-            return Token(Not_Valid, line_number);
+            return Token(Invalid, line_number);
         }
 
         Token is_keyword(int &index, const std::string &line, const int &line_number) {
@@ -422,12 +398,12 @@ class LexicalAnalyzer {
                 }
                 else if (state == 13) {
                     index = perv_index;
-                    return Token(Not_Valid, line_number);
+                    return Token(Invalid, line_number);
                 }
             }
 
             index = perv_index;
-            return Token(Not_Valid, line_number);
+            return Token(Invalid, line_number);
         }
 
         Token is_decimal(int &index, const std::string &line, const int &line_number) {
@@ -462,13 +438,13 @@ class LexicalAnalyzer {
                 }
                 else if (state == 3) {
                     index = perv_index;
-                    return Token(Not_Valid, line_number);
+                    return Token(Invalid, line_number);
                 }
                 index++;
             }
 
             index = perv_index;
-            return Token(Not_Valid, line_number);
+            return Token(Invalid, line_number);
         }
         Token is_hexadecimal(int &index, const std::string &line, const int &line_number) {
             int len = (int)line.size();
@@ -519,13 +495,13 @@ class LexicalAnalyzer {
                 }
                 else if (state == 5) {
                     index = perv_index;
-                    return Token(Not_Valid, line_number);
+                    return Token(Invalid, line_number);
                 }
                 index++;
             }
 
             index = perv_index;
-            return Token(Not_Valid, line_number);
+            return Token(Invalid, line_number);
         }
 
         Token is_id(int &index, const std::string &line, const int &line_number) {
@@ -560,13 +536,13 @@ class LexicalAnalyzer {
                 }
                 else if (state == 3) {
                     index = perv_index;
-                    return Token(Not_Valid, line_number);
+                    return Token(Invalid, line_number);
                 }
                 index++;
             }
 
             index = perv_index;
-            return Token(Not_Valid, line_number);
+            return Token(Invalid, line_number);
 
         }
         Token is_string(int &index, const std::string &line, const int &line_number) {
@@ -606,13 +582,13 @@ class LexicalAnalyzer {
                 }
                 else if (state == 4) {
                     index = perv_index;
-                    return Token(Not_Valid, line_number);
+                    return Token(Invalid, line_number);
                 }
                 index++;
             }
 
             index = perv_index;
-            return Token(Not_Valid, line_number);
+            return Token(Invalid, line_number);
         }
 
         Token is_character(int &index, const std::string &line, const int &line_number) {
@@ -664,13 +640,13 @@ class LexicalAnalyzer {
                 }
                 else if (state == 6) {
                     index = perv_index;
-                    return Token(Not_Valid, line_number);
+                    return Token(Invalid, line_number);
                 }
                 index++;
             }
 
             index = perv_index;
-            return Token(Not_Valid, line_number);
+            return Token(Invalid, line_number);
         }
 
         void extract(std::string &line) {
@@ -681,55 +657,55 @@ class LexicalAnalyzer {
 
             while (index < len) {
                 Token token = is_space(index, line, line_number);
-                if (token.get_type() != Not_Valid) {
+                if (token.get_type() != Invalid) {
                     tokens.push_back(token);
                     continue;
                 }
 
                 token = is_comment(index, line, line_number);
-                if (token.get_type() != Not_Valid) {
+                if (token.get_type() != Invalid) {
                     tokens.push_back(token);
                     continue;
                 }
 
                 token = is_operator(index, line, line_number);
-                if (token.get_type() != Not_Valid) {
+                if (token.get_type() != Invalid) {
                     tokens.push_back(token);
                     continue;
                 }
 
                 token = is_keyword(index, line, line_number);
-                if (token.get_type() != Not_Valid) {
+                if (token.get_type() != Invalid) {
                     tokens.push_back(token);
                     continue;
                 }
                 
                 token = is_hexadecimal(index, line, line_number);
-                if (token.get_type() != Not_Valid) {
+                if (token.get_type() != Invalid) {
                     tokens.push_back(token);
                     continue;
                 }
 
                 token = is_decimal(index, line, line_number);
-                if (token.get_type() != Not_Valid) {
+                if (token.get_type() != Invalid) {
                     tokens.push_back(token);
                     continue;
                 }
 
                 token = is_id(index, line, line_number);
-                if (token.get_type() != Not_Valid) {
+                if (token.get_type() != Invalid) {
                     tokens.push_back(token);
                     continue;
                 }
 
                 token = is_string(index, line, line_number);
-                if (token.get_type() != Not_Valid) {
+                if (token.get_type() != Invalid) {
                     tokens.push_back(token);
                     continue;
                 }
 
                 token = is_character(index, line, line_number);
-                if (token.get_type() != Not_Valid) {
+                if (token.get_type() != Invalid) {
                     tokens.push_back(token);
                     continue;
                 }

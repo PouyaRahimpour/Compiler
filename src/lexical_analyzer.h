@@ -74,7 +74,7 @@ std::string type_to_string[] {
     "T_Comment",
     "T_Whitespace",
 
-    "Not_Valid"
+    "Invalid"
 };
 
 enum token_type {
@@ -125,7 +125,7 @@ enum token_type {
     T_Comment,
     T_Whitespace,
 
-    Not_Valid
+    Invalid
 };
 
 
