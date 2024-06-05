@@ -1,4 +1,5 @@
 #include "syntax_analyzer.h"
+#include <ostream>
 
 
 
@@ -219,16 +220,8 @@ class SyntaxAnalyzer {
         }
 
         void calc_firsts() {
-            std::vector<Variable> v;
-            for (auto vv : variables) v.push_back(vv);
-            int m = v.size();
-
-            for (int i = 0; i < m; i++) {
-                Variable &var = v[i];
-                std::cout << var << ' ';
+            for (auto var : variables) {
                 calc_first(var);
-                var.print_firsts();
-                std::cout << std::endl;
             }
         }
 

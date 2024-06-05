@@ -22,7 +22,7 @@ param_id -> <ID> bracket
 bracket -> <[> <]> # <eps>
 
 stmt_list -> stmt stmt_list # <eps>
-stmt -> break_stmt # continue_stmt # return_stmt # if_stmt # for_stmt # print_stmt # expr_stmt # <{> stmt_list <}> # <;> # <eps>
+stmt -> break_stmt # continue_stmt # return_stmt # if_stmt # for_stmt # print_stmt # expr_stmt # <{> stmt_list <}> # <;>
 break_stmt -> <break> <;>
 continue_stmt -> <continue> <;>
 return_stmt -> <return> exp <;>
