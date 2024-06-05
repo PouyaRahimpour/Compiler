@@ -1,6 +1,4 @@
 #include "syntax_analyzer.h"
-#include <ostream>
-
 
 
 enum Type {
@@ -21,45 +19,65 @@ class Variable {
             follow_done = 0;
         }
 
-        void set_first_done(bool _set) {
-            first_done = _set;
-        }
-        bool get_first_done() {
-            return first_done;
-        }
         void set_name(std::string _name) {
             name = _name;
+        }
+        std::string get_name() const {
+            return name;
         }
 
         void set_type(Type _type) {
             type = _type;
         }
-
-        std::string get_name() const {
-            return name;
-        }
-
         Type get_type() const {
             return type;
         }
 
-        std::set<Variable>& get_first() {
-            return first;
-        }
-
         void add_to_first(Variable _first) {
             first.insert(_first);
+        }
+        std::set<Variable>& get_first() {
+            return first;
         }
 
         void add_to_follow(Variable _follow) {
             follow.insert(_follow);
 
         }
+        std::set<Variable>& get_follow() {
+            return follow;
+        }
+
+        void set_first_done(bool _set) {
+            first_done = _set;
+        }
+        bool get_first_done() {
+            return first_done;
+        }
+
+        void set_follow_done(bool _set) {
+            first_done = _set;
+        }
+        bool get_follow_done() {
+            return first_done;
+        }
+
+        void print_firsts() const {
+            std::cout << "First:";
+            for (auto f : first) {
+                std::cout << " " << f;
+            }
+        }
+        void print_follows() const {
+            std::cout << "Follows:";
+            for (auto f : follow) {
+                std::cout << " " << f;
+            }
+        }
 
         bool operator == (const Variable &other) const {
             return name == other.get_name() && type == other.get_type();
         }
-
         bool operator < (const Variable &other) const {
             return name < other.get_name();
         }
@@ -67,20 +85,8 @@ class Variable {
         std::string toString() {
             return name;
         }
-
         friend std::ostream& operator<<(std::ostream &out, Variable &var) {
             return out << var.toString();
-        }
-
-        void print_firsts() const {
-            std::cout << "First = [";
-            for (auto f : first) {
-                std::cout << f;
-                if (!(f == *first.rbegin())) {
-                    std::cout << ", ";
-                }
-            }
-            std::cout << "]";
         }
 };
 
@@ -101,7 +107,6 @@ class Rule {
         void add_to_body(Variable var) {
             body.push_back(var);
         }
-
         std::vector<Variable>& get_body() {
             return body;
         }
@@ -114,7 +119,6 @@ class Rule {
             }
             return res;
         }
-
         friend std::ostream& operator<<(std::ostream &out, Rule &rule) {
             return out << rule.toString();
         }
@@ -222,7 +226,13 @@ class SyntaxAnalyzer {
         void calc_firsts() {
             for (auto var : variables) {
                 calc_first(var);
+                //var.print_firsts();
+                //std::cout << std::endl;
             }
+        }
+
+        void calc_follow() {
+
         }
 
         void calc_follows() {
