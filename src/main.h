@@ -1,3 +1,3 @@
-#include<string>
+#include "lexical_analyzer.cpp"
+#include "syntax_analyzer.cpp"
 
-#include"lexical_analyzer.cpp"
