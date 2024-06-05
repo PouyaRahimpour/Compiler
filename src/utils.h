@@ -3,6 +3,7 @@
 #include <set>
 #include <iostream>
 #include <fstream>
+#pragma once
 
 #define SUCCESS 0
 #define FAILIURE 1
