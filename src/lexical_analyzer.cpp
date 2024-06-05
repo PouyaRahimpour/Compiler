@@ -1,6 +1,72 @@
-#include"lexical_analyzer.h"
+#include "lexical_analyzer.h"
 
-// TODO beatiful output
+char spaces[] = {9, 10, 13, 32};
+
+std::string key_words[NUM_KEYWORDS] = {
+    "bool",
+    "break",
+    "char",
+    "continue",
+    "else",
+    "false",
+    "for",
+    "if",
+    "int",
+    "print",
+    "return",
+    "true"
+};
+
+std::string type_to_string[] {
+    "T_Bool",
+    "T_Break",
+    "T_Char", 
+    "T_Continue",
+    "T_Else",
+    "T_False",
+    "T_For",
+    "T_If",
+    "T_Int",
+    "T_Print",
+    "T_Return",
+    "T_True",
+
+    "T_AOp_PL",
+    "T_AOp_MN",
+    "T_AOp_ML",
+    "T_AOp_DV",
+    "T_AOp_RM",
+
+    "T_ROp_L",
+    "T_ROp_G",
+    "T_ROp_LE",
+    "T_ROp_GE",
+    "T_ROp_NE",
+    "T_ROp_E",
+
+    "T_LOp_AND",
+    "T_LOp_OR",
+    "T_LOp_NOT",
+
+    "T_Assign",
+    "T_LP",
+    "T_RP",
+    "T_LC",
+    "T_RC",
+    "T_LB",
+    "T_RB",
+    "T_Semicolon",
+    "T_Comma",
+    "T_Id",
+    "T_Decimal",
+    "T_Hexadecimal",
+    "T_String",
+    "T_Character",
+    "T_Comment",
+    "T_Whitespace",
+
+    "Invalid"
+};
 
 bool isspace(const char &ch) {
     for (auto &sp: spaces) {
@@ -94,8 +160,7 @@ class LexicalAnalyzer {
                 index++;
             }
             
-            index = perv_index;
-            return Token(Invalid, line_number);
+            return Token(T_Whitespace, line_number);
         }
 
         Token is_comment(int &index, const std::string &line, const int &line_number) {
@@ -647,13 +712,17 @@ class LexicalAnalyzer {
             while (index < len) {
                 Token token = is_space(index, line, line_number);
                 if (token.get_type() != Invalid) {
-                    tokens.push_back(token);
+                    if (TOKENIZE_WHITESPACE) {
+                        tokens.push_back(token);
+                    }
                     continue;
                 }
 
                 token = is_comment(index, line, line_number);
                 if (token.get_type() != Invalid) {
-                    tokens.push_back(token);
+                    if (TOKENIZE_COMMENT) {
+                        tokens.push_back(token);
+                    }
                     continue;
                 }
 
@@ -698,7 +767,11 @@ class LexicalAnalyzer {
                     tokens.push_back(token);
                     continue;
                 }
-
+                
+                if (SHOW_LEXICAL_ERROR) {
+                    std::string error_message = "Lexical error: line " + std::to_string(line_number) + ", character " + std::to_string(line[index]) + " is invalid";
+                    std::cout << error_message << std::endl; 
+                }
                 index++;
             }
         }
@@ -706,7 +779,7 @@ class LexicalAnalyzer {
         void read_tokens() {
             in.open(in_address);
             if (!in.is_open()) {
-                std::cerr << "error: couldn't open input file" << std::endl;
+                std::cerr << "File error: couldn't open input file" << std::endl;
                 exit(FILE_ERROR);
             }
             std::string line;
@@ -720,7 +793,7 @@ class LexicalAnalyzer {
         void write_tokens() {
             out.open(out_address);
             if (!out.is_open()) {
-                std::cerr << "error: couldn't open output file" << std::endl;
+                std::cerr << "File error: couldn't open output file" << std::endl;
                 exit(FILE_ERROR);
             }
             for (Token token: tokens) {
@@ -735,9 +808,16 @@ class LexicalAnalyzer {
             out_address = output_file;
         }
 
-        void start() {
+        void tokenize() {
             read_tokens();
+            std::cout << "Tokenize Complete!" << std::endl;
+        }
+        
+        void write() {
             write_tokens();
-            std::cout << "mischief managed!" << std::endl;
+        }
+        
+        std::vector<Token> get_tokens() {
+            return tokens;
         }
 };
