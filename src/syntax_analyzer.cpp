@@ -48,7 +48,6 @@ class Variable {
 
         void add_to_first(Variable _first) {
             first.insert(_first);
-            std::cout << first.size() << std::endl;
         }
 
         void add_to_follow(Variable _follow) {
@@ -75,7 +74,7 @@ class Variable {
         void print_firsts() const {
             std::cout << "First = [";
             for (auto f : first) {
-                std::cout << f << ", ";
+                std::cout << f;
                 if (!(f == *first.rbegin())) {
                     std::cout << ", ";
                 }
@@ -170,7 +169,6 @@ class SyntaxAnalyzer {
                     if (rule_parts[j][0] == '<') {
                         tmp.set_name(rule_parts[j].substr(1, rule_parts[j].size() - 2));
                         tmp.set_type(TERMINAL);
-                        variables.insert(tmp);
                     } 
                     else {
                         tmp.set_name(rule_parts[j]);
@@ -185,7 +183,7 @@ class SyntaxAnalyzer {
 
         // TODO DSU
         // add rules of every var to itself
-        void calc_first (Variable var) {
+        void calc_first (Variable &var) {
             if (var.get_type() == TERMINAL) {
                 var.add_to_first(var);
                 var.set_first_done(true);
@@ -221,9 +219,14 @@ class SyntaxAnalyzer {
         }
 
         void calc_firsts() {
-            for (auto var : variables) {
-                calc_first(var);
+            std::vector<Variable> v;
+            for (auto vv : variables) v.push_back(vv);
+            int m = v.size();
+
+            for (int i = 0; i < m; i++) {
+                Variable &var = v[i];
                 std::cout << var << ' ';
+                calc_first(var);
                 var.print_firsts();
                 std::cout << std::endl;
             }
