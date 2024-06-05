@@ -9,8 +9,8 @@
 
 #define NUM_KEYWORDS 12
 
-#define TOKENIZE_COMMENT false
 #define TOKENIZE_WHITESPACE false
+#define TOKENIZE_COMMENT false
 #define SHOW_LEXICAL_ERROR true
 
 enum token_type {
