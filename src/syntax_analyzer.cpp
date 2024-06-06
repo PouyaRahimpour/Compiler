@@ -8,21 +8,17 @@ enum Type {
 };
 
 class Variable {
+
     private:
         std::string name;
         Type type;
-        std::set<Variable> first, follow;
-        bool first_done, follow_done;
+
 
     public:
         Variable() {
-            first_done = 0;
-            follow_done = 0;
         }
 
         Variable(std::string _name, Type _type) {
-            first_done = 0;
-            follow_done = 0;
             name = _name;
             type = _type;
         }
@@ -42,49 +38,6 @@ class Variable {
             return type;
         }
 
-        void add_to_first(Variable &_first) {
-            first.insert(_first);
-        }
-        std::set<Variable>& get_first() {
-            return first;
-        }
-
-        void add_to_follow(Variable _follow) {
-            follow.insert(_follow);
-
-        }
-        std::set<Variable>& get_follow() {
-            return follow;
-        }
-
-        void set_first_done(bool _set) {
-            first_done = _set;
-        }
-        bool get_first_done() {
-            return first_done;
-        }
-
-        void set_follow_done(bool _set) {
-            first_done = _set;
-        }
-        bool get_follow_done() {
-            return first_done;
-        }
-
-        void print_firsts() const {
-            std::cout << "First[" + name + "]:";
-            for (auto f : first) {
-                std::cout << " " << f;
-            }
-            std::cout << std::endl;
-        }
-        void print_follows() const {
-            std::cout << "Follows[" + name + "]:";
-            for (auto f : follow) {
-                std::cout << " " << f;
-            }
-            std::cout << std::endl;
-        }
 
         bool operator == (const Variable &other) const {
             return name == other.get_name() && type == other.get_type();
@@ -158,7 +111,25 @@ class SyntaxAnalyzer {
         //std::map<std::pair<std::string, std::string>, Rule> table;
         std::map<std::pair<Variable, Variable>, Rule> table;
         std::map<Variable, std::vector<Variable>> graph;
+        std::map<Variable, std::set<Variable>> firsts, follows;
+        std::map<Variable, bool> first_done, follow_done;
         Variable eps;
+
+        void print_firsts(Variable var) {
+            std::cout << "First[" + var.get_name() + "]:";
+            for (auto f : firsts[var]) {
+                std::cout << " " << f;
+            }
+            std::cout << std::endl;
+        }
+
+        void print_follows(Variable var) {
+            std::cout << "Follows[" + var.get_name() + "]:";
+            for (auto f : follows[var]) {
+                std::cout << " " << f;
+            }
+            std::cout << std::endl;
+        }
 
         void extract(std::string line) {
             Variable head, tmp;
@@ -217,8 +188,8 @@ class SyntaxAnalyzer {
         // add rules of every var to itself
         void calc_first (Variable &var) {
             if (var.get_type() == TERMINAL) {
-                var.add_to_first(var);
-                var.set_first_done(true);
+                firsts[var].insert(var);
+                first_done[var] = true;
                 return;
             }
 
@@ -226,16 +197,16 @@ class SyntaxAnalyzer {
                 if (rule.get_head() == var) {
                     bool exist_eps = false;
                     for (auto &part_body : rule.get_body()) {
-                        if (part_body.get_first_done() == false) {
+                        if (first_done[part_body] == false) {
                             calc_first(part_body);
                         }
                         exist_eps = false;
-                        for (auto f : part_body.get_first()) {
+                        for (auto f : firsts[part_body]) {
                             if (f == eps) {
                                 exist_eps = true;
                             }
                             else {
-                                var.add_to_first(f);
+                                firsts[var].insert(f);
                             }
                         }
                         if (!exist_eps) {
@@ -243,20 +214,17 @@ class SyntaxAnalyzer {
                         }
                     }
                     if (exist_eps) {
-                        var.add_to_first(eps);
+                        firsts[var].insert(eps);
                     }
                 }
             }
-            var.set_first_done(true);
+            first_done[var] = true;
         }
 
         void calc_firsts() {
-            std::set<Variable> variables2;
             for (auto var : variables) {
                 calc_first(var);
-                variables2.insert(var);
             }
-            variables = variables2;
         }
 
         void calc_follow(Variable &var) {
@@ -266,16 +234,15 @@ class SyntaxAnalyzer {
 
                 for (int i = 0; i < rule_sz; i++) {
                     if (body[i] == var) {
-                        std::cout << rule_sz << std::endl;
                         bool all_eps = true;
                         for (int j = i + 1; j < rule_sz; j++) {
                             bool has_eps = false;
-                            for (auto v : body[j].get_first()) {
+                            for (auto v : firsts[body[j]]) {
                                 if (v == eps) {
                                     has_eps = true;
                                 }
                                 else {
-                                    var.add_to_follow(v);
+                                    follows[var].insert(v);
                                 }
                             }
                             if (!has_eps) {
@@ -289,8 +256,8 @@ class SyntaxAnalyzer {
                                 calc_follow(r.get_head());
                             }
                             */
-                            for (auto v : r.get_head().get_follow()) {
-                                var.add_to_follow(v);
+                            for (auto v : follows[r.get_head()]) {
+                                follows[var].insert(v);
                             }
                             graph[r.get_head()].push_back(var);
                         }
@@ -312,11 +279,11 @@ class SyntaxAnalyzer {
                 q.pop();
 
                 for (auto &v : graph[var]) {
-                    int old_sz = (int)v.get_follow().size();
-                    for (auto &u : var.get_follow()) {
-                        v.add_to_follow(u);
+                    int old_sz = (int)follows[v].size();
+                    for (auto &u : follows[var]) {
+                        follows[v].insert(u);
                     }
-                    int new_sz = (int)v.get_follow().size();
+                    int new_sz = (int)follows[v].size();
                     if (new_sz > old_sz) {
                         q.push(v);
                     }
@@ -325,20 +292,20 @@ class SyntaxAnalyzer {
         }
 
         void calc_follows() {
-            std::set<Variable> variables2;
             for (auto var : variables) {
                 if (var.get_name() == START_VAR) {
-                    var.add_to_follow(Variable("$", TERMINAL));
+                    follows[var].insert(Variable("$", TERMINAL));
                 }
                 calc_follow(var);
-                var.print_follows();
-                variables2.insert(var);
             }
-            variables = variables2;
+            std::cout << "end" << std::endl;
+            for (auto var : variables) {
+                print_follows(var);
+            }
             relaxation();
 
             for (auto var : variables) {
-                var.print_follows();
+                print_follows(var);
             }
         }
         
@@ -365,11 +332,11 @@ class SyntaxAnalyzer {
                     }
                 }
                 if (has_eps) {
-                    for (Variable v: r.get_head().get_follow()) {
+                    for (Variable v: follows[r.get_head()]) {
                         table[{r.get_head(), v}] = r;
                     }
                 } else {
-                    for (Variable v: r.get_head().get_follow()) {
+                    for (Variable v: follows[r.get_head()]) {
                         table[{r.get_head(), v}] = Rule(SYNCH);
                     }
                 }
@@ -408,6 +375,6 @@ class SyntaxAnalyzer {
 
             calc_firsts();
             calc_follows();
-            make_table();
+            //make_table();
         }
 };
