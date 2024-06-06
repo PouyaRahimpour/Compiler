@@ -1,6 +1,4 @@
 #include "syntax_analyzer.h"
-#include <queue>
-
 
 enum Type {
     TERMINAL,
@@ -108,7 +106,6 @@ class SyntaxAnalyzer {
         std::string out_address;
         std::ofstream out;
         std::set<Variable> variables, terminals;
-        //std::map<std::pair<std::string, std::string>, Rule> table;
         std::map<std::pair<Variable, Variable>, Rule> table;
         std::map<Variable, std::set<Variable>> graph;
         std::map<Variable, std::set<Variable>> firsts, follows;
@@ -308,8 +305,30 @@ class SyntaxAnalyzer {
             }
         }
         
-        std::set<Variable>& sf_first(std::vector<Variable>& body) {
+        std::set<Variable> sf_first(std::vector<Variable>& body) {
+            std::set<Variable> res;
+    
+            bool all_eps = true;
+            for (auto part_body : body) {
+                bool has_eps = false;
+                for (auto f : firsts[part_body]) {
+                    if (f == eps) {
+                        has_eps = true; 
+                    }
+                    else {
+                        res.insert(f);
+                    }
+                }
+                if (!has_eps) {
+                    all_eps = false;
+                    break;
+                }
+            }
+            if (all_eps) {
+                res.insert(eps);
+            }
 
+            return res;
         }
 
         void union_set(std::set<Variable>& s1, std::set<Variable>& s2) {
@@ -320,22 +339,24 @@ class SyntaxAnalyzer {
 
         // TODO: table from file
         void make_table() {
-            for (Rule& r: rules) {
+            for (Rule &r : rules) {
                 std::set<Variable> first = sf_first(r.get_body());
                 bool has_eps = false;
-                for (Variable v: first) {
+                for (Variable v : first) {
                     if (v == eps) {
                         has_eps = true;
-                    } else {
+                    } 
+                    else {
                         table[{r.get_head(), v}] = r;
                     }
                 }
                 if (has_eps) {
-                    for (Variable v: follows[r.get_head()]) {
+                    for (Variable v : follows[r.get_head()]) {
                         table[{r.get_head(), v}] = r;
                     }
-                } else {
-                    for (Variable v: follows[r.get_head()]) {
+                } 
+                else {
+                    for (Variable v : follows[r.get_head()]) {
                         table[{r.get_head(), v}] = Rule(SYNCH);
                     }
                 }
@@ -374,6 +395,6 @@ class SyntaxAnalyzer {
 
             calc_firsts();
             calc_follows();
-            //make_table();
+            make_table();
         }
 };
