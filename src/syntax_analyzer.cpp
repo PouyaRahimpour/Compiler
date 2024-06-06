@@ -71,6 +71,9 @@ class Rule {
         Rule(Rule_type _type) {
             type = _type;
         }
+        void set_type(Rule_type _type) {
+            type = _type;
+        }
         void set_head(Variable _head) {
             head = _head;
         }
@@ -83,6 +86,10 @@ class Rule {
         }
         std::vector<Variable>& get_body() {
             return body;
+        }
+        
+        Rule_type get_type() {
+            return type;
         }
 
         std::string toString() {
@@ -110,7 +117,56 @@ class SyntaxAnalyzer {
         std::map<Variable, std::set<Variable>> graph;
         std::map<Variable, std::set<Variable>> firsts, follows;
         std::map<Variable, bool> first_done, follow_done;
+        std::map<token_type, std::string> match;
         Variable eps;
+
+        void set_matches() {
+            match[T_Bool] = "bool";
+            match[T_Break] = "break";
+            match[T_Char] = "char";
+            match[T_Continue] = "continue";
+            match[T_Else] = "else";
+            match[T_False] = "false";
+            match[T_For] = "for";
+            match[T_If] = "if";
+            match[T_Int] = "int";
+            match[T_Print] = "print";
+            match[T_Return] = "return";
+            match[T_True] = "true";
+
+            match[T_AOp_PL] = "+";
+            match[T_AOp_MN] = "-";
+            match[T_AOp_ML] = "*";
+            match[T_AOp_DV] = "/";
+            match[T_AOp_RM] = "%";
+
+            match[T_ROp_L] = "<";
+            match[T_ROp_G] = ">";
+            match[T_ROp_LE] = "<=";
+            match[T_ROp_GE] = ">=";
+            match[T_ROp_NE] = "!=";
+            match[T_ROp_E] = "==";
+
+            match[T_LOp_AND] = "&&";
+            match[T_LOp_OR] = "||";
+            match[T_LOp_NOT] = "!";
+
+            match[T_Assign] = "=";
+            match[T_LP] = "(";
+            match[T_RP] = ")";
+            match[T_LC] = "{";
+            match[T_RC] = "}";
+            match[T_LB] = "[";
+            match[T_RB] = "]";
+            match[T_Semicolon] = ";";
+            match[T_Comma] = ",";
+            match[T_Id] = "id";
+            match[T_Decimal] = "decimal";
+            match[T_Hexadecimal] = "hexadecimal";
+            match[T_String] = "string";
+            match[T_Character] = "character";
+            match[Eof] = "$";
+        }
 
         void print_firsts(Variable var) {
             std::cout << "First[" + var.get_name() + "]:";
@@ -162,6 +218,7 @@ class SyntaxAnalyzer {
             for (int i = 0; i < number_rules; i++) {
                 Rule rule;
                 rule.set_head(head);
+                rule.set_type(VALID);
                 std::vector<std::string> rule_parts = split(rules_str[i]);
 
                 for (int j = 0; j < (int)rule_parts.size(); j++) {
@@ -300,9 +357,11 @@ class SyntaxAnalyzer {
             }
             relaxation();
 
+            /*
             for (auto var : variables) {
                 print_follows(var);
             }
+            */
         }
         
         std::set<Variable> sf_first(std::vector<Variable>& body) {
@@ -342,6 +401,7 @@ class SyntaxAnalyzer {
             for (Rule &r : rules) {
                 std::set<Variable> first = sf_first(r.get_body());
                 bool has_eps = false;
+                //std::cout << first.size() << std::endl;
                 for (Variable v : first) {
                     if (v == eps) {
                         has_eps = true;
@@ -357,7 +417,9 @@ class SyntaxAnalyzer {
                 } 
                 else {
                     for (Variable v : follows[r.get_head()]) {
-                        table[{r.get_head(), v}] = Rule(SYNCH);
+                        if (table[{r.get_head(), v}].get_type() != VALID) {
+                            table[{r.get_head(), v}] = Rule(SYNCH);
+                        }
                     }
                 }
             }
@@ -374,7 +436,54 @@ class SyntaxAnalyzer {
 
         void make_tree() {
             std::stack<Variable> stack;
-            return;
+            int index = 0;
+            tokens.push_back(Token(Eof));
+            int token_sz = (int) tokens.size();
+            stack.push(Variable("$", TERMINAL));
+            stack.push(Variable(START_VAR, VARIABLE));
+
+            while (index < token_sz && stack.size()) {
+                Variable top = stack.top();
+                stack.pop();
+                Variable term = Variable(match[tokens[index].get_type()], TERMINAL);
+
+                if (top.get_type() == TERMINAL) {
+                    if (term == top) {
+                        index++;
+                    } else {
+                        std::cout << term << ' ' << top << std::endl;
+                        std::cout << "ERROR: terminals don't match" << std::endl;
+                    }
+                } 
+                else {
+                    bool found = false;
+                    Rule rule = table[{top, term}];
+                    if (rule.get_type() == VALID) {
+                        std::vector body = rule.get_body();
+                        std::reverse(body.begin(), body.end());
+                        for (Variable var: body) {
+                            if (!(var == eps)) {
+                                stack.push(var);
+                            }
+                        }
+                        //std::cout << "Valid" << std::endl;
+                        //std::cout << rule << std::endl;
+                    } 
+                    else if (rule.get_type() == SYNCH) {
+                        std::cout << "ERROR: synch" << std::endl;
+                    } 
+                    else if (rule.get_type() == EMPTY) {
+                        std::cout << top << ' ' << term << std::endl;
+                        std::cout << "ERROR: empty cell" << std::endl;
+                        index++;
+                        stack.push(top);
+                    }
+                    else {
+                        std::cout << "UNKNOWN ERROR" << std::endl;
+                    }
+                }
+            }
+            std::cout << "Parsed tree successfully" << std::endl;
         }
 
 
@@ -395,6 +504,17 @@ class SyntaxAnalyzer {
 
             calc_firsts();
             calc_follows();
+            set_matches();
             make_table();
+            std::cout << table[{Variable("else_stmt", VARIABLE), Variable("else", TERMINAL)}] << std::endl;
+            /*
+            Variable v = Variable("stmt_list", VARIABLE);
+            print_firsts(v);
+            v = Variable("stmt", VARIABLE);
+            print_firsts(v);
+            for (auto term: terminals) {
+                std::cout << v << ' ' << term << ' ' << table[{v, term}] << std::endl;
+            */
+            make_tree();
         }
 };

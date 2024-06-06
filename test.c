@@ -15,11 +15,11 @@ int main(){
 	char String_2[] = " - ";
 	for(int i = 0; i <= (+10 / 2); i = i + 1){
 		for (int j = 0x0; j != (5 * -1)  ; j = j - 1){
-			print(i);
-			print(String_1);
-			print(j);
-			print(_assign1);
-			print(test_function(i,j,add));
+			// print(i);
+			// print(String_1);
+			// print(j);
+			// print(_assign1);
+			// print(test_function(i,j,add));
 		}
 	}
 	add = false;
@@ -29,11 +29,11 @@ int main(){
 				continue;
 			if(j < -4 && i > 3)
 				break;
-			print(i);
-			print(String_2);
-			print(j);
-			print(_assign1);
-			print(test_function(i, j, add));
+			// print(i);
+			// print(String_2);
+			// print(j);
+			// print(_assign1);
+			// print(test_function(i, j, add));
 		}
 	}
 	print("this is\" a whole string no other token like '=' or 'else' or even \\\\comment should be recogized");

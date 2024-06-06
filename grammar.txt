@@ -6,33 +6,39 @@ var_dec -> type var_dec_list <;> # <;>
 var_dec_list -> var_dec_init var_dec_list2 # <eps>
 var_dec_list2 -> <,> var_dec_init var_dec_list2 # <eps>
 var_dec_init -> var_id initial
-var_id -> <ID> sz
-sz -> <[> <NUMBER> <]> # <eps>
+var_id -> <id> sz
+sz -> <[> optexp <]> # <eps>
+optexp -> exp # <eps>
+
 initial -> <=> eexp # <eps>
 eexp -> exp # <{> exp_list <}>
 exp_list -> exp exp_list2 # <eps>
 exp_list2 -> <,> exp exp_list2 # <eps>
 type -> <int> # <bool> # <char>
 
-func_dec -> type <ID> <(> params <)> <{> stmt_list <}>
+func_dec -> type <id> <(> params <)> <{> stmt_list <}>
 params -> param params2 # <eps>
 params2 -> <,> param params2 # <eps>
 param -> type param_id
-param_id -> <ID> bracket 
+param_id -> <id> bracket 
 bracket -> <[> <]> # <eps>
 
 stmt_list -> stmt stmt_list # <eps>
-stmt -> break_stmt # continue_stmt # return_stmt # if_stmt # for_stmt # print_stmt # expr_stmt # <{> stmt_list <}> # <;>
-break_stmt -> <break> <;>
-continue_stmt -> <continue> <;>
-return_stmt -> <return> exp <;>
+
+stmt -> var_dec # break_stmt # continue_stmt # return_stmt # if_stmt # for_stmt # print_stmt # expr_stmt # <{> stmt_list <}> # <;>
 
 if_stmt -> <if> <(> exp <)> stmt else_stmt
 else_stmt -> <else> stmt # <eps>
 
+
+break_stmt -> <break> <;>
+continue_stmt -> <continue> <;>
+return_stmt -> <return> exp <;>
+
+
 for_stmt -> <for> <(> var_dec exp <;> exp <)> stmt
 print_stmt -> <print> <(> context <)> <;>
-context -> <STRING> context2 
+context -> <string> context2
 context2 -> <,> exp context2 # <eps>
 expr_stmt -> exp <;>
 
@@ -49,26 +55,20 @@ exp3 -> exp4 t4
 t4 -> <&&> exp4 t4 # <eps>
 
 exp4 -> exp5 t5
-t5 -> <&> exp5 t5 # <eps>
+t5 -> <==> exp5 t5 # <!=> exp5 t5 # <eps>
 
 exp5 -> exp6 t6
-t6 -> <|> exp6 t6 # <eps>
+t6 -> <<> exp6 t6 # <>> exp6 t6 # <<=> exp6 t6 # <>=> exp6 t6 # <eps>
 
 exp6 -> exp7 t7
-t7 -> <==> exp7 t7 # <!=> exp7 t7 # <eps>
+t7 -> <+> exp7 t7 # <-> exp7 t7 # <eps>
 
 exp7 -> exp8 t8
-t8 -> <<> exp8 t8 # <>> exp8 t8 # <<=> exp8 t8 # <>=> exp8 t8 # <eps>
+t8 -> <*> exp8 t8 # </> exp8 t8 # <%> exp8 t8 # <eps>
 
-exp8 -> exp9 t9
-t9 -> <+> exp9 t9 # <-> exp9 t9 # <eps>
+exp8 -> <+> exp9 # <-> exp9 # exp9 # <!> exp9
 
-exp9 -> exp10 t10
-t10 -> <*> exp10 t10 # </> exp10 t10 # <%> exp10 t10 # <eps>
+exp9 -> <(> exp <)> # constant 
 
-exp10 -> <+> exp11 # <-> exp11 # exp11
-
-exp11 -> <(> exp <)> # constant 
-
-constant -> <ID> ebracket # <DECIMAL_NUMBER> # <HEX_NUMBER> # <STRING> # <CHARACTER> # <FALSE> # <TRUE>
+constant -> <id> ebracket # <decimal> # <hexadecimal> # <string> # <character> # <false> # <true>
 ebracket -> <[> exp <]> # <eps> 

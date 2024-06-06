@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <string>
 #include <vector>
 #include <stack>
@@ -61,7 +62,8 @@ enum token_type {
     T_Comment,
     T_Whitespace,
 
-    Invalid
+    Invalid,
+    Eof
 };
 
 std::string type_to_string[] = {
@@ -112,7 +114,8 @@ std::string type_to_string[] = {
     "T_Comment",
     "T_Whitespace",
 
-    "Invalid"
+    "Invalid",
+    "Eof"
 };
 class Token {
     private:
@@ -121,7 +124,7 @@ class Token {
         int line_number;
 
     public:
-        Token (token_type _type, int _line_number, std::string _content = "") {
+        Token (token_type _type, int _line_number=-1, std::string _content = "") {
             content = _content;
             type = _type;
             line_number = _line_number;
