@@ -1,4 +1,5 @@
 #include "syntax_analyzer.h"
+#include <queue>
 
 
 enum Type {
@@ -41,7 +42,7 @@ class Variable {
             return type;
         }
 
-        void add_to_first(Variable _first) {
+        void add_to_first(Variable &_first) {
             first.insert(_first);
         }
         std::set<Variable>& get_first() {
@@ -156,6 +157,7 @@ class SyntaxAnalyzer {
         std::set<Variable> variables, terminals;
         //std::map<std::pair<std::string, std::string>, Rule> table;
         std::map<std::pair<Variable, Variable>, Rule> table;
+        std::map<Variable, std::vector<Variable>> graph;
         Variable eps;
 
         void extract(std::string line) {
@@ -249,27 +251,30 @@ class SyntaxAnalyzer {
         }
 
         void calc_firsts() {
+            std::set<Variable> variables2;
             for (auto var : variables) {
                 calc_first(var);
-                //var.print_firsts();
+                variables2.insert(var);
             }
+            variables = variables2;
         }
 
         void calc_follow(Variable &var) {
-            std::cout << var << std::endl;
-            for (Rule &r: rules) {
-                std::vector<Variable>& body = r.get_body();
-                int rule_sz = (int) body.size();
+            for (Rule &r : rules) {
+                std::vector<Variable> &body = r.get_body();
+                int rule_sz = (int)body.size();
 
-                for (int i=0; i< rule_sz; i++) {
+                for (int i = 0; i < rule_sz; i++) {
                     if (body[i] == var) {
+                        std::cout << rule_sz << std::endl;
                         bool all_eps = true;
-                        for (int j=i+1; j<rule_sz; j++) {
+                        for (int j = i + 1; j < rule_sz; j++) {
                             bool has_eps = false;
-                            for (auto v: body[j].get_first()) {
+                            for (auto v : body[j].get_first()) {
                                 if (v == eps) {
                                     has_eps = true;
-                                } else {
+                                }
+                                else {
                                     var.add_to_follow(v);
                                 }
                             }
@@ -279,26 +284,60 @@ class SyntaxAnalyzer {
                             }
                         }
                         if (all_eps && !(r.get_head() == var)) {
+                            /*
                             if (!r.get_head().get_follow_done()) {
                                 calc_follow(r.get_head());
                             }
-                            for (auto v: r.get_head().get_follow()) {
+                            */
+                            for (auto v : r.get_head().get_follow()) {
                                 var.add_to_follow(v);
                             }
+                            graph[r.get_head()].push_back(var);
                         }
                     }
                 }
             }
 
-            var.set_follow_done(true);
+            //var.set_follow_done(true);
+        }
+
+        void relaxation() {
+            std::queue<Variable> q;
+            for (auto &var : variables) {
+                q.push(var);
+            }
+
+            while (!q.empty()) {
+                Variable &var = q.front();
+                q.pop();
+
+                for (auto &v : graph[var]) {
+                    int old_sz = (int)v.get_follow().size();
+                    for (auto &u : var.get_follow()) {
+                        v.add_to_follow(u);
+                    }
+                    int new_sz = (int)v.get_follow().size();
+                    if (new_sz > old_sz) {
+                        q.push(v);
+                    }
+                }
+            }
         }
 
         void calc_follows() {
-            for (auto var: variables) {
+            std::set<Variable> variables2;
+            for (auto var : variables) {
                 if (var.get_name() == START_VAR) {
                     var.add_to_follow(Variable("$", TERMINAL));
                 }
                 calc_follow(var);
+                var.print_follows();
+                variables2.insert(var);
+            }
+            variables = variables2;
+            relaxation();
+
+            for (auto var : variables) {
                 var.print_follows();
             }
         }
