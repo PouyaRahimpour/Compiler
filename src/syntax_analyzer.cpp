@@ -423,6 +423,14 @@ class SyntaxAnalyzer {
                     }
                 }
             }
+
+            // add this rule: else_stmt -> <else> stmt
+            Rule r;
+            r.set_type(VALID);
+            r.set_head(Variable("else_stmt", VARIABLE));
+            r.add_to_body(Variable("else", TERMINAL));
+            r.add_to_body(Variable("stmt", VARIABLE));
+            table[{Variable("else_stmt", VARIABLE), Variable("else", TERMINAL)}] = r;
         }
     
 
@@ -506,15 +514,7 @@ class SyntaxAnalyzer {
             calc_follows();
             set_matches();
             make_table();
-            std::cout << table[{Variable("else_stmt", VARIABLE), Variable("else", TERMINAL)}] << std::endl;
-            /*
-            Variable v = Variable("stmt_list", VARIABLE);
-            print_firsts(v);
-            v = Variable("stmt", VARIABLE);
-            print_firsts(v);
-            for (auto term: terminals) {
-                std::cout << v << ' ' << term << ' ' << table[{v, term}] << std::endl;
-            */
+
             make_tree();
         }
 };

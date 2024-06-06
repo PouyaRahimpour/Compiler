@@ -1,11 +1,10 @@
 int test_function(int a, int b, bool c){
 	// this is a function
-	if (c == true){
-		return a+b;
-	}
-	else {
-		return a-b;
-	}
+	if (c == true)
+        if (1)
+            a;
+    else 
+        b;
 }
 
 int main(){
