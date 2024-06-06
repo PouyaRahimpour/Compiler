@@ -1,6 +1,8 @@
 #include <string>
 #include <vector>
 #include <set>
+#include <stack>
+#include <map>
 #include <iostream>
 #include <fstream>
 #pragma once

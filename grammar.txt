@@ -26,8 +26,10 @@ stmt -> break_stmt # continue_stmt # return_stmt # if_stmt # for_stmt # print_st
 break_stmt -> <break> <;>
 continue_stmt -> <continue> <;>
 return_stmt -> <return> exp <;>
+
 if_stmt -> <if> <(> exp <)> stmt else_stmt
 else_stmt -> <else> stmt # <eps>
+
 for_stmt -> <for> <(> var_dec exp <;> exp <)> stmt
 print_stmt -> <print> <(> context <)> <;>
 context -> <STRING> context2 

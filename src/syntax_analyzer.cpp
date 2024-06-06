@@ -19,6 +19,14 @@ class Variable {
             follow_done = 0;
         }
 
+        Variable(std::string _name, Type _type) {
+            first_done = 0;
+            follow_done = 0;
+            name = _name;
+            type = _type;
+        }
+
+ 
         void set_name(std::string _name) {
             name = _name;
         }
@@ -63,16 +71,18 @@ class Variable {
         }
 
         void print_firsts() const {
-            std::cout << "First:";
+            std::cout << "First[" + name + "]:";
             for (auto f : first) {
                 std::cout << " " << f;
             }
+            std::cout << std::endl;
         }
         void print_follows() const {
-            std::cout << "Follows:";
+            std::cout << "Follows[" + name + "]:";
             for (auto f : follow) {
                 std::cout << " " << f;
             }
+            std::cout << std::endl;
         }
 
         bool operator == (const Variable &other) const {
@@ -90,17 +100,29 @@ class Variable {
         }
 };
 
+enum Rule_type {
+    EMPTY,
+    SYNCH,
+    VALID
+};
 class Rule {
 
     private:
         Variable head;
         std::vector<Variable> body;
+        Rule_type type;
 
     public:
+        Rule() {
+            type = EMPTY;
+        }
+        Rule(Rule_type _type) {
+            type = _type;
+        }
         void set_head(Variable _head) {
             head = _head;
         }
-        Variable get_head() {
+        Variable& get_head() {
             return head;
         }
 
@@ -131,7 +153,9 @@ class SyntaxAnalyzer {
         std::vector<Token> tokens;
         std::string out_address;
         std::ofstream out;
-        std::set<Variable> variables;
+        std::set<Variable> variables, terminals;
+        //std::map<std::pair<std::string, std::string>, Rule> table;
+        std::map<std::pair<Variable, Variable>, Rule> table;
         Variable eps;
 
         void extract(std::string line) {
@@ -174,6 +198,7 @@ class SyntaxAnalyzer {
                     if (rule_parts[j][0] == '<') {
                         tmp.set_name(rule_parts[j].substr(1, rule_parts[j].size() - 2));
                         tmp.set_type(TERMINAL);
+                        terminals.insert(tmp);
                     } 
                     else {
                         tmp.set_name(rule_parts[j]);
@@ -227,17 +252,91 @@ class SyntaxAnalyzer {
             for (auto var : variables) {
                 calc_first(var);
                 //var.print_firsts();
-                //std::cout << std::endl;
             }
         }
 
-        void calc_follow() {
+        void calc_follow(Variable &var) {
+            std::cout << var << std::endl;
+            for (Rule &r: rules) {
+                std::vector<Variable>& body = r.get_body();
+                int rule_sz = (int) body.size();
 
+                for (int i=0; i< rule_sz; i++) {
+                    if (body[i] == var) {
+                        bool all_eps = true;
+                        for (int j=i+1; j<rule_sz; j++) {
+                            bool has_eps = false;
+                            for (auto v: body[j].get_first()) {
+                                if (v == eps) {
+                                    has_eps = true;
+                                } else {
+                                    var.add_to_follow(v);
+                                }
+                            }
+                            if (!has_eps) {
+                                all_eps = false;
+                                break;
+                            }
+                        }
+                        if (all_eps && !(r.get_head() == var)) {
+                            if (!r.get_head().get_follow_done()) {
+                                calc_follow(r.get_head());
+                            }
+                            for (auto v: r.get_head().get_follow()) {
+                                var.add_to_follow(v);
+                            }
+                        }
+                    }
+                }
+            }
+
+            var.set_follow_done(true);
         }
 
         void calc_follows() {
+            for (auto var: variables) {
+                if (var.get_name() == START_VAR) {
+                    var.add_to_follow(Variable("$", TERMINAL));
+                }
+                calc_follow(var);
+                var.print_follows();
+            }
+        }
+        
+        std::set<Variable>& sf_first(std::vector<Variable>& body) {
 
         }
+
+        void union_set(std::set<Variable>& s1, std::set<Variable>& s2) {
+            for (Variable v: s2) {
+                s1.insert(v);
+            }
+        }
+
+        // TODO: table from file
+        void make_table() {
+            for (Rule& r: rules) {
+                std::set<Variable> first = sf_first(r.get_body());
+                bool has_eps = false;
+                for (Variable v: first) {
+                    if (v == eps) {
+                        has_eps = true;
+                    } else {
+                        table[{r.get_head(), v}] = r;
+                    }
+                }
+                if (has_eps) {
+                    for (Variable v: r.get_head().get_follow()) {
+                        table[{r.get_head(), v}] = r;
+                    }
+                } else {
+                    for (Variable v: r.get_head().get_follow()) {
+                        table[{r.get_head(), v}] = Rule(SYNCH);
+                    }
+                }
+            }
+        }
+    
 
     public:
         SyntaxAnalyzer(std::vector<Token> _tokens, std::string output_file) {
@@ -248,6 +347,7 @@ class SyntaxAnalyzer {
         }
 
         void make_tree() {
+            std::stack<Variable> stack;
             return;
         }
 
@@ -269,5 +369,6 @@ class SyntaxAnalyzer {
 
             calc_firsts();
             calc_follows();
+            make_table();
         }
 };
