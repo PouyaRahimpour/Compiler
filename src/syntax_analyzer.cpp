@@ -110,7 +110,7 @@ class SyntaxAnalyzer {
         std::set<Variable> variables, terminals;
         //std::map<std::pair<std::string, std::string>, Rule> table;
         std::map<std::pair<Variable, Variable>, Rule> table;
-        std::map<Variable, std::vector<Variable>> graph;
+        std::map<Variable, std::set<Variable>> graph;
         std::map<Variable, std::set<Variable>> firsts, follows;
         std::map<Variable, bool> first_done, follow_done;
         Variable eps;
@@ -225,9 +225,12 @@ class SyntaxAnalyzer {
             for (auto var : variables) {
                 calc_first(var);
             }
+            for (auto term : terminals) {
+                calc_first(term);
+            }
         }
 
-        void calc_follow(Variable &var) {
+        void calc_follow(Variable var) {
             for (Rule &r : rules) {
                 std::vector<Variable> &body = r.get_body();
                 int rule_sz = (int)body.size();
@@ -259,7 +262,7 @@ class SyntaxAnalyzer {
                             for (auto v : follows[r.get_head()]) {
                                 follows[var].insert(v);
                             }
-                            graph[r.get_head()].push_back(var);
+                            graph[r.get_head()].insert(var);
                         }
                     }
                 }
@@ -270,17 +273,17 @@ class SyntaxAnalyzer {
 
         void relaxation() {
             std::queue<Variable> q;
-            for (auto &var : variables) {
+            for (auto var : variables) {
                 q.push(var);
             }
 
             while (!q.empty()) {
-                Variable &var = q.front();
+                Variable var = q.front();
                 q.pop();
 
-                for (auto &v : graph[var]) {
+                for (auto v : graph[var]) {
                     int old_sz = (int)follows[v].size();
-                    for (auto &u : follows[var]) {
+                    for (auto u : follows[var]) {
                         follows[v].insert(u);
                     }
                     int new_sz = (int)follows[v].size();
@@ -297,10 +300,6 @@ class SyntaxAnalyzer {
                     follows[var].insert(Variable("$", TERMINAL));
                 }
                 calc_follow(var);
-            }
-            std::cout << "end" << std::endl;
-            for (auto var : variables) {
-                print_follows(var);
             }
             relaxation();
 
