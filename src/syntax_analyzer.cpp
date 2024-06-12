@@ -21,6 +21,26 @@ std::vector<std::string> split(std::string s, char ch = ' ') {
     return sp;
 }
 
+std::string strip(std::string s, char ch = ' ') {
+    while (!s.empty() && s.back() == ch) {
+        s.pop_back();
+    }
+
+    int n = s.size();
+    std::string res = "";
+    for (int i = 0; i < n; i++) {
+        if (s[i] == ch) {
+            continue;
+        }
+        while (i < n) {
+            res += s[i];
+            i++;
+        }
+    }
+
+    return res;
+}
+
 class Variable {
     private:
         std::string name;
@@ -127,13 +147,13 @@ class SyntaxAnalyzer {
         std::map<token_type, std::string> match;
         Tree<Variable> tree;
         bool has_par[200];
-        Variable eps; // TODO delete eps?
+        Variable eps;
 
         // TODO add rules of every var to itself && change calc_first
         void extract(std::string line) {
             Variable head, tmp;
 
-            // TODO: strip line
+            line = strip(line);
             std::string head_str = "", body_str = "";
             int len = (int)line.size();
             for (int i = 0; i < len; i++) {
@@ -289,16 +309,15 @@ class SyntaxAnalyzer {
             }
         }
 
-        // TODO use set instead queue
         void relaxation() {
-            std::queue<Variable> q;
+            std::set<Variable> set;
             for (auto var : variables) {
-                q.push(var);
+                set.insert(var);
             }
 
-            while (!q.empty()) {
-                Variable var = q.front();
-                q.pop();
+            while (!set.empty()) {
+                Variable var = *set.begin();
+                set.erase(set.begin());
 
                 for (auto v : graph[var]) {
                     int old_size = (int)follows[v].size();
@@ -307,7 +326,7 @@ class SyntaxAnalyzer {
                     }
                     int new_size = (int)follows[v].size();
                     if (new_size > old_size) {
-                        q.push(v);
+                        set.insert(v);
                     }
                 }
             }
