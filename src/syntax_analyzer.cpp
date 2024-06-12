@@ -447,8 +447,6 @@ class SyntaxAnalyzer {
             calc_firsts();
             calc_follows();
             make_table();
-
-            make_tree();
         }
 
         // write tree on file syntax.txt
@@ -479,6 +477,8 @@ class SyntaxAnalyzer {
 
                 if (top_var.get_type() == TERMINAL) {
                     if (term == top_var) {
+                        std::string content = tokens[index].get_content();
+                        top_node->set_content(content);
                         index++;
                     } 
                     else {
@@ -497,7 +497,6 @@ class SyntaxAnalyzer {
                                 stack.push(node);
                             }
                         }
-                        // TODO make a tree
                     } 
                     else if (rule.get_type() == SYNCH) {
                         std::cout << "Syntax Error: synch, line: " << line_number << std::endl;
@@ -513,7 +512,6 @@ class SyntaxAnalyzer {
                 }
             }
             std::cout << "Parsed tree successfully" << std::endl;
-
             tree.print_tree(tree.get_root());
         }
 };

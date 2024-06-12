@@ -169,11 +169,13 @@ class Node {
         T data; 
         Node<T>* parent;
         std::deque<Node<T>*> children;
+        std::string content;
 
     public:
         Node(T _data, Node<T>* _parent = NULL) {
             data = _data;
             parent = _parent;
+            content = "";
         }
 
         void set_date(T _data) {
@@ -197,16 +199,24 @@ class Node {
         std::deque<Node<T>*> get_children() {
             return children;
         }
+        void set_content(std::string _content) {
+            content = _content;
+        }
+        std::string get_content() {
+            return content;
+        }
 };
 
 template <typename T>
 class Tree {
     private:
         Node<T>* root;
+        bool has_par[200];
 
     public:
         Tree(Node<T>* _root) {
             root = _root;
+            std::fill(has_par, has_par + 200, false);
         }
 
         void set_root(Node<T>* _root) {
@@ -216,15 +226,70 @@ class Tree {
             return root;
         }
 
-        void print_tree(Node<T>* node, int num = 0) {
+        void print_tree(Node<T>* node, int num = 0, bool last = false) {
             T var = node->get_data();
-            for (int i = 0; i < num*2; i++) {
-                std::cout << ' ';
-            }
-            std::cout << var << std::endl;
 
+            if (node->get_content() != "") {
+                for (int i = 0; i < num * 4 - 4; i++) {
+                    if (has_par[i]) {
+                        std::cout << "│";
+                    }
+                    else {
+                        std::cout << " ";
+                    }
+                }
+                if (num) {
+                    if (last) {
+                        std::cout << "└── ";
+                    }
+                    else {
+                        std::cout << "├── ";
+                    }
+                }
+                std::cout << "<" << var << ">" << std::endl;
+                for (int i = 0; i < num * 4; i++) {
+                    if (has_par[i]) {
+                        std::cout << "│";
+                    }
+                    else {
+                        std::cout << " ";
+                    }
+                }
+                std::cout << "└── '" << node->get_content() << "'" << std::endl;
+            }
+            else {
+                for (int i = 0; i < num * 4 - 4; i++) {
+                    if (has_par[i]) {
+                        std::cout << "│";
+                    }
+                    else {
+                        std::cout << " ";
+                    }
+                }
+                if (num) {
+                    if (last) {
+                        std::cout << "└── ";
+                    }
+                    else {
+                        std::cout << "├── ";
+                    }
+                }
+                if (var.get_name() == "eps") {
+                    std::cout << "'" << var << "'" << std::endl;
+                }
+                else {
+                    std::cout << var << std::endl;
+                }
+            }
+
+            has_par[num * 4] = true;
             for (auto child : node->get_children()) {
-                print_tree(child, num + 1);
+                bool end = false;
+                if (child == node->get_children().back()) {
+                    has_par[num * 4] = false;
+                    end = true;
+                }
+                print_tree(child, num + 1, end);
             }
         }
 };

@@ -181,43 +181,43 @@ class LexicalAnalyzer {
                     }
                 }
                 else if (state == 1) {
-                    return Token(T_LP, line_number);
+                    return Token(T_LP, line_number, "(");
                 }
                 else if (state == 2) {
-                    return Token(T_RP, line_number);
+                    return Token(T_RP, line_number, ")");
                 }
                 else if (state == 3) {
-                    return Token(T_LB, line_number);
+                    return Token(T_LB, line_number, "[");
                 }
                 else if (state == 4) {
-                    return Token(T_RB, line_number);
+                    return Token(T_RB, line_number, "]");
                 }
                 else if (state == 5) {
-                    return Token(T_LC, line_number);
+                    return Token(T_LC, line_number, "{");
                 }
                 else if (state == 6) {
-                    return Token(T_RC, line_number);
+                    return Token(T_RC, line_number, "}");
                 }
                 else if (state == 7) {
-                    return Token(T_Comma, line_number);
+                    return Token(T_Comma, line_number, ",");
                 }
                 else if (state == 8) {
-                    return Token(T_Semicolon, line_number);
+                    return Token(T_Semicolon, line_number, ";");
                 }
                 else if (state == 9) {
-                    return Token(T_AOp_PL, line_number);
+                    return Token(T_AOp_PL, line_number, "+");
                 }
                 else if (state == 10) {
-                    return Token(T_AOp_MN, line_number);
+                    return Token(T_AOp_MN, line_number, "-");
                 }
                 else if (state == 11) {
-                    return Token(T_AOp_ML, line_number);
+                    return Token(T_AOp_ML, line_number, "*");
                 }
                 else if (state == 12) {
-                    return Token(T_AOp_DV, line_number);
+                    return Token(T_AOp_DV, line_number, "/");
                 }
                 else if (state == 13) {
-                    return Token(T_AOp_RM, line_number);
+                    return Token(T_AOp_RM, line_number, "%");
                 }
                 else if (state == 14) {
                     if (line[index] == '&') {
@@ -228,7 +228,7 @@ class LexicalAnalyzer {
                     }
                 }
                 else if (state == 15) {
-                    return Token(T_LOp_AND, line_number);
+                    return Token(T_LOp_AND, line_number, "&&");
                 }
                 else if (state == 16) {
                     if (line[index] == '|') {
@@ -239,7 +239,7 @@ class LexicalAnalyzer {
                     }
                 }
                 else if (state == 17) {
-                    return Token(T_LOp_OR, line_number);
+                    return Token(T_LOp_OR, line_number, "||");
                 }
                 else if (state == 18) {
                     if (line[index] == '=') {
@@ -251,10 +251,10 @@ class LexicalAnalyzer {
                     }
                 }
                 else if (state == 19) {
-                    return Token(T_ROp_E, line_number);
+                    return Token(T_ROp_E, line_number, "==");
                 }
                 else if (state == 20) {
-                    return Token(T_Assign, line_number);
+                    return Token(T_Assign, line_number, "=");
                 }
                 else if (state == 21) {
                     if (line[index] == '=') {
@@ -266,10 +266,10 @@ class LexicalAnalyzer {
                     }
                 }
                 else if (state == 22) {
-                    return Token(T_ROp_NE, line_number);
+                    return Token(T_ROp_NE, line_number, "!=");
                 }
                 else if (state == 23) {
-                    return Token(T_LOp_NOT, line_number);
+                    return Token(T_LOp_NOT, line_number, "!");
                 }
                 else if (state == 24) {
                     if (line[index] == '=') {
@@ -281,10 +281,10 @@ class LexicalAnalyzer {
                     }
                 }
                 else if (state == 25) {
-                    return Token(T_ROp_LE, line_number);
+                    return Token(T_ROp_LE, line_number, "<=");
                 }
                 else if (state == 26) {
-                    return Token(T_ROp_L, line_number);
+                    return Token(T_ROp_L, line_number, "<");
                 }
                 else if (state == 27) {
                     if (line[index] == '=') {
@@ -296,10 +296,10 @@ class LexicalAnalyzer {
                     }
                 }
                 else if (state == 28) {
-                    return Token(T_ROp_GE, line_number);
+                    return Token(T_ROp_GE, line_number, ">=");
                 }
                 else if (state == 29) {
-                    return Token(T_ROp_G, line_number);
+                    return Token(T_ROp_G, line_number, ">");
                 }
                 else if (state == 30) {
                     index = perv_index;
@@ -329,40 +329,40 @@ class LexicalAnalyzer {
                     }
                 }
                 else if (state == 1) {
-                    return Token(T_Bool, line_number);
+                    return Token(T_Bool, line_number, "bool");
                 }
                 else if (state == 2) {
-                    return Token(T_Break, line_number);
+                    return Token(T_Break, line_number, "break");
                 }
                 else if (state == 3) {
-                    return Token(T_Char, line_number);
+                    return Token(T_Char, line_number, "char");
                 }
                 else if (state == 4) {
-                    return Token(T_Continue, line_number);
+                    return Token(T_Continue, line_number, "continue");
                 }
                 else if (state == 5) {
-                    return Token(T_Else, line_number);
+                    return Token(T_Else, line_number, "else");
                 }
                 else if (state == 6) {
-                    return Token(T_False, line_number);
+                    return Token(T_False, line_number, "false");
                 }
                 else if (state == 7) {
-                    return Token(T_For, line_number);
+                    return Token(T_For, line_number, "for");
                 }
                 else if (state == 8) {
-                    return Token(T_If, line_number);
+                    return Token(T_If, line_number, "if");
                 }
                 else if (state == 9) {
-                    return Token(T_Int, line_number);
+                    return Token(T_Int, line_number, "int");
                 }
                 else if (state == 10) {
-                    return Token(T_Print, line_number);
+                    return Token(T_Print, line_number, "print");
                 }
                 else if (state == 11) {
-                    return Token(T_Return, line_number);
+                    return Token(T_Return, line_number, "return");
                 }
                 else if (state == 12) {
-                    return Token(T_True, line_number);
+                    return Token(T_True, line_number, "true");
                 }
                 else if (state == 13) {
                     index = perv_index;
