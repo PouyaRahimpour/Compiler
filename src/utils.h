@@ -4,6 +4,7 @@
 #include <vector>
 #include <queue>
 #include <stack>
+#include <deque>
 #include <set>
 #include <map>
 #include <algorithm>
@@ -126,7 +127,7 @@ class Token {
         std::string content;
 
     public:
-        Token (token_type _type, int _line_number = -1, std::string _content = "") {
+        Token(token_type _type, int _line_number = -1, std::string _content = "") {
             type = _type;
             line_number = _line_number;
             content = _content;
@@ -159,5 +160,71 @@ class Token {
         }
         friend std::ostream& operator << (std::ostream &out, const Token &token) {
             return out << token.toString();
+        }
+};
+
+template <typename T>
+class Node {
+    private:
+        T data; 
+        Node<T>* parent;
+        std::deque<Node<T>*> children;
+
+    public:
+        Node(T _data, Node<T>* _parent = NULL) {
+            data = _data;
+            parent = _parent;
+        }
+
+        void set_date(T _data) {
+            data = _data;
+        }
+        T get_data() {
+            return data;
+        }
+        void set_parent(Node<T>* _parent) {
+            parent = _parent; 
+        }
+        Node<T>* get_parent() {
+            return parent;
+        }
+        void push_back_children(Node<T>* node) {
+            children.push_back(node);
+        }
+        void push_front_children(Node<T>* node) {
+            children.push_front(node);
+        }
+        std::deque<Node<T>*> get_children() {
+            return children;
+        }
+};
+
+template <typename T>
+class Tree {
+    private:
+        Node<T>* root;
+
+    public:
+        Tree(Node<T>* _root) {
+            root = _root;
+        }
+
+        void set_root(Node<T>* _root) {
+            root = _root;
+        }
+        Node<T>* get_root() {
+            return root;
+        }
+
+        void print_tree(Node<T>* node, int num = 0) {
+            T var = node->get_data();
+            for (int i = 0; i < num*2; i++) {
+                std::cout << ' ';
+            }
+            std::cout << var << std::endl;
+
+            for (auto child : node->get_children()) {
+                print_tree(child, num + 1);
+            }
         }
 };

@@ -457,37 +457,44 @@ class SyntaxAnalyzer {
         void make_tree() {
             set_matches();
 
-            std::stack<Variable> stack;
+            std::stack<Node<Variable>*> stack;
             int index = 0;
             tokens.push_back(Token(Eof));
             int tokens_len = (int)tokens.size();
-            stack.push(Variable("$", TERMINAL));
-            stack.push(Variable(START_VAR, VARIABLE));
+
+            Node<Variable> Eof(Variable("$", TERMINAL));
+            stack.push(&Eof);
+            Node<Variable> root(Variable(START_VAR, VARIABLE));
+            stack.push(&root);
+
+            Tree<Variable> tree(&root);
 
             while (index < tokens_len && stack.size()) {
-                Variable top = stack.top();
+                Node<Variable>* top_node = stack.top();
+                Variable top_var = top_node->get_data(); 
                 stack.pop();
+
                 Variable term = Variable(match[tokens[index].get_type()], TERMINAL);
                 int line_number = tokens[index].get_line_number();
 
-                if (top.get_type() == TERMINAL) {
-                    if (term == top) {
+                if (top_var.get_type() == TERMINAL) {
+                    if (term == top_var) {
                         index++;
                     } 
                     else {
-                        std::cout << term << ' ' << top << std::endl;
                         std::cout << "Syntax ERROR: terminals don't match, line: " << line_number << std::endl;
                     }
                 } 
                 else {
-                    bool found = false;
-                    Rule rule = table[{top, term}];
+                    Rule rule = table[{top_var, term}];
                     if (rule.get_type() == VALID) {
                         std::vector<Variable> body = rule.get_body();
                         std::reverse(body.begin(), body.end());
-                        for (Variable var : body) {
+                        for (auto var : body) {
+                            Node<Variable>* node = new Node<Variable>(var, top_node);
+                            top_node->push_front_children(node);
                             if (var != eps) {
-                                stack.push(var);
+                                stack.push(node);
                             }
                         }
                         // TODO make a tree
@@ -498,13 +505,15 @@ class SyntaxAnalyzer {
                     else if (rule.get_type() == EMPTY) {
                         std::cout << "Syntax Error: empty cell, line: " << line_number << std::endl;
                         index++;
-                        stack.push(top);
+                        stack.push(top_node);
                     }
                     else {
-                        std::cout << "UNKNOWN ERROR" << std::endl;
+                        std::cout << "Unknown Error, line: " << line_number << std::endl;
                     }
                 }
             }
             std::cout << "Parsed tree successfully" << std::endl;
+
+            tree.print_tree(tree.get_root());
         }
 };
