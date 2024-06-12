@@ -15,7 +15,7 @@ int main(int argc, char* argv[]) {
         syn_analyzer.update_grammar();
     }
     syn_analyzer.make_tree();
-    // syn_analyzer.write();
+    syn_analyzer.write();
     
     // SemanticAnalyzer
 

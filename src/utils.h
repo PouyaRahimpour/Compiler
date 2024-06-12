@@ -214,6 +214,10 @@ class Tree {
         bool has_par[200];
 
     public:
+        Tree() {
+            root = NULL;
+            std::fill(has_par, has_par + 200, false);
+        }
         Tree(Node<T>* _root) {
             root = _root;
             std::fill(has_par, has_par + 200, false);
@@ -283,9 +287,10 @@ class Tree {
             }
 
             has_par[num * 4] = true;
-            for (auto child : node->get_children()) {
+            std::deque<Node<T>*> children = node->get_children();
+            for (auto child : children) {
                 bool end = false;
-                if (child == node->get_children().back()) {
+                if (child == children.back()) {
                     has_par[num * 4] = false;
                     end = true;
                 }

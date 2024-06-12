@@ -116,6 +116,7 @@ class Rule {
 class SyntaxAnalyzer {
     private:
         std::string out_address;
+        std::ofstream out;
         std::vector<Token> tokens;
         std::vector<Rule> rules;
         std::set<Variable> variables, terminals;
@@ -124,6 +125,8 @@ class SyntaxAnalyzer {
         std::map<Variable, std::set<Variable>> graph;
         std::map<std::pair<Variable, Variable>, Rule> table;
         std::map<token_type, std::string> match;
+        Tree<Variable> tree;
+        bool has_par[200];
         Variable eps; // TODO delete eps?
 
         // TODO add rules of every var to itself && change calc_first
@@ -420,6 +423,74 @@ class SyntaxAnalyzer {
             table[{Variable("else_stmt", VARIABLE), Variable("else", TERMINAL)}] = rule;
         }
 
+        void write_tree(Node<Variable>* node, int num = 0, bool last = false) {
+            Variable var = node->get_data();
+
+            if (node->get_content() != "") {
+                for (int i = 0; i < num * 4 - 4; i++) {
+                    if (has_par[i]) {
+                        out << "│";
+                    }
+                    else {
+                        out << " ";
+                    }
+                }
+                if (num) {
+                    if (last) {
+                        out << "└── ";
+                    }
+                    else {
+                        out << "├── ";
+                    }
+                }
+                out << "<" << var << ">" << "\n";
+                for (int i = 0; i < num * 4; i++) {
+                    if (has_par[i]) {
+                        out << "│";
+                    }
+                    else {
+                        out << " ";
+                    }
+                }
+                out << "└── '" << node->get_content() << "'" << "\n";
+            }
+            else {
+                for (int i = 0; i < num * 4 - 4; i++) {
+                    if (has_par[i]) {
+                        out << "│";
+                    }
+                    else {
+                        out << " ";
+                    }
+                }
+                if (num) {
+                    if (last) {
+                        out << "└── ";
+                    }
+                    else {
+                        out << "├── ";
+                    }
+                }
+                if (var.get_name() == "eps") {
+                    out << "'" << var << "'" << "\n";
+                }
+                else {
+                    out << var << "\n";
+                }
+            }
+
+            has_par[num * 4] = true;
+            std::deque<Node<Variable>*> children = node->get_children();
+            for (auto child : children) {
+                bool end = false;
+                if (child == children.back()) {
+                    has_par[num * 4] = false;
+                    end = true;
+                }
+                write_tree(child, num + 1, end);
+            }
+        }
+
     public:
         SyntaxAnalyzer(std::vector<Token> _tokens, std::string output_file) {
             tokens = _tokens;
@@ -449,7 +520,6 @@ class SyntaxAnalyzer {
             make_table();
         }
 
-        // write tree on file syntax.txt
         // TODO colored error messages
         // TODO better error messages
         void make_tree() {
@@ -460,12 +530,12 @@ class SyntaxAnalyzer {
             tokens.push_back(Token(Eof));
             int tokens_len = (int)tokens.size();
 
-            Node<Variable> Eof(Variable("$", TERMINAL));
-            stack.push(&Eof);
-            Node<Variable> root(Variable(START_VAR, VARIABLE));
-            stack.push(&root);
+            Node<Variable>* Eof = new Node<Variable>(Variable("$", TERMINAL), NULL);
+            stack.push(Eof);
+            Node<Variable>* root = new Node<Variable>(Variable(START_VAR, VARIABLE), NULL);
+            stack.push(root);
 
-            Tree<Variable> tree(&root);
+            tree.set_root(root);
 
             while (index < tokens_len && stack.size()) {
                 Node<Variable>* top_node = stack.top();
@@ -512,6 +582,16 @@ class SyntaxAnalyzer {
                 }
             }
             std::cout << "Parsed tree successfully" << std::endl;
-            tree.print_tree(tree.get_root());
+        }
+
+        void write() {
+            out.open(out_address);
+            if (!out.is_open()) {
+                std::cerr << "File error: couldn't open output file" << std::endl;
+                exit(FILE_ERROR);
+            }
+            std::fill(has_par, has_par + 200, false);
+            write_tree(tree.get_root());
+            out.close();
         }
 };
