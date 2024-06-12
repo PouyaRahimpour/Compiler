@@ -7,3 +7,9 @@ enum Type {
     TERMINAL,
     VARIABLE
 };
+
+enum Rule_type {
+    VALID,
+    SYNCH,
+    EMPTY
+};
