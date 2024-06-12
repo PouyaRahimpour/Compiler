@@ -37,7 +37,6 @@ std::string strip(std::string s, char ch = ' ') {
             i++;
         }
     }
-
     return res;
 }
 
@@ -397,7 +396,7 @@ class SyntaxAnalyzer {
             match[Eof] = "$";
         }
 
-        // TODO write tabel on file && if UPDATE_GRAMMAR is false read table from file table.txt
+        // TODO read & write tabel on file table.txt
         void make_table() {
             for (auto &rule : rules) {
                 std::vector<Variable> &body = rule.get_body();
