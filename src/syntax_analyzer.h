@@ -2,3 +2,8 @@
 
 #define GRAMMAR_PATH "../grammar.txt"
 #define START_VAR "program"
+
+enum Type {
+    TERMINAL,
+    VARIABLE
+};

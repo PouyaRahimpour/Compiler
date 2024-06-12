@@ -1,12 +1,13 @@
-#include <algorithm>
-#include <string>
-#include <vector>
-#include <stack>
-#include <queue>
-#include <set>
-#include <map>
 #include <iostream>
 #include <fstream>
+#include <string>
+#include <vector>
+#include <queue>
+#include <stack>
+#include <set>
+#include <map>
+#include <algorithm>
+
 #pragma once
 
 #define SUCCESS 0
@@ -66,7 +67,7 @@ enum token_type {
     Eof
 };
 
-std::string type_to_string[] = {
+const std::string type_to_string[] = {
     "T_Bool",
     "T_Break",
     "T_Char", 
@@ -117,25 +118,20 @@ std::string type_to_string[] = {
     "Invalid",
     "Eof"
 };
+
 class Token {
     private:
-        std::string content;
         token_type type;
         int line_number;
+        std::string content;
 
     public:
-        Token (token_type _type, int _line_number=-1, std::string _content = "") {
-            content = _content;
+        Token (token_type _type, int _line_number = -1, std::string _content = "") {
             type = _type;
             line_number = _line_number;
-        }
-
-        std::string get_content() {
-            return content;
-        }
-        void set_content(std::string _content) {
             content = _content;
         }
+
         token_type get_type() {
             return type;
         }
@@ -148,35 +144,20 @@ class Token {
         void set_line_number(int _line_number) {
             line_number = _line_number;
         }
+        std::string get_content() {
+            return content;
+        }
+        void set_content(std::string _content) {
+            content = _content;
+        }
 
         std::string toString() const {
             if (content == "") {
-                return "< type: " + type_to_string[type] + ", line#: " + std::to_string(line_number) + " >";
+                return "< type: " + type_to_string[type] + ", line: " + std::to_string(line_number) + " >";
             }
-            return "< type: " + type_to_string[type] + ", line#: " + std::to_string(line_number) + ", content: " + content + " >";
+            return "< type: " + type_to_string[type] + ", line: " + std::to_string(line_number) + ", content: " + content + " >";
         }
-        friend std::ostream& operator<<(std::ostream &out, const Token &token) {
+        friend std::ostream& operator << (std::ostream &out, const Token &token) {
             return out << token.toString();
         }
 };
-
-std::vector<std::string> split(std::string s, char ch = ' ') {
-    int n = s.size();
-    std::vector<std::string> sp;
-
-    std::string tmp = "";
-    for (int i = 0; i < n; i++) {
-        if (s[i] != ch) {
-            tmp += s[i];
-        }
-        else if (tmp != "") {
-            sp.push_back(tmp);
-            tmp = "";
-        }
-    }
-    if (tmp != "") {
-        sp.push_back(tmp);
-    }
-
-    return sp;
-}

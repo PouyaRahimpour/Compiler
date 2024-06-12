@@ -24,7 +24,6 @@ bool isspace(const char &ch) {
             return true;
         }
     }
-
     return false;
 }
 

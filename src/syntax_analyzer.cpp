@@ -1,21 +1,33 @@
 #include "syntax_analyzer.h"
 
-enum Type {
-    TERMINAL,
-    VARIABLE
-};
+std::vector<std::string> split(std::string s, char ch = ' ') {
+    int n = s.size();
+    std::vector<std::string> sp;
+
+    std::string tmp = "";
+    for (int i = 0; i < n; i++) {
+        if (s[i] != ch) {
+            tmp += s[i];
+        }
+        else if (tmp != "") {
+            sp.push_back(tmp);
+            tmp = "";
+        }
+    }
+    if (tmp != "") {
+        sp.push_back(tmp);
+    }
+
+    return sp;
+}
 
 class Variable {
-
     private:
         std::string name;
         Type type;
 
-
     public:
-        Variable() {
-        }
-
+        Variable() {}
         Variable(std::string _name, Type _type) {
             name = _name;
             type = _type;
