@@ -1,6 +1,10 @@
 program -> dec_list
 dec_list -> dec dec_list # <eps>
-dec -> var_dec # func_dec
+dec -> type <id> init_dec
+init_dec -> var_dec_global # func_dec
+
+var_dec_global -> sz more 
+more -> , var_dec_list <;> # <;>
 
 var_dec -> type var_dec_list <;> # <;>
 var_dec_list -> var_dec_init var_dec_list2 # <eps>
@@ -16,7 +20,7 @@ exp_list -> exp exp_list2 # <eps>
 exp_list2 -> <,> exp exp_list2 # <eps>
 type -> <int> # <bool> # <char>
 
-func_dec -> type <id> <(> params <)> <{> stmt_list <}>
+func_dec -> <(> params <)> <{> stmt_list <}>
 params -> param params2 # <eps>
 params2 -> <,> param params2 # <eps>
 param -> type param_id
