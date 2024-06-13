@@ -598,7 +598,6 @@ class SyntaxAnalyzer {
             write_table();
         }
 
-        // TODO better error messages
         void make_tree(bool update = true) {
             if (update) {
                 update_grammar();
@@ -636,6 +635,8 @@ class SyntaxAnalyzer {
                     } 
                     else {
                         std::cerr << RED << "Syntax Error: Terminals don't match, line: " << line_number << WHITE << std::endl;
+                        std::cerr << RED << "Expected '" + top_var.get_name() +  "' , but found '" + term.get_name() + "' instead." << WHITE << std::endl;
+                        std::cerr << "---------------------------------------------------------------" << std::endl;
                     }
                 } 
                 else {
@@ -653,14 +654,19 @@ class SyntaxAnalyzer {
                     } 
                     else if (rule.get_type() == SYNCH) {
                         std::cerr << RED << "Syntax Error: Synch, line: " << line_number << WHITE << std::endl;
+                        std::cerr << RED << "Synced by adding '" + top_var.get_name() + "' before" + term.get_name() + "'." << WHITE << std::endl;
+                        std::cerr << "---------------------------------------------------------------" << std::endl;
                     } 
                     else if (rule.get_type() == EMPTY) {
                         std::cerr << RED << "Syntax Error: Empty cell, line: " << line_number << WHITE << std::endl;
+                        std::cerr << RED << "Ignored '" + term.get_name() + "' due to syntax mismatch." << WHITE << std::endl;
+                        std::cerr << "---------------------------------------------------------------" << std::endl;
                         index++;
                         stack.push(top_node);
                     }
                     else {
                         std::cerr << "Unknown Error: ?, line: " << line_number << WHITE << std::endl;
+                        std::cerr << "---------------------------------------------------------------" << std::endl;
                     }
                 }
             }

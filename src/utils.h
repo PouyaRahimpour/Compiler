@@ -18,7 +18,7 @@
 
 #define COLORED_ERRORS true
 
-const std::string WHITE = COLORED_ERRORS ? "\033[0;31m" : "";
+const std::string WHITE = COLORED_ERRORS ? "\033[0;m" : "";
 const std::string RED = COLORED_ERRORS ? "\033[0;31m" : "";
 
 enum token_type {

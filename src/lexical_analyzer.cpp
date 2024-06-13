@@ -677,7 +677,7 @@ class LexicalAnalyzer {
                 if (SHOW_LEXICAL_ERROR) {
                     std::string error_message = "Lexical Error: character '" + std::to_string(line[index]) + "' is Invalid, " + "line:" + std::to_string(line_number); 
                     std::cerr << RED << error_message << WHITE << std::endl; 
-                    std::cerr << RED << "----------------------------------------------------------------" << WHITE << std::endl;
+                    std::cerr << "----------------------------------------------------------------" << std::endl;
                 }
                 index++;
             }
