@@ -1,4 +1,5 @@
 #include "syntax_analyzer.h"
+#include <cstddef>
 
 std::vector<std::string> split(std::string s, char ch = ' ') {
     int n = s.size();

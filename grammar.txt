@@ -76,7 +76,7 @@ exp9 -> <(> exp <)> # <id> func_call_or_id # constant
 
 func_call_or_id -> <(> params_call <)> # ebracket 
 params_call -> exp1 params_call2 # <eps>
-params_call2 -> <,> constant params_call2 # <eps>
+params_call2 -> <,> exp1 params_call2 # <eps>
 ebracket -> <[> exp <]> # <eps> 
 
 constant -> <decimal> # <hexadecimal> # <string> # <character> # <false> # <true>

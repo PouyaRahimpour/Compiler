@@ -1115,7 +1115,7 @@ SYNCH
 # params_call2 <)>
 params_call2 -> <eps> 
 # params_call2 <,>
-params_call2 -> <,> constant params_call2 
+params_call2 -> <,> exp1 params_call2 
 # params_call2 <;>
 SYNCH
 # params_call2 <}>

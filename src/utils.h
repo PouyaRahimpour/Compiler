@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -179,7 +180,12 @@ class Node {
         std::string content;
 
     public:
-        Node(T _data, Node<T>* _parent = NULL) {
+        Node() {
+            data = T();
+            parent = nullptr;
+            content = "";
+        }
+        Node(T _data, Node<T>* _parent = nullptr) {
             data = _data;
             parent = _parent;
             content = "";
@@ -222,7 +228,7 @@ class Tree {
 
     public:
         Tree() {
-            root = NULL;
+            root = nullptr;
             std::fill(has_par, has_par + 200, false);
         }
         Tree(Node<T>* _root) {
