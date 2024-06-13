@@ -17,7 +17,7 @@
 #define FILE_ERROR 2
 #define GRAMMAR_ERROR 3
 
-#define TAB 4
+#define TAB 2
 
 #define COLORED_ERRORS true
 
