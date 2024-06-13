@@ -1,9 +1,17 @@
+# , <;>
+SYNCH
+# , <}>
+SYNCH
 # bracket <)>
 bracket -> <eps> 
 # bracket <,>
 bracket -> <eps> 
+# bracket <;>
+SYNCH
 # bracket <[>
 bracket -> <[> <]> 
+# bracket <}>
+SYNCH
 # break_stmt <!>
 SYNCH
 # break_stmt <(>
@@ -106,12 +114,20 @@ SYNCH
 SYNCH
 # context <)>
 SYNCH
+# context <;>
+SYNCH
 # context <string>
 context -> <string> context2 
+# context <}>
+SYNCH
 # context2 <)>
 context2 -> <eps> 
 # context2 <,>
 context2 -> <,> exp context2 
+# context2 <;>
+SYNCH
+# context2 <}>
+SYNCH
 # continue_stmt <!>
 SYNCH
 # continue_stmt <(>
@@ -162,20 +178,28 @@ SYNCH
 SYNCH
 # dec <$>
 SYNCH
+# dec <;>
+SYNCH
 # dec <bool>
 dec -> type <id> init_dec 
 # dec <char>
 dec -> type <id> init_dec 
 # dec <int>
 dec -> type <id> init_dec 
+# dec <}>
+SYNCH
 # dec_list <$>
 dec_list -> <eps> 
+# dec_list <;>
+SYNCH
 # dec_list <bool>
 dec_list -> dec dec_list 
 # dec_list <char>
 dec_list -> dec dec_list 
 # dec_list <int>
 dec_list -> dec dec_list 
+# dec_list <}>
+SYNCH
 # ebracket <!=>
 ebracket -> <eps> 
 # ebracket <%>
@@ -244,6 +268,8 @@ eexp -> exp
 eexp -> exp 
 # eexp <{>
 eexp -> <{> exp_list <}> 
+# eexp <}>
+SYNCH
 # else_stmt <!>
 else_stmt -> <eps> 
 # else_stmt <(>
@@ -724,6 +750,8 @@ exp_list -> exp exp_list2
 exp_list -> exp exp_list2 
 # exp_list <->
 exp_list -> exp exp_list2 
+# exp_list <;>
+SYNCH
 # exp_list <character>
 exp_list -> exp exp_list2 
 # exp_list <decimal>
@@ -742,6 +770,8 @@ exp_list -> exp exp_list2
 exp_list -> <eps> 
 # exp_list2 <,>
 exp_list2 -> <,> exp exp_list2 
+# exp_list2 <;>
+SYNCH
 # exp_list2 <}>
 exp_list2 -> <eps> 
 # expr_stmt <!>
@@ -844,11 +874,15 @@ SYNCH
 SYNCH
 # func_dec <(>
 func_dec -> <(> params <)> <{> stmt_list <}> 
+# func_dec <;>
+SYNCH
 # func_dec <bool>
 SYNCH
 # func_dec <char>
 SYNCH
 # func_dec <int>
+SYNCH
+# func_dec <}>
 SYNCH
 # if_stmt <!>
 SYNCH
@@ -914,12 +948,16 @@ SYNCH
 SYNCH
 # init_dec <int>
 SYNCH
+# init_dec <}>
+SYNCH
 # initial <,>
 initial -> <eps> 
 # initial <;>
 initial -> <eps> 
 # initial <=>
 initial -> <=> eexp 
+# initial <}>
+SYNCH
 # more <$>
 SYNCH
 # more <,>
@@ -932,6 +970,8 @@ SYNCH
 SYNCH
 # more <int>
 SYNCH
+# more <}>
+SYNCH
 # optexp <!>
 optexp -> exp 
 # optexp <(>
@@ -940,6 +980,8 @@ optexp -> exp
 optexp -> exp 
 # optexp <->
 optexp -> exp 
+# optexp <;>
+SYNCH
 # optexp <]>
 optexp -> <eps> 
 # optexp <character>
@@ -956,9 +998,13 @@ optexp -> exp
 optexp -> exp 
 # optexp <true>
 optexp -> exp 
+# optexp <}>
+SYNCH
 # param <)>
 SYNCH
 # param <,>
+SYNCH
+# param <;>
 SYNCH
 # param <bool>
 param -> type param_id 
@@ -966,24 +1012,38 @@ param -> type param_id
 param -> type param_id 
 # param <int>
 param -> type param_id 
+# param <}>
+SYNCH
 # param_id <)>
 SYNCH
 # param_id <,>
 SYNCH
+# param_id <;>
+SYNCH
 # param_id <id>
 param_id -> <id> bracket 
+# param_id <}>
+SYNCH
 # params <)>
 params -> <eps> 
+# params <;>
+SYNCH
 # params <bool>
 params -> param params2 
 # params <char>
 params -> param params2 
 # params <int>
 params -> param params2 
+# params <}>
+SYNCH
 # params2 <)>
 params2 -> <eps> 
 # params2 <,>
 params2 -> <,> param params2 
+# params2 <;>
+SYNCH
+# params2 <}>
+SYNCH
 # print_stmt <!>
 SYNCH
 # print_stmt <(>
@@ -1034,12 +1094,16 @@ SYNCH
 SYNCH
 # program <$>
 program -> dec_list 
+# program <;>
+SYNCH
 # program <bool>
 program -> dec_list 
 # program <char>
 program -> dec_list 
 # program <int>
 program -> dec_list 
+# program <}>
+SYNCH
 # return_stmt <!>
 SYNCH
 # return_stmt <(>
@@ -1190,6 +1254,8 @@ sz -> <eps>
 sz -> <eps> 
 # sz <[>
 sz -> <[> optexp <]> 
+# sz <}>
+SYNCH
 # t1 <)>
 t1 -> <eps> 
 # t1 <,>
@@ -1370,6 +1436,8 @@ type -> <char>
 SYNCH
 # type <int>
 type -> <int> 
+# type <}>
+SYNCH
 # var_dec <!>
 SYNCH
 # var_dec <(>
@@ -1432,20 +1500,28 @@ SYNCH
 SYNCH
 # var_dec_global <int>
 SYNCH
+# var_dec_global <}>
+SYNCH
 # var_dec_init <,>
 SYNCH
 # var_dec_init <;>
 SYNCH
 # var_dec_init <id>
 var_dec_init -> var_id initial 
+# var_dec_init <}>
+SYNCH
 # var_dec_list <;>
 var_dec_list -> <eps> 
 # var_dec_list <id>
 var_dec_list -> var_dec_init var_dec_list2 
+# var_dec_list <}>
+SYNCH
 # var_dec_list2 <,>
 var_dec_list2 -> <,> var_dec_init var_dec_list2 
 # var_dec_list2 <;>
 var_dec_list2 -> <eps> 
+# var_dec_list2 <}>
+SYNCH
 # var_id <,>
 SYNCH
 # var_id <;>
@@ -1454,3 +1530,5 @@ SYNCH
 SYNCH
 # var_id <id>
 var_id -> <id> sz 
+# var_id <}>
+SYNCH

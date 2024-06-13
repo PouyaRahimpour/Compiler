@@ -322,6 +322,9 @@ class LexicalAnalyzer {
                     for (int i = 0; i < NUM_KEYWORDS; i++) {
                         int sz = (int)key_words[i].size();
                         if (line.std::string::substr(index, sz) == key_words[i]) {
+                            if ((index + sz) < (int)line.size() && (std::isalnum(line[index + sz]) || line[index + sz] == '_')) {
+                                continue;
+                            }
                             index += sz;
                             state = i + 1;
                             break;

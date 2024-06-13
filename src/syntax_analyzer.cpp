@@ -160,6 +160,7 @@ class SyntaxAnalyzer {
         std::map<token_type, std::string> match;
         Tree<Variable> tree;
         bool has_par[200];
+        bool has_error;
         Variable eps;
 
         void extract(std::string line) {
@@ -450,6 +451,18 @@ class SyntaxAnalyzer {
             rule.add_to_body(Variable("else", TERMINAL));
             rule.add_to_body(Variable("stmt", VARIABLE));
             table[{Variable("else_stmt", VARIABLE), Variable("else", TERMINAL)}] = rule;
+
+            // error handeling
+            Variable semicolon = Variable(";", TERMINAL);
+            Variable closed_curly = Variable("}", TERMINAL);
+            for (auto var : variables) {
+                if (table[{var, semicolon}].get_type() != VALID) {
+                    table[{var, semicolon}] = Rule(SYNCH);
+                }
+                if (table[{var, closed_curly}].get_type() != VALID) {
+                    table[{var, closed_curly}] = Rule(SYNCH);
+                }
+            }
         }
         
         void write_table() {
@@ -574,6 +587,7 @@ class SyntaxAnalyzer {
             out_address = output_file;
             eps.set_name("eps");
             eps.set_type(TERMINAL);
+            has_error = false;
         }
 
         void update_grammar() {
@@ -637,6 +651,7 @@ class SyntaxAnalyzer {
                         std::cerr << RED << "Syntax Error: Terminals don't match, line: " << line_number << WHITE << std::endl;
                         std::cerr << RED << "Expected '" + top_var.get_name() +  "' , but found '" + term.get_name() + "' instead." << WHITE << std::endl;
                         std::cerr << "---------------------------------------------------------------" << std::endl;
+                        has_error = true;
                     }
                 } 
                 else {
@@ -654,8 +669,9 @@ class SyntaxAnalyzer {
                     } 
                     else if (rule.get_type() == SYNCH) {
                         std::cerr << RED << "Syntax Error: Synch, line: " << line_number << WHITE << std::endl;
-                        std::cerr << RED << "Synced by adding '" + top_var.get_name() + "' before" + term.get_name() + "'." << WHITE << std::endl;
+                        std::cerr << RED << "Synced by adding '" + top_var.get_name() + "' before '" + term.get_name() + "'." << WHITE << std::endl;
                         std::cerr << "---------------------------------------------------------------" << std::endl;
+                        has_error = true;
                     } 
                     else if (rule.get_type() == EMPTY) {
                         std::cerr << RED << "Syntax Error: Empty cell, line: " << line_number << WHITE << std::endl;
@@ -663,17 +679,28 @@ class SyntaxAnalyzer {
                         std::cerr << "---------------------------------------------------------------" << std::endl;
                         index++;
                         stack.push(top_node);
+                        has_error = true;
                     }
                     else {
                         std::cerr << "Unknown Error: ?, line: " << line_number << WHITE << std::endl;
                         std::cerr << "---------------------------------------------------------------" << std::endl;
+                        has_error = true;
                     }
                 }
             }
-            std::cout << "Parsed tree successfully" << std::endl;
+            if (!has_error) {
+                std::cout << "Parsed tree successfully" << std::endl;
+            }
+            else {
+                std::cout << "Parsed tree unsuccessfully" << std::endl;
+            }
         }
 
         void write() {
+            if (has_error) {
+                return;
+            }
+
             out.open(out_address);
             if (!out.is_open()) {
                 std::cerr << RED << "File Error: Couldn't open output file" << WHITE << std::endl;
