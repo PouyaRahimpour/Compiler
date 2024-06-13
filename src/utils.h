@@ -233,24 +233,24 @@ class Tree {
         void print_tree(Node<T>* node, int num = 0, bool last = false) {
             T var = node->get_data();
 
+            for (int i = 0; i < num * 4 - 4; i++) {
+                if (has_par[i]) {
+                    std::cout << "│";
+                }
+                else {
+                    std::cout << " ";
+                }
+            }
+            if (num) {
+                if (last) {
+                    std::cout << "└── ";
+                }
+                else {
+                    std::cout << "├── ";
+                }
+            }
+            std::cout << var << std::endl;
             if (node->get_content() != "") {
-                for (int i = 0; i < num * 4 - 4; i++) {
-                    if (has_par[i]) {
-                        std::cout << "│";
-                    }
-                    else {
-                        std::cout << " ";
-                    }
-                }
-                if (num) {
-                    if (last) {
-                        std::cout << "└── ";
-                    }
-                    else {
-                        std::cout << "├── ";
-                    }
-                }
-                std::cout << "<" << var << ">" << std::endl;
                 for (int i = 0; i < num * 4; i++) {
                     if (has_par[i]) {
                         std::cout << "│";
@@ -260,30 +260,6 @@ class Tree {
                     }
                 }
                 std::cout << "└── '" << node->get_content() << "'" << std::endl;
-            }
-            else {
-                for (int i = 0; i < num * 4 - 4; i++) {
-                    if (has_par[i]) {
-                        std::cout << "│";
-                    }
-                    else {
-                        std::cout << " ";
-                    }
-                }
-                if (num) {
-                    if (last) {
-                        std::cout << "└── ";
-                    }
-                    else {
-                        std::cout << "├── ";
-                    }
-                }
-                if (var.get_name() == "eps") {
-                    std::cout << "'" << var << "'" << std::endl;
-                }
-                else {
-                    std::cout << var << std::endl;
-                }
             }
 
             has_par[num * 4] = true;

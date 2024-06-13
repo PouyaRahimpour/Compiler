@@ -11,10 +11,7 @@ int main(int argc, char* argv[]) {
 
     // TODO add option for update grammar
     SyntaxAnalyzer syn_analyzer(lex_analyzer.get_tokens(), output_file_name);
-    if (1) {
-        syn_analyzer.update_grammar();
-    }
-    syn_analyzer.make_tree();
+    syn_analyzer.make_tree(UPDATE_GRAMMAR);
     syn_analyzer.write();
     
     // SemanticAnalyzer

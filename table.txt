@@ -1,0 +1,1456 @@
+# bracket <)>
+bracket -> <eps> 
+# bracket <,>
+bracket -> <eps> 
+# bracket <[>
+bracket -> <[> <]> 
+# break_stmt <!>
+SYNCH
+# break_stmt <(>
+SYNCH
+# break_stmt <+>
+SYNCH
+# break_stmt <->
+SYNCH
+# break_stmt <;>
+SYNCH
+# break_stmt <bool>
+SYNCH
+# break_stmt <break>
+break_stmt -> <break> <;> 
+# break_stmt <char>
+SYNCH
+# break_stmt <character>
+SYNCH
+# break_stmt <continue>
+SYNCH
+# break_stmt <decimal>
+SYNCH
+# break_stmt <else>
+SYNCH
+# break_stmt <false>
+SYNCH
+# break_stmt <for>
+SYNCH
+# break_stmt <hexadecimal>
+SYNCH
+# break_stmt <id>
+SYNCH
+# break_stmt <if>
+SYNCH
+# break_stmt <int>
+SYNCH
+# break_stmt <print>
+SYNCH
+# break_stmt <return>
+SYNCH
+# break_stmt <string>
+SYNCH
+# break_stmt <true>
+SYNCH
+# break_stmt <{>
+SYNCH
+# break_stmt <}>
+SYNCH
+# constant <!=>
+SYNCH
+# constant <%>
+SYNCH
+# constant <&&>
+SYNCH
+# constant <)>
+SYNCH
+# constant <*>
+SYNCH
+# constant <+>
+SYNCH
+# constant <,>
+SYNCH
+# constant <->
+SYNCH
+# constant </>
+SYNCH
+# constant <;>
+SYNCH
+# constant <<>
+SYNCH
+# constant <<=>
+SYNCH
+# constant <=>
+SYNCH
+# constant <==>
+SYNCH
+# constant <>>
+SYNCH
+# constant <>=>
+SYNCH
+# constant <]>
+SYNCH
+# constant <character>
+constant -> <character> 
+# constant <decimal>
+constant -> <decimal> 
+# constant <false>
+constant -> <false> 
+# constant <hexadecimal>
+constant -> <hexadecimal> 
+# constant <id>
+constant -> <id> ebracket 
+# constant <string>
+constant -> <string> 
+# constant <true>
+constant -> <true> 
+# constant <||>
+SYNCH
+# constant <}>
+SYNCH
+# context <)>
+SYNCH
+# context <string>
+context -> <string> context2 
+# context2 <)>
+context2 -> <eps> 
+# context2 <,>
+context2 -> <,> exp context2 
+# continue_stmt <!>
+SYNCH
+# continue_stmt <(>
+SYNCH
+# continue_stmt <+>
+SYNCH
+# continue_stmt <->
+SYNCH
+# continue_stmt <;>
+SYNCH
+# continue_stmt <bool>
+SYNCH
+# continue_stmt <break>
+SYNCH
+# continue_stmt <char>
+SYNCH
+# continue_stmt <character>
+SYNCH
+# continue_stmt <continue>
+continue_stmt -> <continue> <;> 
+# continue_stmt <decimal>
+SYNCH
+# continue_stmt <else>
+SYNCH
+# continue_stmt <false>
+SYNCH
+# continue_stmt <for>
+SYNCH
+# continue_stmt <hexadecimal>
+SYNCH
+# continue_stmt <id>
+SYNCH
+# continue_stmt <if>
+SYNCH
+# continue_stmt <int>
+SYNCH
+# continue_stmt <print>
+SYNCH
+# continue_stmt <return>
+SYNCH
+# continue_stmt <string>
+SYNCH
+# continue_stmt <true>
+SYNCH
+# continue_stmt <{>
+SYNCH
+# continue_stmt <}>
+SYNCH
+# dec <$>
+SYNCH
+# dec <bool>
+dec -> type <id> init_dec 
+# dec <char>
+dec -> type <id> init_dec 
+# dec <int>
+dec -> type <id> init_dec 
+# dec_list <$>
+dec_list -> <eps> 
+# dec_list <bool>
+dec_list -> dec dec_list 
+# dec_list <char>
+dec_list -> dec dec_list 
+# dec_list <int>
+dec_list -> dec dec_list 
+# ebracket <!=>
+ebracket -> <eps> 
+# ebracket <%>
+ebracket -> <eps> 
+# ebracket <&&>
+ebracket -> <eps> 
+# ebracket <)>
+ebracket -> <eps> 
+# ebracket <*>
+ebracket -> <eps> 
+# ebracket <+>
+ebracket -> <eps> 
+# ebracket <,>
+ebracket -> <eps> 
+# ebracket <->
+ebracket -> <eps> 
+# ebracket </>
+ebracket -> <eps> 
+# ebracket <;>
+ebracket -> <eps> 
+# ebracket <<>
+ebracket -> <eps> 
+# ebracket <<=>
+ebracket -> <eps> 
+# ebracket <=>
+ebracket -> <eps> 
+# ebracket <==>
+ebracket -> <eps> 
+# ebracket <>>
+ebracket -> <eps> 
+# ebracket <>=>
+ebracket -> <eps> 
+# ebracket <[>
+ebracket -> <[> exp <]> 
+# ebracket <]>
+ebracket -> <eps> 
+# ebracket <||>
+ebracket -> <eps> 
+# ebracket <}>
+ebracket -> <eps> 
+# eexp <!>
+eexp -> exp 
+# eexp <(>
+eexp -> exp 
+# eexp <+>
+eexp -> exp 
+# eexp <,>
+SYNCH
+# eexp <->
+eexp -> exp 
+# eexp <;>
+SYNCH
+# eexp <character>
+eexp -> exp 
+# eexp <decimal>
+eexp -> exp 
+# eexp <false>
+eexp -> exp 
+# eexp <hexadecimal>
+eexp -> exp 
+# eexp <id>
+eexp -> exp 
+# eexp <string>
+eexp -> exp 
+# eexp <true>
+eexp -> exp 
+# eexp <{>
+eexp -> <{> exp_list <}> 
+# else_stmt <!>
+else_stmt -> <eps> 
+# else_stmt <(>
+else_stmt -> <eps> 
+# else_stmt <+>
+else_stmt -> <eps> 
+# else_stmt <->
+else_stmt -> <eps> 
+# else_stmt <;>
+else_stmt -> <eps> 
+# else_stmt <bool>
+else_stmt -> <eps> 
+# else_stmt <break>
+else_stmt -> <eps> 
+# else_stmt <char>
+else_stmt -> <eps> 
+# else_stmt <character>
+else_stmt -> <eps> 
+# else_stmt <continue>
+else_stmt -> <eps> 
+# else_stmt <decimal>
+else_stmt -> <eps> 
+# else_stmt <else>
+else_stmt -> <else> stmt 
+# else_stmt <false>
+else_stmt -> <eps> 
+# else_stmt <for>
+else_stmt -> <eps> 
+# else_stmt <hexadecimal>
+else_stmt -> <eps> 
+# else_stmt <id>
+else_stmt -> <eps> 
+# else_stmt <if>
+else_stmt -> <eps> 
+# else_stmt <int>
+else_stmt -> <eps> 
+# else_stmt <print>
+else_stmt -> <eps> 
+# else_stmt <return>
+else_stmt -> <eps> 
+# else_stmt <string>
+else_stmt -> <eps> 
+# else_stmt <true>
+else_stmt -> <eps> 
+# else_stmt <{>
+else_stmt -> <eps> 
+# else_stmt <}>
+else_stmt -> <eps> 
+# exp <!>
+exp -> exp1 t1 
+# exp <(>
+exp -> exp1 t1 
+# exp <)>
+SYNCH
+# exp <+>
+exp -> exp1 t1 
+# exp <,>
+SYNCH
+# exp <->
+exp -> exp1 t1 
+# exp <;>
+SYNCH
+# exp <]>
+SYNCH
+# exp <character>
+exp -> exp1 t1 
+# exp <decimal>
+exp -> exp1 t1 
+# exp <false>
+exp -> exp1 t1 
+# exp <hexadecimal>
+exp -> exp1 t1 
+# exp <id>
+exp -> exp1 t1 
+# exp <string>
+exp -> exp1 t1 
+# exp <true>
+exp -> exp1 t1 
+# exp <}>
+SYNCH
+# exp1 <!>
+exp1 -> exp2 t2 
+# exp1 <(>
+exp1 -> exp2 t2 
+# exp1 <)>
+SYNCH
+# exp1 <+>
+exp1 -> exp2 t2 
+# exp1 <,>
+SYNCH
+# exp1 <->
+exp1 -> exp2 t2 
+# exp1 <;>
+SYNCH
+# exp1 <]>
+SYNCH
+# exp1 <character>
+exp1 -> exp2 t2 
+# exp1 <decimal>
+exp1 -> exp2 t2 
+# exp1 <false>
+exp1 -> exp2 t2 
+# exp1 <hexadecimal>
+exp1 -> exp2 t2 
+# exp1 <id>
+exp1 -> exp2 t2 
+# exp1 <string>
+exp1 -> exp2 t2 
+# exp1 <true>
+exp1 -> exp2 t2 
+# exp1 <}>
+SYNCH
+# exp2 <!>
+exp2 -> exp3 t3 
+# exp2 <(>
+exp2 -> exp3 t3 
+# exp2 <)>
+SYNCH
+# exp2 <+>
+exp2 -> exp3 t3 
+# exp2 <,>
+SYNCH
+# exp2 <->
+exp2 -> exp3 t3 
+# exp2 <;>
+SYNCH
+# exp2 <=>
+SYNCH
+# exp2 <]>
+SYNCH
+# exp2 <character>
+exp2 -> exp3 t3 
+# exp2 <decimal>
+exp2 -> exp3 t3 
+# exp2 <false>
+exp2 -> exp3 t3 
+# exp2 <hexadecimal>
+exp2 -> exp3 t3 
+# exp2 <id>
+exp2 -> exp3 t3 
+# exp2 <string>
+exp2 -> exp3 t3 
+# exp2 <true>
+exp2 -> exp3 t3 
+# exp2 <}>
+SYNCH
+# exp3 <!>
+exp3 -> exp4 t4 
+# exp3 <(>
+exp3 -> exp4 t4 
+# exp3 <)>
+SYNCH
+# exp3 <+>
+exp3 -> exp4 t4 
+# exp3 <,>
+SYNCH
+# exp3 <->
+exp3 -> exp4 t4 
+# exp3 <;>
+SYNCH
+# exp3 <=>
+SYNCH
+# exp3 <]>
+SYNCH
+# exp3 <character>
+exp3 -> exp4 t4 
+# exp3 <decimal>
+exp3 -> exp4 t4 
+# exp3 <false>
+exp3 -> exp4 t4 
+# exp3 <hexadecimal>
+exp3 -> exp4 t4 
+# exp3 <id>
+exp3 -> exp4 t4 
+# exp3 <string>
+exp3 -> exp4 t4 
+# exp3 <true>
+exp3 -> exp4 t4 
+# exp3 <||>
+SYNCH
+# exp3 <}>
+SYNCH
+# exp4 <!>
+exp4 -> exp5 t5 
+# exp4 <&&>
+SYNCH
+# exp4 <(>
+exp4 -> exp5 t5 
+# exp4 <)>
+SYNCH
+# exp4 <+>
+exp4 -> exp5 t5 
+# exp4 <,>
+SYNCH
+# exp4 <->
+exp4 -> exp5 t5 
+# exp4 <;>
+SYNCH
+# exp4 <=>
+SYNCH
+# exp4 <]>
+SYNCH
+# exp4 <character>
+exp4 -> exp5 t5 
+# exp4 <decimal>
+exp4 -> exp5 t5 
+# exp4 <false>
+exp4 -> exp5 t5 
+# exp4 <hexadecimal>
+exp4 -> exp5 t5 
+# exp4 <id>
+exp4 -> exp5 t5 
+# exp4 <string>
+exp4 -> exp5 t5 
+# exp4 <true>
+exp4 -> exp5 t5 
+# exp4 <||>
+SYNCH
+# exp4 <}>
+SYNCH
+# exp5 <!>
+exp5 -> exp6 t6 
+# exp5 <!=>
+SYNCH
+# exp5 <&&>
+SYNCH
+# exp5 <(>
+exp5 -> exp6 t6 
+# exp5 <)>
+SYNCH
+# exp5 <+>
+exp5 -> exp6 t6 
+# exp5 <,>
+SYNCH
+# exp5 <->
+exp5 -> exp6 t6 
+# exp5 <;>
+SYNCH
+# exp5 <=>
+SYNCH
+# exp5 <==>
+SYNCH
+# exp5 <]>
+SYNCH
+# exp5 <character>
+exp5 -> exp6 t6 
+# exp5 <decimal>
+exp5 -> exp6 t6 
+# exp5 <false>
+exp5 -> exp6 t6 
+# exp5 <hexadecimal>
+exp5 -> exp6 t6 
+# exp5 <id>
+exp5 -> exp6 t6 
+# exp5 <string>
+exp5 -> exp6 t6 
+# exp5 <true>
+exp5 -> exp6 t6 
+# exp5 <||>
+SYNCH
+# exp5 <}>
+SYNCH
+# exp6 <!>
+exp6 -> exp7 t7 
+# exp6 <!=>
+SYNCH
+# exp6 <&&>
+SYNCH
+# exp6 <(>
+exp6 -> exp7 t7 
+# exp6 <)>
+SYNCH
+# exp6 <+>
+exp6 -> exp7 t7 
+# exp6 <,>
+SYNCH
+# exp6 <->
+exp6 -> exp7 t7 
+# exp6 <;>
+SYNCH
+# exp6 <<>
+SYNCH
+# exp6 <<=>
+SYNCH
+# exp6 <=>
+SYNCH
+# exp6 <==>
+SYNCH
+# exp6 <>>
+SYNCH
+# exp6 <>=>
+SYNCH
+# exp6 <]>
+SYNCH
+# exp6 <character>
+exp6 -> exp7 t7 
+# exp6 <decimal>
+exp6 -> exp7 t7 
+# exp6 <false>
+exp6 -> exp7 t7 
+# exp6 <hexadecimal>
+exp6 -> exp7 t7 
+# exp6 <id>
+exp6 -> exp7 t7 
+# exp6 <string>
+exp6 -> exp7 t7 
+# exp6 <true>
+exp6 -> exp7 t7 
+# exp6 <||>
+SYNCH
+# exp6 <}>
+SYNCH
+# exp7 <!>
+exp7 -> exp8 t8 
+# exp7 <!=>
+SYNCH
+# exp7 <&&>
+SYNCH
+# exp7 <(>
+exp7 -> exp8 t8 
+# exp7 <)>
+SYNCH
+# exp7 <+>
+exp7 -> exp8 t8 
+# exp7 <,>
+SYNCH
+# exp7 <->
+exp7 -> exp8 t8 
+# exp7 <;>
+SYNCH
+# exp7 <<>
+SYNCH
+# exp7 <<=>
+SYNCH
+# exp7 <=>
+SYNCH
+# exp7 <==>
+SYNCH
+# exp7 <>>
+SYNCH
+# exp7 <>=>
+SYNCH
+# exp7 <]>
+SYNCH
+# exp7 <character>
+exp7 -> exp8 t8 
+# exp7 <decimal>
+exp7 -> exp8 t8 
+# exp7 <false>
+exp7 -> exp8 t8 
+# exp7 <hexadecimal>
+exp7 -> exp8 t8 
+# exp7 <id>
+exp7 -> exp8 t8 
+# exp7 <string>
+exp7 -> exp8 t8 
+# exp7 <true>
+exp7 -> exp8 t8 
+# exp7 <||>
+SYNCH
+# exp7 <}>
+SYNCH
+# exp8 <!>
+exp8 -> <!> exp9 
+# exp8 <!=>
+SYNCH
+# exp8 <%>
+SYNCH
+# exp8 <&&>
+SYNCH
+# exp8 <(>
+exp8 -> exp9 
+# exp8 <)>
+SYNCH
+# exp8 <*>
+SYNCH
+# exp8 <+>
+exp8 -> <+> exp9 
+# exp8 <,>
+SYNCH
+# exp8 <->
+exp8 -> <-> exp9 
+# exp8 </>
+SYNCH
+# exp8 <;>
+SYNCH
+# exp8 <<>
+SYNCH
+# exp8 <<=>
+SYNCH
+# exp8 <=>
+SYNCH
+# exp8 <==>
+SYNCH
+# exp8 <>>
+SYNCH
+# exp8 <>=>
+SYNCH
+# exp8 <]>
+SYNCH
+# exp8 <character>
+exp8 -> exp9 
+# exp8 <decimal>
+exp8 -> exp9 
+# exp8 <false>
+exp8 -> exp9 
+# exp8 <hexadecimal>
+exp8 -> exp9 
+# exp8 <id>
+exp8 -> exp9 
+# exp8 <string>
+exp8 -> exp9 
+# exp8 <true>
+exp8 -> exp9 
+# exp8 <||>
+SYNCH
+# exp8 <}>
+SYNCH
+# exp9 <!=>
+SYNCH
+# exp9 <%>
+SYNCH
+# exp9 <&&>
+SYNCH
+# exp9 <(>
+exp9 -> <(> exp <)> 
+# exp9 <)>
+SYNCH
+# exp9 <*>
+SYNCH
+# exp9 <+>
+SYNCH
+# exp9 <,>
+SYNCH
+# exp9 <->
+SYNCH
+# exp9 </>
+SYNCH
+# exp9 <;>
+SYNCH
+# exp9 <<>
+SYNCH
+# exp9 <<=>
+SYNCH
+# exp9 <=>
+SYNCH
+# exp9 <==>
+SYNCH
+# exp9 <>>
+SYNCH
+# exp9 <>=>
+SYNCH
+# exp9 <]>
+SYNCH
+# exp9 <character>
+exp9 -> constant 
+# exp9 <decimal>
+exp9 -> constant 
+# exp9 <false>
+exp9 -> constant 
+# exp9 <hexadecimal>
+exp9 -> constant 
+# exp9 <id>
+exp9 -> constant 
+# exp9 <string>
+exp9 -> constant 
+# exp9 <true>
+exp9 -> constant 
+# exp9 <||>
+SYNCH
+# exp9 <}>
+SYNCH
+# exp_list <!>
+exp_list -> exp exp_list2 
+# exp_list <(>
+exp_list -> exp exp_list2 
+# exp_list <+>
+exp_list -> exp exp_list2 
+# exp_list <->
+exp_list -> exp exp_list2 
+# exp_list <character>
+exp_list -> exp exp_list2 
+# exp_list <decimal>
+exp_list -> exp exp_list2 
+# exp_list <false>
+exp_list -> exp exp_list2 
+# exp_list <hexadecimal>
+exp_list -> exp exp_list2 
+# exp_list <id>
+exp_list -> exp exp_list2 
+# exp_list <string>
+exp_list -> exp exp_list2 
+# exp_list <true>
+exp_list -> exp exp_list2 
+# exp_list <}>
+exp_list -> <eps> 
+# exp_list2 <,>
+exp_list2 -> <,> exp exp_list2 
+# exp_list2 <}>
+exp_list2 -> <eps> 
+# expr_stmt <!>
+expr_stmt -> exp <;> 
+# expr_stmt <(>
+expr_stmt -> exp <;> 
+# expr_stmt <+>
+expr_stmt -> exp <;> 
+# expr_stmt <->
+expr_stmt -> exp <;> 
+# expr_stmt <;>
+SYNCH
+# expr_stmt <bool>
+SYNCH
+# expr_stmt <break>
+SYNCH
+# expr_stmt <char>
+SYNCH
+# expr_stmt <character>
+expr_stmt -> exp <;> 
+# expr_stmt <continue>
+SYNCH
+# expr_stmt <decimal>
+expr_stmt -> exp <;> 
+# expr_stmt <else>
+SYNCH
+# expr_stmt <false>
+expr_stmt -> exp <;> 
+# expr_stmt <for>
+SYNCH
+# expr_stmt <hexadecimal>
+expr_stmt -> exp <;> 
+# expr_stmt <id>
+expr_stmt -> exp <;> 
+# expr_stmt <if>
+SYNCH
+# expr_stmt <int>
+SYNCH
+# expr_stmt <print>
+SYNCH
+# expr_stmt <return>
+SYNCH
+# expr_stmt <string>
+expr_stmt -> exp <;> 
+# expr_stmt <true>
+expr_stmt -> exp <;> 
+# expr_stmt <{>
+SYNCH
+# expr_stmt <}>
+SYNCH
+# for_stmt <!>
+SYNCH
+# for_stmt <(>
+SYNCH
+# for_stmt <+>
+SYNCH
+# for_stmt <->
+SYNCH
+# for_stmt <;>
+SYNCH
+# for_stmt <bool>
+SYNCH
+# for_stmt <break>
+SYNCH
+# for_stmt <char>
+SYNCH
+# for_stmt <character>
+SYNCH
+# for_stmt <continue>
+SYNCH
+# for_stmt <decimal>
+SYNCH
+# for_stmt <else>
+SYNCH
+# for_stmt <false>
+SYNCH
+# for_stmt <for>
+for_stmt -> <for> <(> var_dec exp <;> exp <)> stmt 
+# for_stmt <hexadecimal>
+SYNCH
+# for_stmt <id>
+SYNCH
+# for_stmt <if>
+SYNCH
+# for_stmt <int>
+SYNCH
+# for_stmt <print>
+SYNCH
+# for_stmt <return>
+SYNCH
+# for_stmt <string>
+SYNCH
+# for_stmt <true>
+SYNCH
+# for_stmt <{>
+SYNCH
+# for_stmt <}>
+SYNCH
+# func_dec <$>
+SYNCH
+# func_dec <(>
+func_dec -> <(> params <)> <{> stmt_list <}> 
+# func_dec <bool>
+SYNCH
+# func_dec <char>
+SYNCH
+# func_dec <int>
+SYNCH
+# if_stmt <!>
+SYNCH
+# if_stmt <(>
+SYNCH
+# if_stmt <+>
+SYNCH
+# if_stmt <->
+SYNCH
+# if_stmt <;>
+SYNCH
+# if_stmt <bool>
+SYNCH
+# if_stmt <break>
+SYNCH
+# if_stmt <char>
+SYNCH
+# if_stmt <character>
+SYNCH
+# if_stmt <continue>
+SYNCH
+# if_stmt <decimal>
+SYNCH
+# if_stmt <else>
+SYNCH
+# if_stmt <false>
+SYNCH
+# if_stmt <for>
+SYNCH
+# if_stmt <hexadecimal>
+SYNCH
+# if_stmt <id>
+SYNCH
+# if_stmt <if>
+if_stmt -> <if> <(> exp <)> stmt else_stmt 
+# if_stmt <int>
+SYNCH
+# if_stmt <print>
+SYNCH
+# if_stmt <return>
+SYNCH
+# if_stmt <string>
+SYNCH
+# if_stmt <true>
+SYNCH
+# if_stmt <{>
+SYNCH
+# if_stmt <}>
+SYNCH
+# init_dec <$>
+SYNCH
+# init_dec <(>
+init_dec -> func_dec 
+# init_dec <,>
+init_dec -> var_dec_global 
+# init_dec <;>
+init_dec -> var_dec_global 
+# init_dec <[>
+init_dec -> var_dec_global 
+# init_dec <bool>
+SYNCH
+# init_dec <char>
+SYNCH
+# init_dec <int>
+SYNCH
+# initial <,>
+initial -> <eps> 
+# initial <;>
+initial -> <eps> 
+# initial <=>
+initial -> <=> eexp 
+# more <$>
+SYNCH
+# more <,>
+more -> , var_dec_list <;> 
+# more <;>
+more -> <;> 
+# more <bool>
+SYNCH
+# more <char>
+SYNCH
+# more <int>
+SYNCH
+# optexp <!>
+optexp -> exp 
+# optexp <(>
+optexp -> exp 
+# optexp <+>
+optexp -> exp 
+# optexp <->
+optexp -> exp 
+# optexp <]>
+optexp -> <eps> 
+# optexp <character>
+optexp -> exp 
+# optexp <decimal>
+optexp -> exp 
+# optexp <false>
+optexp -> exp 
+# optexp <hexadecimal>
+optexp -> exp 
+# optexp <id>
+optexp -> exp 
+# optexp <string>
+optexp -> exp 
+# optexp <true>
+optexp -> exp 
+# param <)>
+SYNCH
+# param <,>
+SYNCH
+# param <bool>
+param -> type param_id 
+# param <char>
+param -> type param_id 
+# param <int>
+param -> type param_id 
+# param_id <)>
+SYNCH
+# param_id <,>
+SYNCH
+# param_id <id>
+param_id -> <id> bracket 
+# params <)>
+params -> <eps> 
+# params <bool>
+params -> param params2 
+# params <char>
+params -> param params2 
+# params <int>
+params -> param params2 
+# params2 <)>
+params2 -> <eps> 
+# params2 <,>
+params2 -> <,> param params2 
+# print_stmt <!>
+SYNCH
+# print_stmt <(>
+SYNCH
+# print_stmt <+>
+SYNCH
+# print_stmt <->
+SYNCH
+# print_stmt <;>
+SYNCH
+# print_stmt <bool>
+SYNCH
+# print_stmt <break>
+SYNCH
+# print_stmt <char>
+SYNCH
+# print_stmt <character>
+SYNCH
+# print_stmt <continue>
+SYNCH
+# print_stmt <decimal>
+SYNCH
+# print_stmt <else>
+SYNCH
+# print_stmt <false>
+SYNCH
+# print_stmt <for>
+SYNCH
+# print_stmt <hexadecimal>
+SYNCH
+# print_stmt <id>
+SYNCH
+# print_stmt <if>
+SYNCH
+# print_stmt <int>
+SYNCH
+# print_stmt <print>
+print_stmt -> <print> <(> context <)> <;> 
+# print_stmt <return>
+SYNCH
+# print_stmt <string>
+SYNCH
+# print_stmt <true>
+SYNCH
+# print_stmt <{>
+SYNCH
+# print_stmt <}>
+SYNCH
+# program <$>
+program -> dec_list 
+# program <bool>
+program -> dec_list 
+# program <char>
+program -> dec_list 
+# program <int>
+program -> dec_list 
+# return_stmt <!>
+SYNCH
+# return_stmt <(>
+SYNCH
+# return_stmt <+>
+SYNCH
+# return_stmt <->
+SYNCH
+# return_stmt <;>
+SYNCH
+# return_stmt <bool>
+SYNCH
+# return_stmt <break>
+SYNCH
+# return_stmt <char>
+SYNCH
+# return_stmt <character>
+SYNCH
+# return_stmt <continue>
+SYNCH
+# return_stmt <decimal>
+SYNCH
+# return_stmt <else>
+SYNCH
+# return_stmt <false>
+SYNCH
+# return_stmt <for>
+SYNCH
+# return_stmt <hexadecimal>
+SYNCH
+# return_stmt <id>
+SYNCH
+# return_stmt <if>
+SYNCH
+# return_stmt <int>
+SYNCH
+# return_stmt <print>
+SYNCH
+# return_stmt <return>
+return_stmt -> <return> exp <;> 
+# return_stmt <string>
+SYNCH
+# return_stmt <true>
+SYNCH
+# return_stmt <{>
+SYNCH
+# return_stmt <}>
+SYNCH
+# stmt <!>
+stmt -> expr_stmt 
+# stmt <(>
+stmt -> expr_stmt 
+# stmt <+>
+stmt -> expr_stmt 
+# stmt <->
+stmt -> expr_stmt 
+# stmt <;>
+stmt -> <;> 
+# stmt <bool>
+stmt -> var_dec 
+# stmt <break>
+stmt -> break_stmt 
+# stmt <char>
+stmt -> var_dec 
+# stmt <character>
+stmt -> expr_stmt 
+# stmt <continue>
+stmt -> continue_stmt 
+# stmt <decimal>
+stmt -> expr_stmt 
+# stmt <else>
+SYNCH
+# stmt <false>
+stmt -> expr_stmt 
+# stmt <for>
+stmt -> for_stmt 
+# stmt <hexadecimal>
+stmt -> expr_stmt 
+# stmt <id>
+stmt -> expr_stmt 
+# stmt <if>
+stmt -> if_stmt 
+# stmt <int>
+stmt -> var_dec 
+# stmt <print>
+stmt -> print_stmt 
+# stmt <return>
+stmt -> return_stmt 
+# stmt <string>
+stmt -> expr_stmt 
+# stmt <true>
+stmt -> expr_stmt 
+# stmt <{>
+stmt -> <{> stmt_list <}> 
+# stmt <}>
+SYNCH
+# stmt_list <!>
+stmt_list -> stmt stmt_list 
+# stmt_list <(>
+stmt_list -> stmt stmt_list 
+# stmt_list <+>
+stmt_list -> stmt stmt_list 
+# stmt_list <->
+stmt_list -> stmt stmt_list 
+# stmt_list <;>
+stmt_list -> stmt stmt_list 
+# stmt_list <bool>
+stmt_list -> stmt stmt_list 
+# stmt_list <break>
+stmt_list -> stmt stmt_list 
+# stmt_list <char>
+stmt_list -> stmt stmt_list 
+# stmt_list <character>
+stmt_list -> stmt stmt_list 
+# stmt_list <continue>
+stmt_list -> stmt stmt_list 
+# stmt_list <decimal>
+stmt_list -> stmt stmt_list 
+# stmt_list <false>
+stmt_list -> stmt stmt_list 
+# stmt_list <for>
+stmt_list -> stmt stmt_list 
+# stmt_list <hexadecimal>
+stmt_list -> stmt stmt_list 
+# stmt_list <id>
+stmt_list -> stmt stmt_list 
+# stmt_list <if>
+stmt_list -> stmt stmt_list 
+# stmt_list <int>
+stmt_list -> stmt stmt_list 
+# stmt_list <print>
+stmt_list -> stmt stmt_list 
+# stmt_list <return>
+stmt_list -> stmt stmt_list 
+# stmt_list <string>
+stmt_list -> stmt stmt_list 
+# stmt_list <true>
+stmt_list -> stmt stmt_list 
+# stmt_list <{>
+stmt_list -> stmt stmt_list 
+# stmt_list <}>
+stmt_list -> <eps> 
+# sz <,>
+sz -> <eps> 
+# sz <;>
+sz -> <eps> 
+# sz <=>
+sz -> <eps> 
+# sz <[>
+sz -> <[> optexp <]> 
+# t1 <)>
+t1 -> <eps> 
+# t1 <,>
+t1 -> <eps> 
+# t1 <;>
+t1 -> <eps> 
+# t1 <]>
+t1 -> <eps> 
+# t1 <}>
+t1 -> <eps> 
+# t2 <)>
+t2 -> <eps> 
+# t2 <,>
+t2 -> <eps> 
+# t2 <;>
+t2 -> <eps> 
+# t2 <=>
+t2 -> <=> exp1 
+# t2 <]>
+t2 -> <eps> 
+# t2 <}>
+t2 -> <eps> 
+# t3 <)>
+t3 -> <eps> 
+# t3 <,>
+t3 -> <eps> 
+# t3 <;>
+t3 -> <eps> 
+# t3 <=>
+t3 -> <eps> 
+# t3 <]>
+t3 -> <eps> 
+# t3 <||>
+t3 -> <||> exp3 t3 
+# t3 <}>
+t3 -> <eps> 
+# t4 <&&>
+t4 -> <&&> exp4 t4 
+# t4 <)>
+t4 -> <eps> 
+# t4 <,>
+t4 -> <eps> 
+# t4 <;>
+t4 -> <eps> 
+# t4 <=>
+t4 -> <eps> 
+# t4 <]>
+t4 -> <eps> 
+# t4 <||>
+t4 -> <eps> 
+# t4 <}>
+t4 -> <eps> 
+# t5 <!=>
+t5 -> <!=> exp5 t5 
+# t5 <&&>
+t5 -> <eps> 
+# t5 <)>
+t5 -> <eps> 
+# t5 <,>
+t5 -> <eps> 
+# t5 <;>
+t5 -> <eps> 
+# t5 <=>
+t5 -> <eps> 
+# t5 <==>
+t5 -> <==> exp5 t5 
+# t5 <]>
+t5 -> <eps> 
+# t5 <||>
+t5 -> <eps> 
+# t5 <}>
+t5 -> <eps> 
+# t6 <!=>
+t6 -> <eps> 
+# t6 <&&>
+t6 -> <eps> 
+# t6 <)>
+t6 -> <eps> 
+# t6 <,>
+t6 -> <eps> 
+# t6 <;>
+t6 -> <eps> 
+# t6 <<>
+t6 -> <<> exp6 t6 
+# t6 <<=>
+t6 -> <<=> exp6 t6 
+# t6 <=>
+t6 -> <eps> 
+# t6 <==>
+t6 -> <eps> 
+# t6 <>>
+t6 -> <>> exp6 t6 
+# t6 <>=>
+t6 -> <>=> exp6 t6 
+# t6 <]>
+t6 -> <eps> 
+# t6 <||>
+t6 -> <eps> 
+# t6 <}>
+t6 -> <eps> 
+# t7 <!=>
+t7 -> <eps> 
+# t7 <&&>
+t7 -> <eps> 
+# t7 <)>
+t7 -> <eps> 
+# t7 <+>
+t7 -> <+> exp7 t7 
+# t7 <,>
+t7 -> <eps> 
+# t7 <->
+t7 -> <-> exp7 t7 
+# t7 <;>
+t7 -> <eps> 
+# t7 <<>
+t7 -> <eps> 
+# t7 <<=>
+t7 -> <eps> 
+# t7 <=>
+t7 -> <eps> 
+# t7 <==>
+t7 -> <eps> 
+# t7 <>>
+t7 -> <eps> 
+# t7 <>=>
+t7 -> <eps> 
+# t7 <]>
+t7 -> <eps> 
+# t7 <||>
+t7 -> <eps> 
+# t7 <}>
+t7 -> <eps> 
+# t8 <!=>
+t8 -> <eps> 
+# t8 <%>
+t8 -> <%> exp8 t8 
+# t8 <&&>
+t8 -> <eps> 
+# t8 <)>
+t8 -> <eps> 
+# t8 <*>
+t8 -> <*> exp8 t8 
+# t8 <+>
+t8 -> <eps> 
+# t8 <,>
+t8 -> <eps> 
+# t8 <->
+t8 -> <eps> 
+# t8 </>
+t8 -> </> exp8 t8 
+# t8 <;>
+t8 -> <eps> 
+# t8 <<>
+t8 -> <eps> 
+# t8 <<=>
+t8 -> <eps> 
+# t8 <=>
+t8 -> <eps> 
+# t8 <==>
+t8 -> <eps> 
+# t8 <>>
+t8 -> <eps> 
+# t8 <>=>
+t8 -> <eps> 
+# t8 <]>
+t8 -> <eps> 
+# t8 <||>
+t8 -> <eps> 
+# t8 <}>
+t8 -> <eps> 
+# type <;>
+SYNCH
+# type <bool>
+type -> <bool> 
+# type <char>
+type -> <char> 
+# type <id>
+SYNCH
+# type <int>
+type -> <int> 
+# var_dec <!>
+SYNCH
+# var_dec <(>
+SYNCH
+# var_dec <+>
+SYNCH
+# var_dec <->
+SYNCH
+# var_dec <;>
+var_dec -> <;> 
+# var_dec <bool>
+var_dec -> type var_dec_list <;> 
+# var_dec <break>
+SYNCH
+# var_dec <char>
+var_dec -> type var_dec_list <;> 
+# var_dec <character>
+SYNCH
+# var_dec <continue>
+SYNCH
+# var_dec <decimal>
+SYNCH
+# var_dec <else>
+SYNCH
+# var_dec <false>
+SYNCH
+# var_dec <for>
+SYNCH
+# var_dec <hexadecimal>
+SYNCH
+# var_dec <id>
+SYNCH
+# var_dec <if>
+SYNCH
+# var_dec <int>
+var_dec -> type var_dec_list <;> 
+# var_dec <print>
+SYNCH
+# var_dec <return>
+SYNCH
+# var_dec <string>
+SYNCH
+# var_dec <true>
+SYNCH
+# var_dec <{>
+SYNCH
+# var_dec <}>
+SYNCH
+# var_dec_global <$>
+SYNCH
+# var_dec_global <,>
+var_dec_global -> sz more 
+# var_dec_global <;>
+var_dec_global -> sz more 
+# var_dec_global <[>
+var_dec_global -> sz more 
+# var_dec_global <bool>
+SYNCH
+# var_dec_global <char>
+SYNCH
+# var_dec_global <int>
+SYNCH
+# var_dec_init <,>
+SYNCH
+# var_dec_init <;>
+SYNCH
+# var_dec_init <id>
+var_dec_init -> var_id initial 
+# var_dec_list <;>
+var_dec_list -> <eps> 
+# var_dec_list <id>
+var_dec_list -> var_dec_init var_dec_list2 
+# var_dec_list2 <,>
+var_dec_list2 -> <,> var_dec_init var_dec_list2 
+# var_dec_list2 <;>
+var_dec_list2 -> <eps> 
+# var_id <,>
+SYNCH
+# var_id <;>
+SYNCH
+# var_id <=>
+SYNCH
+# var_id <id>
+var_id -> <id> sz 

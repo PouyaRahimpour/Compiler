@@ -79,7 +79,14 @@ class Variable {
         }
 
         std::string toString() {
-            return name;
+            std::string res = "";
+            if (type == VARIABLE) {
+                res = name;
+            }
+            else {
+                res = "<" + name + ">";
+            }
+            return res;
         }
         friend std::ostream& operator << (std::ostream &out, Variable &var) {
             return out << var.toString();
@@ -121,9 +128,15 @@ class Rule {
 
         std::string toString() {
             std::string res = "";
-            res += head.get_name() + " -> ";
+            res += head.toString() + " -> ";
             for (auto &part : body) {
-                res += part.get_name() + " ";
+                res += part.toString() + " ";
+            }
+            if (type == SYNCH) {
+                res = "SYNCH";
+            }
+            if (type == EMPTY) {
+                res = "EMPTY";
             }
             return res;
         }
@@ -138,6 +151,7 @@ class SyntaxAnalyzer {
         std::ofstream out;
         std::vector<Token> tokens;
         std::vector<Rule> rules;
+        std::map<Variable, std::vector<Rule>> self_rules;
         std::set<Variable> variables, terminals;
         std::map<Variable, std::set<Variable>> firsts, follows;
         std::map<Variable, bool> first_done;
@@ -148,7 +162,6 @@ class SyntaxAnalyzer {
         bool has_par[200];
         Variable eps;
 
-        // TODO add rules of every var to itself && change calc_first
         void extract(std::string line) {
             Variable head, tmp;
 
@@ -200,6 +213,7 @@ class SyntaxAnalyzer {
                     rule.add_to_body(tmp);
                 }
                 rules.push_back(rule);
+                self_rules[rule.get_head()].push_back(rule);
             }
         }
 
@@ -219,29 +233,27 @@ class SyntaxAnalyzer {
                 return;
             }
 
-            for (auto &rule : rules) {
-                if (rule.get_head() == var) {
-                    bool exist_eps = false;
-                    for (auto &part_body : rule.get_body()) {
-                        if (first_done[part_body] == false) {
-                            calc_first(part_body);
+            for (auto &rule : self_rules[var]) {
+                bool exist_eps = false;
+                for (auto &part_body : rule.get_body()) {
+                    if (first_done[part_body] == false) {
+                        calc_first(part_body);
+                    }
+                    exist_eps = false;
+                    for (auto first : firsts[part_body]) {
+                        if (first == eps) {
+                            exist_eps = true;
                         }
-                        exist_eps = false;
-                        for (auto first : firsts[part_body]) {
-                            if (first == eps) {
-                                exist_eps = true;
-                            }
-                            else {
-                                firsts[var].insert(first);
-                            }
-                        }
-                        if (!exist_eps) {
-                            break;
+                        else {
+                            firsts[var].insert(first);
                         }
                     }
-                    if (exist_eps) {
-                        firsts[var].insert(eps);
+                    if (!exist_eps) {
+                        break;
                     }
+                }
+                if (exist_eps) {
+                    firsts[var].insert(eps);
                 }
             }
             first_done[var] = true;
@@ -396,7 +408,6 @@ class SyntaxAnalyzer {
             match[Eof] = "$";
         }
 
-        // TODO read & write tabel on file table.txt
         void make_table() {
             for (auto &rule : rules) {
                 std::vector<Variable> &body = rule.get_body();
@@ -440,28 +451,100 @@ class SyntaxAnalyzer {
             rule.add_to_body(Variable("stmt", VARIABLE));
             table[{Variable("else_stmt", VARIABLE), Variable("else", TERMINAL)}] = rule;
         }
+        
+        void write_table() {
+            std::ofstream table_file;
+            table_file.open(TABLE_PATH);
+            if (!table_file.is_open()) {
+                std::cerr << "File error: couldn't open table file for write" << std::endl;
+                exit(FILE_ERROR);
+            }
+            for (auto &col : table) {
+                Variable head1 = col.first.first;
+                Variable head2 = col.first.second;
+                Rule rule = col.second;
+
+                table_file << "# " << head1 << ' ' << head2 << '\n';
+                table_file << rule << '\n';
+            }
+
+            table_file.close();
+        }
+
+        void read_table() {
+            std::ifstream table_file;
+            table_file.open(TABLE_PATH);
+            if (!table_file.is_open()) {
+                std::cerr << "File error: couldn't open table file for read" << std::endl;
+                exit(FILE_ERROR);
+            }
+
+            std::string line;
+            Variable head1("", VARIABLE), head2("", TERMINAL);
+            while (getline(table_file, line)) {
+                line = strip(line);
+                std::vector<std::string> line_parts = split(line);
+                int part_rules = (int)line_parts.size();
+                if (line_parts[0] != "SYNCH" && line_parts[0] != "EMPTY" && part_rules < 3) {
+                    std::cerr << "Table Error: Invalid table in file" << std::endl;
+                    exit(GRAMMAR_ERROR);
+                }
+
+                if (line_parts[0] == "#") {
+                    head1.set_name(line_parts[1]);
+                    head2.set_name(line_parts[2].substr(1, (int)line_parts[2].size() - 2));
+                }
+                else if (line_parts[0] == "SYNCH") {
+                    Rule rule(SYNCH);
+                    table[{head1, head2}] = rule;
+                }
+                else if (line_parts[0] == "EMPTY") {
+                    Rule rule(EMPTY);
+                    table[{head1, head2}] = rule;
+                }
+                else {
+                    Variable head(line_parts[0], VARIABLE), tmp;
+                    Rule rule(VALID);
+                    rule.set_head(head);
+
+                    for (int i = 2; i < part_rules; i++) {
+                        if (line_parts[i][0] == '<') {
+                            tmp.set_name(line_parts[i].substr(1, line_parts[i].size() - 2));
+                            tmp.set_type(TERMINAL);
+                        } 
+                        else {
+                            tmp.set_name(line_parts[i]);
+                            tmp.set_type(VARIABLE);
+                        }
+                        rule.add_to_body(tmp);
+                    }
+                    table[{head1, head2}] = rule;
+                }
+            }
+            table_file.close();
+        }
 
         void write_tree(Node<Variable>* node, int num = 0, bool last = false) {
             Variable var = node->get_data();
 
+            for (int i = 0; i < num * 4 - 4; i++) {
+                if (has_par[i]) {
+                    out << "│";
+                }
+                else {
+                    out << " ";
+                }
+            }
+            if (num) {
+                if (last) {
+                    out << "└── ";
+                }
+                else {
+                    out << "├── ";
+                }
+            }
+            out << var << "\n";
             if (node->get_content() != "") {
-                for (int i = 0; i < num * 4 - 4; i++) {
-                    if (has_par[i]) {
-                        out << "│";
-                    }
-                    else {
-                        out << " ";
-                    }
-                }
-                if (num) {
-                    if (last) {
-                        out << "└── ";
-                    }
-                    else {
-                        out << "├── ";
-                    }
-                }
-                out << "<" << var << ">" << "\n";
                 for (int i = 0; i < num * 4; i++) {
                     if (has_par[i]) {
                         out << "│";
@@ -471,30 +554,6 @@ class SyntaxAnalyzer {
                     }
                 }
                 out << "└── '" << node->get_content() << "'" << "\n";
-            }
-            else {
-                for (int i = 0; i < num * 4 - 4; i++) {
-                    if (has_par[i]) {
-                        out << "│";
-                    }
-                    else {
-                        out << " ";
-                    }
-                }
-                if (num) {
-                    if (last) {
-                        out << "└── ";
-                    }
-                    else {
-                        out << "├── ";
-                    }
-                }
-                if (var.get_name() == "eps") {
-                    out << "'" << var << "'" << "\n";
-                }
-                else {
-                    out << var << "\n";
-                }
             }
 
             has_par[num * 4] = true;
@@ -536,13 +595,20 @@ class SyntaxAnalyzer {
             calc_firsts();
             calc_follows();
             make_table();
+            write_table();
         }
 
         // TODO colored error messages
         // TODO better error messages
-        void make_tree() {
-            set_matches();
+        void make_tree(bool update = true) {
+            if (update) {
+                update_grammar();
+            }
+            else {
+                read_table();
+            }
 
+            set_matches();
             std::stack<Node<Variable>*> stack;
             int index = 0;
             tokens.push_back(Token(Eof));
