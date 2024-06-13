@@ -676,8 +676,8 @@ class LexicalAnalyzer {
                 
                 if (SHOW_LEXICAL_ERROR) {
                     std::string error_message = "Lexical Error: character '" + std::to_string(line[index]) + "' is Invalid, " + "line:" + std::to_string(line_number); 
-                    std::cout << error_message << std::endl; 
-                    std::cout << "----------------------------------------------------------------" << std::endl;
+                    std::cerr << RED << error_message << WHITE << std::endl; 
+                    std::cerr << RED << "----------------------------------------------------------------" << WHITE << std::endl;
                 }
                 index++;
             }
@@ -686,7 +686,7 @@ class LexicalAnalyzer {
         void read_tokens() {
             in.open(in_address);
             if (!in.is_open()) {
-                std::cerr << "File error: couldn't open input file" << std::endl;
+                std::cerr << RED << "File error: couldn't open input file" << WHITE << std::endl;
                 exit(FILE_ERROR);
             }
             std::string line;
@@ -700,7 +700,7 @@ class LexicalAnalyzer {
         void write_tokens() {
             out.open(out_address);
             if (!out.is_open()) {
-                std::cerr << "File error: couldn't open output file" << std::endl;
+                std::cerr << RED << "File error: couldn't open output file" << WHITE << std::endl;
                 exit(FILE_ERROR);
             }
             for (Token token: tokens) {

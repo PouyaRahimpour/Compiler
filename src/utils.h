@@ -16,6 +16,11 @@
 #define FILE_ERROR 2
 #define GRAMMAR_ERROR 3
 
+#define COLORED_ERRORS true
+
+const std::string WHITE = COLORED_ERRORS ? "\033[0;31m" : "";
+const std::string RED = COLORED_ERRORS ? "\033[0;31m" : "";
+
 enum token_type {
     T_Bool,
     T_Break,

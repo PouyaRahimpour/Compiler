@@ -189,7 +189,7 @@ class SyntaxAnalyzer {
             std::vector<std::string> rules_str = split(body_str, '#');
             int number_rules = (int)rules_str.size();
             if (number_rules < 1) {
-                std::cerr << "Grammar Error: Invalid grammar in file" << std::endl;
+                std::cerr << RED << "Grammar Error: Invalid grammar in file" << WHITE << std::endl;
                 exit(GRAMMAR_ERROR);
             }
 
@@ -456,7 +456,7 @@ class SyntaxAnalyzer {
             std::ofstream table_file;
             table_file.open(TABLE_PATH);
             if (!table_file.is_open()) {
-                std::cerr << "File error: couldn't open table file for write" << std::endl;
+                std::cerr << RED << "File Error: Couldn't open table file for write" << WHITE << std::endl;
                 exit(FILE_ERROR);
             }
             for (auto &col : table) {
@@ -475,7 +475,7 @@ class SyntaxAnalyzer {
             std::ifstream table_file;
             table_file.open(TABLE_PATH);
             if (!table_file.is_open()) {
-                std::cerr << "File error: couldn't open table file for read" << std::endl;
+                std::cerr << RED << "File Error: Couldn't open table file for read" << WHITE << std::endl;
                 exit(FILE_ERROR);
             }
 
@@ -486,7 +486,7 @@ class SyntaxAnalyzer {
                 std::vector<std::string> line_parts = split(line);
                 int part_rules = (int)line_parts.size();
                 if (line_parts[0] != "SYNCH" && line_parts[0] != "EMPTY" && part_rules < 3) {
-                    std::cerr << "Table Error: Invalid table in file" << std::endl;
+                    std::cerr << RED << "Table Error: Invalid table in file" << WHITE << std::endl;
                     exit(GRAMMAR_ERROR);
                 }
 
@@ -580,7 +580,7 @@ class SyntaxAnalyzer {
             std::ifstream in;
             in.open(GRAMMAR_PATH);
             if (!in.is_open()) {
-                std::cerr << "File error: couldn't open grammar input file" << std::endl;
+                std::cerr << RED << "File Error: Couldn't open grammar input file" << WHITE << std::endl;
                 exit(FILE_ERROR);
             }
 
@@ -636,7 +636,7 @@ class SyntaxAnalyzer {
                         index++;
                     } 
                     else {
-                        std::cout << "Syntax ERROR: terminals don't match, line: " << line_number << std::endl;
+                        std::cerr << RED << "Syntax Error: Terminals don't match, line: " << line_number << WHITE << std::endl;
                     }
                 } 
                 else {
@@ -653,15 +653,15 @@ class SyntaxAnalyzer {
                         }
                     } 
                     else if (rule.get_type() == SYNCH) {
-                        std::cout << "Syntax Error: synch, line: " << line_number << std::endl;
+                        std::cerr << RED << "Syntax Error: Synch, line: " << line_number << WHITE << std::endl;
                     } 
                     else if (rule.get_type() == EMPTY) {
-                        std::cout << "Syntax Error: empty cell, line: " << line_number << std::endl;
+                        std::cerr << RED << "Syntax Error: Empty cell, line: " << line_number << WHITE << std::endl;
                         index++;
                         stack.push(top_node);
                     }
                     else {
-                        std::cout << "Unknown Error, line: " << line_number << std::endl;
+                        std::cerr << "Unknown Error: ?, line: " << line_number << WHITE << std::endl;
                     }
                 }
             }
@@ -671,7 +671,7 @@ class SyntaxAnalyzer {
         void write() {
             out.open(out_address);
             if (!out.is_open()) {
-                std::cerr << "File error: couldn't open output file" << std::endl;
+                std::cerr << RED << "File Error: Couldn't open output file" << WHITE << std::endl;
                 exit(FILE_ERROR);
             }
             std::fill(has_par, has_par + 200, false);
