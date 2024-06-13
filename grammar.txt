@@ -72,7 +72,11 @@ t8 -> <*> exp8 t8 # </> exp8 t8 # <%> exp8 t8 # <eps>
 
 exp8 -> <+> exp9 # <-> exp9 # exp9 # <!> exp9
 
-exp9 -> <(> exp <)> # constant 
+exp9 -> <(> exp <)> # <id> func_call_or_id # constant
 
-constant -> <id> ebracket # <decimal> # <hexadecimal> # <string> # <character> # <false> # <true>
+func_call_or_id -> <(> params_call <)> # ebracket 
+params_call -> exp1 params_call2 # <eps>
+params_call2 -> <,> constant params_call2 # <eps>
 ebracket -> <[> exp <]> # <eps> 
+
+constant -> <decimal> # <hexadecimal> # <string> # <character> # <false> # <true>

@@ -33,7 +33,7 @@ int main(){
 			// print(String_2);
 			// print(j);
 			// print(_assign1);
-			// print(test_function(i, j, add));
+			test_function(12, 13, true);
 		}
 	}
 	print("this is\" a whole string no other token like '=' or 'else' or even \\\\comment should be recogized");

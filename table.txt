@@ -102,8 +102,6 @@ constant -> <decimal>
 constant -> <false> 
 # constant <hexadecimal>
 constant -> <hexadecimal> 
-# constant <id>
-constant -> <id> ebracket 
 # constant <string>
 constant -> <string> 
 # constant <true>
@@ -733,7 +731,7 @@ exp9 -> constant
 # exp9 <hexadecimal>
 exp9 -> constant 
 # exp9 <id>
-exp9 -> constant 
+exp9 -> <id> func_call_or_id 
 # exp9 <string>
 exp9 -> constant 
 # exp9 <true>
@@ -870,6 +868,48 @@ SYNCH
 SYNCH
 # for_stmt <}>
 SYNCH
+# func_call_or_id <!=>
+func_call_or_id -> ebracket 
+# func_call_or_id <%>
+func_call_or_id -> ebracket 
+# func_call_or_id <&&>
+func_call_or_id -> ebracket 
+# func_call_or_id <(>
+func_call_or_id -> <(> params_call <)> 
+# func_call_or_id <)>
+func_call_or_id -> ebracket 
+# func_call_or_id <*>
+func_call_or_id -> ebracket 
+# func_call_or_id <+>
+func_call_or_id -> ebracket 
+# func_call_or_id <,>
+func_call_or_id -> ebracket 
+# func_call_or_id <->
+func_call_or_id -> ebracket 
+# func_call_or_id </>
+func_call_or_id -> ebracket 
+# func_call_or_id <;>
+func_call_or_id -> ebracket 
+# func_call_or_id <<>
+func_call_or_id -> ebracket 
+# func_call_or_id <<=>
+func_call_or_id -> ebracket 
+# func_call_or_id <=>
+func_call_or_id -> ebracket 
+# func_call_or_id <==>
+func_call_or_id -> ebracket 
+# func_call_or_id <>>
+func_call_or_id -> ebracket 
+# func_call_or_id <>=>
+func_call_or_id -> ebracket 
+# func_call_or_id <[>
+func_call_or_id -> ebracket 
+# func_call_or_id <]>
+func_call_or_id -> ebracket 
+# func_call_or_id <||>
+func_call_or_id -> ebracket 
+# func_call_or_id <}>
+func_call_or_id -> ebracket 
 # func_dec <$>
 SYNCH
 # func_dec <(>
@@ -1043,6 +1083,42 @@ params2 -> <,> param params2
 # params2 <;>
 SYNCH
 # params2 <}>
+SYNCH
+# params_call <!>
+params_call -> exp1 params_call2 
+# params_call <(>
+params_call -> exp1 params_call2 
+# params_call <)>
+params_call -> <eps> 
+# params_call <+>
+params_call -> exp1 params_call2 
+# params_call <->
+params_call -> exp1 params_call2 
+# params_call <;>
+SYNCH
+# params_call <character>
+params_call -> exp1 params_call2 
+# params_call <decimal>
+params_call -> exp1 params_call2 
+# params_call <false>
+params_call -> exp1 params_call2 
+# params_call <hexadecimal>
+params_call -> exp1 params_call2 
+# params_call <id>
+params_call -> exp1 params_call2 
+# params_call <string>
+params_call -> exp1 params_call2 
+# params_call <true>
+params_call -> exp1 params_call2 
+# params_call <}>
+SYNCH
+# params_call2 <)>
+params_call2 -> <eps> 
+# params_call2 <,>
+params_call2 -> <,> constant params_call2 
+# params_call2 <;>
+SYNCH
+# params_call2 <}>
 SYNCH
 # print_stmt <!>
 SYNCH

@@ -16,6 +16,8 @@
 #define FILE_ERROR 2
 #define GRAMMAR_ERROR 3
 
+#define TAB 4
+
 #define COLORED_ERRORS true
 
 const std::string WHITE = COLORED_ERRORS ? "\033[0;m" : "";
@@ -238,7 +240,7 @@ class Tree {
         void print_tree(Node<T>* node, int num = 0, bool last = false) {
             T var = node->get_data();
 
-            for (int i = 0; i < num * 4 - 4; i++) {
+            for (int i = 0; i < num * TAB - TAB; i++) {
                 if (has_par[i]) {
                     std::cout << "│";
                 }
@@ -256,7 +258,7 @@ class Tree {
             }
             std::cout << var << std::endl;
             if (node->get_content() != "") {
-                for (int i = 0; i < num * 4; i++) {
+                for (int i = 0; i < num * TAB; i++) {
                     if (has_par[i]) {
                         std::cout << "│";
                     }
@@ -267,12 +269,12 @@ class Tree {
                 std::cout << "└── '" << node->get_content() << "'" << std::endl;
             }
 
-            has_par[num * 4] = true;
+            has_par[num * TAB] = true;
             std::deque<Node<T>*> children = node->get_children();
             for (auto child : children) {
                 bool end = false;
                 if (child == children.back()) {
-                    has_par[num * 4] = false;
+                    has_par[num * TAB] = false;
                     end = true;
                 }
                 print_tree(child, num + 1, end);

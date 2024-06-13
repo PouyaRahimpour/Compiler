@@ -540,7 +540,7 @@ class SyntaxAnalyzer {
         void write_tree(Node<Variable>* node, int num = 0, bool last = false) {
             Variable var = node->get_data();
 
-            for (int i = 0; i < num * 4 - 4; i++) {
+            for (int i = 0; i < num * TAB - TAB; i++) {
                 if (has_par[i]) {
                     out << "│";
                 }
@@ -558,7 +558,7 @@ class SyntaxAnalyzer {
             }
             out << var << "\n";
             if (node->get_content() != "") {
-                for (int i = 0; i < num * 4; i++) {
+                for (int i = 0; i < num * TAB; i++) {
                     if (has_par[i]) {
                         out << "│";
                     }
@@ -569,12 +569,12 @@ class SyntaxAnalyzer {
                 out << "└── '" << node->get_content() << "'" << "\n";
             }
 
-            has_par[num * 4] = true;
+            has_par[num * TAB] = true;
             std::deque<Node<Variable>*> children = node->get_children();
             for (auto child : children) {
                 bool end = false;
                 if (child == children.back()) {
-                    has_par[num * 4] = false;
+                    has_par[num * TAB] = false;
                     end = true;
                 }
                 write_tree(child, num + 1, end);
