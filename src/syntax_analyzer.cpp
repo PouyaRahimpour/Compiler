@@ -598,7 +598,6 @@ class SyntaxAnalyzer {
             write_table();
         }
 
-        // TODO colored error messages
         // TODO better error messages
         void make_tree(bool update = true) {
             if (update) {
