@@ -41,89 +41,37 @@ std::string strip(std::string s, char ch = ' ') {
     return res;
 }
 
-class Variable {
-    private:
-        std::string name;
-        Type type;
-
-    public:
-        Variable() {}
-        Variable(std::string _name, Type _type) {
-            name = _name;
-            type = _type;
-        }
- 
-        void set_name(std::string _name) {
-            name = _name;
-        }
-        std::string get_name() const {
-            return name;
-        }
-        void set_type(Type _type) {
-            type = _type;
-        }
-        Type get_type() const {
-            return type;
-        }
-
-        bool operator == (const Variable &other) const {
-            return name == other.get_name() && type == other.get_type();
-        }
-        bool operator != (const Variable &other) const {
-            return name != other.get_name() || type != other.get_type();
-        }
-        bool operator < (const Variable &other) const {
-            return name < other.get_name();
-        }
-        bool operator > (const Variable &other) const {
-            return name > other.get_name();
-        }
-
-        std::string toString() {
-            std::string res = "";
-            if (type == VARIABLE) {
-                res = name;
-            }
-            else {
-                res = "<" + name + ">";
-            }
-            return res;
-        }
-        friend std::ostream& operator << (std::ostream &out, Variable &var) {
-            return out << var.toString();
-        }
-};
 
 class Rule {
     private:
-        Variable head;
-        std::vector<Variable> body;
-        Rule_type type;
+        Symbol head;
+        std::vector<Symbol> body;
+        rule_type type;
 
     public:
         Rule() {
             type = EMPTY;
         }
-        Rule(Rule_type _type) {
+        Rule(rule_type _type) {
             type = _type;
         }
 
-        void set_head(Variable _head) {
+        void set_head(Symbol _head) {
             head = _head;
         }
-        Variable& get_head() {
+        Symbol& get_head() {
             return head;
         }
-        void set_type(Rule_type _type) {
+        void set_type(rule_type _type) {
             type = _type;
         }
-        Rule_type get_type() {
+        rule_type get_type() {
             return type;
         }
-        void add_to_body(Variable var) {
+        void add_to_body(Symbol var) {
             body.push_back(var);
         }
-        std::vector<Variable>& get_body() {
+        std::vector<Symbol>& get_body() {
             return body;
         }
 
@@ -152,20 +100,20 @@ class SyntaxAnalyzer {
         std::ofstream out;
         std::vector<Token> tokens;
         std::vector<Rule> rules;
-        std::map<Variable, std::vector<Rule>> self_rules;
-        std::set<Variable> variables, terminals;
-        std::map<Variable, std::set<Variable>> firsts, follows;
-        std::map<Variable, bool> first_done;
-        std::map<Variable, std::set<Variable>> graph;
-        std::map<std::pair<Variable, Variable>, Rule> table;
+        std::map<Symbol, std::vector<Rule>> self_rules;
+        std::set<Symbol> variables, terminals;
+        std::map<Symbol, std::set<Symbol>> firsts, follows;
+        std::map<Symbol, bool> first_done;
+        std::map<Symbol, std::set<Symbol>> graph;
+        std::map<std::pair<Symbol, Symbol>, Rule> table;
         std::map<token_type, std::string> match;
-        Tree<Variable> tree;
+        Tree<Symbol> tree;
         bool has_par[200];
         bool has_error;
-        Variable eps;
+        Symbol eps;
 
         void extract(std::string line) {
-            Variable head, tmp;
+            Symbol head, tmp;
 
             line = strip(line);
             std::string head_str = "", body_str = "";
@@ -228,7 +176,7 @@ class SyntaxAnalyzer {
             }
         }
 
-        void calc_first(Variable var) {
+        void calc_first(Symbol var) {
             if (var.get_type() == TERMINAL) {
                 firsts[var].insert(var);
                 first_done[var] = true;
@@ -270,7 +218,7 @@ class SyntaxAnalyzer {
             }
         }
 
-        void print_first(Variable var) {
+        void print_first(Symbol var) {
             std::cout << "First[" + var.get_name() + "]:";
             for (auto first : firsts[var]) {
                 std::cout << " " << first;
@@ -281,16 +229,16 @@ class SyntaxAnalyzer {
         void calc_follows() {
             for (auto var : variables) {
                 if (var.get_name() == START_VAR) {
-                    follows[var].insert(Variable("$", TERMINAL));
+                    follows[var].insert(Symbol("$", TERMINAL));
                 }
                 calc_follow(var);
             }
             relaxation();
         }
 
-        void calc_follow(Variable var) {
+        void calc_follow(Symbol var) {
             for (auto &rule : rules) {
-                std::vector<Variable> &body = rule.get_body();
+                std::vector<Symbol> &body = rule.get_body();
                 int body_len = (int)body.size();
 
                 for (int i = 0; i < body_len; i++) {
@@ -323,13 +271,13 @@ class SyntaxAnalyzer {
         }
 
         void relaxation() {
-            std::set<Variable> set;
+            std::set<Symbol> set;
             for (auto var : variables) {
                 set.insert(var);
             }
 
             while (!set.empty()) {
-                Variable var = *set.begin();
+                Symbol var = *set.begin();
                 set.erase(set.begin());
 
                 for (auto v : graph[var]) {
@@ -351,7 +299,7 @@ class SyntaxAnalyzer {
             }
         }
 
-        void print_follow(Variable var) {
+        void print_follow(Symbol var) {
             std::cout << "Follow[" + var.get_name() + "]:";
             for (auto follow : follows[var]) {
                 std::cout << " " << follow;
@@ -412,8 +360,8 @@ class SyntaxAnalyzer {
 
         void make_table() {
             for (auto &rule : rules) {
-                std::vector<Variable> &body = rule.get_body();
-                Variable head = rule.get_head();
+                std::vector<Symbol> &body = rule.get_body();
+                Symbol head = rule.get_head();
                 bool all_eps = true;
                 for (auto part_body : body) {
                     bool has_eps = false;
@@ -432,12 +380,12 @@ class SyntaxAnalyzer {
                 }
 
                 if (all_eps) {
-                    for (Variable var : follows[rule.get_head()]) {
+                    for (Symbol var : follows[rule.get_head()]) {
                         table[{rule.get_head(), var}] = rule;
                     }
                 } 
                 else {
-                    for (Variable var : follows[rule.get_head()]) {
+                    for (Symbol var : follows[rule.get_head()]) {
                         if (table[{rule.get_head(), var}].get_type() != VALID) {
                             table[{rule.get_head(), var}] = Rule(SYNCH);
                         }
@@ -448,14 +396,14 @@ class SyntaxAnalyzer {
             // add rule (else_stmt -> <else> stmt)
             Rule rule;
             rule.set_type(VALID);
-            rule.set_head(Variable("else_stmt", VARIABLE));
-            rule.add_to_body(Variable("else", TERMINAL));
-            rule.add_to_body(Variable("stmt", VARIABLE));
-            table[{Variable("else_stmt", VARIABLE), Variable("else", TERMINAL)}] = rule;
+            rule.set_head(Symbol("else_stmt", VARIABLE));
+            rule.add_to_body(Symbol("else", TERMINAL));
+            rule.add_to_body(Symbol("stmt", VARIABLE));
+            table[{Symbol("else_stmt", VARIABLE), Symbol("else", TERMINAL)}] = rule;
 
             // error handeling
-            Variable semicolon = Variable(";", TERMINAL);
-            Variable closed_curly = Variable("}", TERMINAL);
+            Symbol semicolon = Symbol(";", TERMINAL);
+            Symbol closed_curly = Symbol("}", TERMINAL);
             for (auto var : variables) {
                 if (table[{var, semicolon}].get_type() != VALID) {
                     table[{var, semicolon}] = Rule(SYNCH);
@@ -474,8 +422,8 @@ class SyntaxAnalyzer {
                 exit(FILE_ERROR);
             }
             for (auto &col : table) {
-                Variable head1 = col.first.first;
-                Variable head2 = col.first.second;
+                Symbol head1 = col.first.first;
+                Symbol head2 = col.first.second;
                 Rule rule = col.second;
 
                 table_file << "# " << head1 << ' ' << head2 << '\n';
@@ -494,7 +442,7 @@ class SyntaxAnalyzer {
             }
 
             std::string line;
-            Variable head1("", VARIABLE), head2("", TERMINAL);
+            Symbol head1("", VARIABLE), head2("", TERMINAL);
             while (getline(table_file, line)) {
                 line = strip(line);
                 std::vector<std::string> line_parts = split(line);
@@ -517,7 +465,7 @@ class SyntaxAnalyzer {
                     table[{head1, head2}] = rule;
                 }
                 else {
-                    Variable head(line_parts[0], VARIABLE), tmp;
+                    Symbol head(line_parts[0], VARIABLE), tmp;
                     Rule rule(VALID);
                     rule.set_head(head);
 
@@ -538,8 +486,8 @@ class SyntaxAnalyzer {
             table_file.close();
         }
 
-        void write_tree(Node<Variable>* node, int num = 0, bool last = false) {
-            Variable var = node->get_data();
+        void write_tree(Node<Symbol>* node, int num = 0, bool last = false) {
+            Symbol var = node->get_data();
 
             for (int i = 0; i < num * TAB - TAB; i++) {
                 if (has_par[i]) {
@@ -571,7 +519,7 @@ class SyntaxAnalyzer {
             }
 
             has_par[num * TAB] = true;
-            std::deque<Node<Variable>*> children = node->get_children();
+            std::deque<Node<Symbol>*> children = node->get_children();
             for (auto child : children) {
                 bool end = false;
                 if (child == children.back()) {
@@ -622,24 +570,24 @@ class SyntaxAnalyzer {
             }
 
             set_matches();
-            std::stack<Node<Variable>*> stack;
+            std::stack<Node<Symbol>*> stack;
             int index = 0;
             tokens.push_back(Token(Eof));
             int tokens_len = (int)tokens.size();
 
-            Node<Variable>* Eof = new Node<Variable>(Variable("$", TERMINAL), NULL);
+            Node<Symbol>* Eof = new Node<Symbol>(Symbol("$", TERMINAL), NULL);
             stack.push(Eof);
-            Node<Variable>* root = new Node<Variable>(Variable(START_VAR, VARIABLE), NULL);
+            Node<Symbol>* root = new Node<Symbol>(Symbol(START_VAR, VARIABLE), NULL);
             stack.push(root);
 
             tree.set_root(root);
 
             while (index < tokens_len && stack.size()) {
-                Node<Variable>* top_node = stack.top();
-                Variable top_var = top_node->get_data(); 
+                Node<Symbol>* top_node = stack.top();
+                Symbol top_var = top_node->get_data(); 
                 stack.pop();
 
-                Variable term = Variable(match[tokens[index].get_type()], TERMINAL);
+                Symbol term = Symbol(match[tokens[index].get_type()], TERMINAL);
                 int line_number = tokens[index].get_line_number();
 
                 if (top_var.get_type() == TERMINAL) {
@@ -658,10 +606,10 @@ class SyntaxAnalyzer {
                 else {
                     Rule rule = table[{top_var, term}];
                     if (rule.get_type() == VALID) {
-                        std::vector<Variable> body = rule.get_body();
+                        std::vector<Symbol> body = rule.get_body();
                         std::reverse(body.begin(), body.end());
                         for (auto var : body) {
-                            Node<Variable>* node = new Node<Variable>(var, top_node);
+                            Node<Symbol>* node = new Node<Symbol>(var, top_node);
                             top_node->push_front_children(node);
                             if (var != eps) {
                                 stack.push(node);
@@ -710,5 +658,9 @@ class SyntaxAnalyzer {
             std::fill(has_par, has_par + 200, false);
             write_tree(tree.get_root());
             out.close();
+        }
+
+        Tree<Symbol> get_tree() {
+            return tree; 
         }
 };

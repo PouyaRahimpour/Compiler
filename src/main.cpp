@@ -26,6 +26,7 @@ int main(int argc, char* argv[]) {
     syn_analyzer.write();
     
     // SemanticAnalyzer
+    SemanticAnalyzer sem_analyzer(syn_analyzer.get_tree(), output_file_name);
 
     return 0;
 }

@@ -128,6 +128,79 @@ const std::string type_to_string[] = {
     "Eof"
 };
 
+enum symbol_type {
+    TERMINAL,
+    VARIABLE
+};
+
+enum semantic_type {
+    VOID,
+    INT,
+    BOOL,
+    CHAR
+};
+
+class Symbol {
+    private:
+        std::string name;
+        symbol_type type;
+        semantic_type stype;
+
+    public:
+        Symbol() {}
+        Symbol(std::string _name, symbol_type _type) {
+            name = _name;
+            type = _type;
+            stype = VOID;
+        }
+ 
+        void set_name(std::string _name) {
+            name = _name;
+        }
+        std::string get_name() const {
+            return name;
+        }
+        void set_type(symbol_type _type) {
+            type = _type;
+        }
+        symbol_type get_type() const {
+            return type;
+        }
+        void set_stype(semantic_type _stype) {
+           stype = _stype; 
+        }
+        semantic_type get_stype() const {
+            return stype;
+        }
+
+        bool operator == (const Symbol &other) const {
+            return name == other.get_name() && type == other.get_type();
+        }
+        bool operator != (const Symbol &other) const {
+            return name != other.get_name() || type != other.get_type();
+        }
+        bool operator < (const Symbol &other) const {
+            return name < other.get_name();
+        }
+        bool operator > (const Symbol &other) const {
+            return name > other.get_name();
+        }
+
+        std::string toString() {
+            std::string res = "";
+            if (type == VARIABLE) {
+                res = name;
+            }
+            else {
+                res = "<" + name + ">";
+            }
+            return res;
+        }
+        friend std::ostream& operator << (std::ostream &out, Symbol &var) {
+            return out << var.toString();
+        }
+};
+
 class Token {
     private:
         token_type type;
@@ -224,16 +297,13 @@ template <typename T>
 class Tree {
     private:
         Node<T>* root;
-        bool has_par[200];
 
     public:
         Tree() {
             root = nullptr;
-            std::fill(has_par, has_par + 200, false);
         }
         Tree(Node<T>* _root) {
             root = _root;
-            std::fill(has_par, has_par + 200, false);
         }
 
         void set_root(Node<T>* _root) {
@@ -243,7 +313,13 @@ class Tree {
             return root;
         }
 
-        void print_tree(Node<T>* node, int num = 0, bool last = false) {
+        void print_tree() {
+            bool has_par[200];
+            std::fill(has_par, has_par + 200, false);
+            _print_tree(root, has_par);
+        }
+
+        void _print_tree(Node<T>* node, bool* has_par, int num = 0, bool last = false) {
             T var = node->get_data();
 
             for (int i = 0; i < num * TAB - TAB; i++) {
@@ -283,7 +359,7 @@ class Tree {
                     has_par[num * TAB] = false;
                     end = true;
                 }
-                print_tree(child, num + 1, end);
+                _print_tree(child, has_par, num + 1, end);
             }
         }
 };

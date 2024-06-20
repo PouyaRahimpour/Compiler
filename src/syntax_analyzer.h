@@ -4,12 +4,8 @@
 #define TABLE_PATH "../table.txt"
 #define START_VAR "program"
 
-enum Type {
-    TERMINAL,
-    VARIABLE
-};
 
-enum Rule_type {
+enum rule_type {
     VALID,
     SYNCH,
     EMPTY
