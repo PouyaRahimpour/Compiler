@@ -1,0 +1,78 @@
+program -> dec_list
+dec_list -> dec dec_list # <eps>
+dec -> type {id.type = type.type} <id> {init_dec.type = type.type} init_dec {dec.type = type.type}
+init_dec -> {var_dec_global.type = init_dec.type} var_dec_global # {func_dec.type = init_dec.type} func_dec 
+var_dec_global -> sz {more.type = var_dec_global.type} more
+more -> <,> {var_dec_list.type = more.type} var_dec_list <;> # <;>            
+
+var_dec -> type {var_dec_list.type = type.type} var_dec_list {var_dec.type = type.type} <;> # <;>
+var_dec_list -> {var_dec_init.type = var_dec_list.type} var_dec_init {var_dec_list2.type = var_dec_list.type} var_dec_list2 # <eps>
+var_dec_list2 -> <,> {var_dec_init.type = var_dec_list2.type} var_dec_init {var_dec_list2@.type = var_dec_list2} var_dec_list2@ # <eps>
+var_dec_init -> {var_id.type = var_dec_init.type} var_id initial  // assert var_id.type == initial.type or initial.type is void
+var_id -> {id.type = var_id.type} <id> sz
+sz -> <[> optexp <]> # <eps> // assert optexp is void or positive int
+optexp -> exp {optexp.type = exp.type} # <eps> {optexp.type = void}
+
+initial -> <=> eexp {initial.type = eexp.type} # <eps> {initial.type = void}
+eexp -> exp {eexp.type = exp.type} # <{> exp_list <}> {eexp.type = exp_list.type}
+exp_list -> exp exp_list2 {if (exp.type == exp_list2.type || exp_list2.type == void) exp_list.type = exp.type; else error, exp_list.type = void;} # <eps> {exp_list.type = void}
+exp_list2 -> <,> exp exp_list2 {if (exp.type == exp_list2.type || exp_list2.type == void) exp_list.type = exp.type; else error, exp_list.type = void;} # <eps> {exp_list.type = void}
+type -> <int> {type.type = int} # <bool> {type.type = bool} # <char> {type.type = char}
+
+func_dec -> <(> params <)> <{> stmt_list <}>
+params -> param params2 # <eps>
+params2 -> <,> param params2 # <eps>
+param -> type {param_id.type = type.type} param_id {param.type = type.type}
+param_id -> {id.type = param_id.type} <id> bracket
+bracket -> <[> <]> # <eps>
+
+stmt_list -> stmt stmt_list # <eps>
+stmt -> var_dec # break_stmt # continue_stmt # return_stmt # if_stmt # for_stmt # print_stmt # expr_stmt # <{> stmt_list <}> # <;>
+
+if_stmt -> <if> <(> exp <)> stmt else_stmt {if_stmt.type = exp.type}
+else_stmt -> <else> stmt # <eps>
+
+break_stmt -> <break> <;>
+continue_stmt -> <continue> <;>
+return_stmt -> <return> exp <;> {return_stmt.type = exp.type}
+
+for_stmt -> <for> <(> var_dec exp <;> exp <)> stmt
+print_stmt -> <print> <(> context <)> <;>
+context -> <string> context2
+context2 -> <,> exp context2 # <eps>
+expr_stmt -> exp <;>
+
+exp -> exp1 t1 {if (t1.type == void) exp.type = exp1.type; else exp.type = t1.type;}
+t1 -> <,> exp1 t1@ {if (t1@.type == void) t1.type = exp1.type; else t1.type = t1@.type;} # <eps> {t1.type = void}
+
+exp1 -> exp2 t2 {if (t2.type == void) exp1.type = exp2.type; else exp1.type = exp2.type;} // assert t2.type is void or exp2.type == t2.type
+t2 -> <=> exp1 {t2.type = exp1.type} # <eps> {t2.type = void}
+
+exp2 -> exp3 t3
+t3 -> <||> exp3 t3 # <eps>
+
+exp3 -> exp4 t4
+t4 -> <&&> exp4 t4 # <eps>
+
+exp4 -> exp5 t5
+t5 -> <==> exp5 t5 # <!=> exp5 t5 # <eps>
+
+exp5 -> exp6 t6
+t6 -> <<> exp6 t6 # <>> exp6 t6 # <<=> exp6 t6 # <>=> exp6 t6 # <eps>
+
+exp6 -> exp7 t7
+t7 -> <+> exp7 t7 # <-> exp7 t7 # <eps>
+
+exp7 -> exp8 t8
+t8 -> <*> exp8 t8 # </> exp8 t8 # <%> exp8 t8 # <eps>
+
+exp8 -> <+> exp9 # <-> exp9 # exp9 # <!> exp9
+
+exp9 -> <(> exp <)> # <id> func_call_or_id # constant
+
+func_call_or_id -> <(> params_call <)> # ebracket 
+params_call -> exp1 params_call2 # <eps>
+params_call2 -> <,> exp1 params_call2 # <eps>
+ebracket -> <[> exp <]> # <eps> 
+
+constant -> <decimal> # <hexadecimal> # <string> # <character> # <false> # <true>
