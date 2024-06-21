@@ -305,27 +305,6 @@ class Tree {
     private:
         Node<T>* root;
 
-    public:
-        Tree() {
-            root = nullptr;
-        }
-        Tree(Node<T>* _root) {
-            root = _root;
-        }
-
-        void set_root(Node<T>* _root) {
-            root = _root;
-        }
-        Node<T>* get_root() {
-            return root;
-        }
-
-        void print_tree() {
-            bool has_par[200];
-            std::fill(has_par, has_par + 200, false);
-            _print_tree(root, has_par);
-        }
-
         void _print_tree(Node<T>* node, bool* has_par, int num = 0, bool last = false) {
             T var = node->get_data();
 
@@ -368,5 +347,26 @@ class Tree {
                 }
                 _print_tree(child, has_par, num + 1, end);
             }
+        }
+
+    public:
+        Tree() {
+            root = nullptr;
+        }
+        Tree(Node<T>* _root) {
+            root = _root;
+        }
+
+        void set_root(Node<T>* _root) {
+            root = _root;
+        }
+        Node<T>* get_root() {
+            return root;
+        }
+
+        void print_tree() {
+            bool has_par[200];
+            std::fill(has_par, has_par + 200, false);
+            _print_tree(root, has_par);
         }
 };
