@@ -50,7 +50,7 @@ exp -> exp1 t1
 t1 -> <,> exp1 t1 # <eps>
 
 exp1 -> exp2 t2 
-t2 -> <=> exp1 # <eps>
+t2 -> <=> exp2 t2 # <eps>
 
 exp2 -> exp3 t3
 t3 -> <||> exp3 t3 # <eps>

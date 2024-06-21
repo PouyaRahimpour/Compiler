@@ -17,7 +17,7 @@ var_dec_list2 -> <,> {var_dec_init.type = var_dec_list2.type} var_dec_init {var_
 var_dec_list2 -> <eps>
 var_dec_init -> {var_id.type = var_dec_init.type} var_id initial {if (var_id.type != initial.type and initial.type != void) error}
 var_id -> {id.type = var_id.type} <id> sz
-sz -> <[> optexp <]> // assert optexp is void or positive int
+sz -> <[> optexp <]> {if (optexp.type != void and optexp.type != int} error;}
 sz -> <eps>
 optexp -> exp {optexp.type = exp.type}
 optexp -> <eps> {optexp.type = void}
@@ -57,7 +57,7 @@ stmt -> expr_stmt
 stmt -> <{> stmt_list <}>
 stmt -> <;>
 
-if_stmt -> <if> <(> exp <)> stmt else_stmt {if_stmt.type = exp.type}
+if_stmt -> <if> <(> exp <)> stmt else_stmt {if (exp.type != void && exp.type != bool) error;}
 else_stmt -> <else> stmt
 else_stmt -> <eps>
 
@@ -126,7 +126,7 @@ params_call -> exp1 params_call2
 params_call -> <eps>
 params_call2 -> <,> exp1 params_call2
 params_call2 -> <eps>
-ebracket -> <[> exp <]> // exp.type == int and exp.value >= 0
+ebracket -> <[> exp <]> {if (exp.type != int) error;}
 ebracket -> <eps> 
 
 constant -> <decimal> {constant.type = int}

@@ -1,6 +1,7 @@
 #include "semantic_analyzer.h"
 #include "utils.h"
 
+// TODO shaw line number for errors
 class SymbolTableEntry {
     private:
         // variable function array
@@ -142,6 +143,31 @@ class SemanticAnalyzer {
                     std::cerr << "---------------------------------------------------------------" << std::endl;
                 }
             }
+            else if (head_name == "sz") {
+                if (children[0]->get_data().get_name() == "[") {
+                    if (children[1]->get_data().get_stype() != VOID && children[1]->get_data().get_stype() != INT) {
+                        int line_number = -1;
+                        Node<Symbol>* tmp = node->get_parent();
+                        std::string id;
+                        while (true) {
+                            if (tmp->get_data().get_name() == "dec") {
+                                id = tmp->get_children()[1]->get_content();
+                                break;
+                            }
+                            else if (tmp->get_data().get_name() == "var_dec_init") {
+                                id = tmp->get_children()[0]->get_children()[0]->get_content();
+                                break;
+                            }
+                            tmp = tmp->get_parent();
+                        }
+                        std::string size_type = semantic_type_to_string[children[1]->get_data().get_stype()];
+
+                        std::cerr << RED << "Semantic Error: The array size must have an int type for array '" + id + "', line: " << line_number << WHITE << std::endl;
+                        std::cerr << RED << "The array size type is '" + size_type +  "'." << WHITE << std::endl;
+                        std::cerr << "---------------------------------------------------------------" << std::endl;
+                    }
+                }
+            }
             else if (head_name == "optexp") {
                 if (children[0]->get_data().get_name() == "exp") {
                     // optexp.type = exp.type
@@ -266,8 +292,14 @@ class SemanticAnalyzer {
                 symbol.set_stype(children[0]->get_data().get_stype());
             }
             else if (head_name == "if_stmt") {
-                // if_stmt.type = exp.type
-                symbol.set_stype(children[2]->get_data().get_stype());
+                if (children[2]->get_data().get_stype() != VOID && children[2]->get_data().get_stype() != BOOL) {
+                    int line_number = -1;
+                    std::string condition_type = semantic_type_to_string[children[2]->get_data().get_stype()];
+
+                    std::cerr << RED << "Semantic Error: The condition type of if stmt must have a bool type, line: " << line_number << WHITE << std::endl;
+                    std::cerr << RED << "The condition type is '" + condition_type +  "'." << WHITE << std::endl;
+                    std::cerr << "---------------------------------------------------------------" << std::endl;
+                }
             }
             else if (head_name == "return_stmt") {
                 // return_stmt.type = exp.type
@@ -526,6 +558,19 @@ class SemanticAnalyzer {
                 else if (children[0]->get_data().get_name() == "constant") {
                     // exp9.type = constant.type
                     symbol.set_stype(children[0]->get_data().get_stype());
+                }
+            }
+            else if (head_name == "ebracket") {
+                if (children[0]->get_data().get_name() == "[") {
+                    if (children[1]->get_data().get_stype() != INT) {
+                        int line_number = -1;
+                        std::string id = node->get_parent()->get_parent()->get_children()[0]->get_content();
+                        std::string index_type = semantic_type_to_string[children[1]->get_data().get_stype()];
+
+                        std::cerr << RED << "Semantic Error: The array index must have an int type for array '" + id + "', line: " << line_number << WHITE << std::endl;
+                        std::cerr << RED << "The array index type is '" + index_type +  "'." << WHITE << std::endl;
+                        std::cerr << "---------------------------------------------------------------" << std::endl;
+                    }
                 }
             }
             else if (head_name == "constant") {
