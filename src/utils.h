@@ -267,7 +267,7 @@ class Node {
         void set_date(T _data) {
             data = _data;
         }
-        T get_data() {
+        T& get_data() {
             return data;
         }
         void set_parent(Node<T>* _parent) {

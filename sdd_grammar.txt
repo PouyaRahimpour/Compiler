@@ -1,36 +1,65 @@
 program -> dec_list
-dec_list -> dec dec_list # <eps>
+dec_list -> dec dec_list
+dec_list -> <eps>
 dec -> type {id.type = type.type} <id> {init_dec.type = type.type} init_dec {dec.type = type.type}
-init_dec -> {var_dec_global.type = init_dec.type} var_dec_global # {func_dec.type = init_dec.type} func_dec 
-var_dec_global -> sz {more.type = var_dec_global.type} more
-more -> <,> {var_dec_list.type = more.type} var_dec_list <;> # <;>            
+init_dec -> {var_dec_global.type = init_dec.type} var_dec_global
+init_dec -> {func_dec.type = init_dec.type} func_dec
 
-var_dec -> type {var_dec_list.type = type.type} var_dec_list {var_dec.type = type.type} <;> # <;>
-var_dec_list -> {var_dec_init.type = var_dec_list.type} var_dec_init {var_dec_list2.type = var_dec_list.type} var_dec_list2 # <eps>
-var_dec_list2 -> <,> {var_dec_init.type = var_dec_list2.type} var_dec_init {var_dec_list2@.type = var_dec_list2} var_dec_list2@ # <eps>
+var_dec_global -> sz initial {more.type = var_dec_global.type} more
+more -> <,> {var_dec_list.type = more.type} var_dec_list <;>
+more -> <;>
+
+var_dec -> type {var_dec_list.type = type.type} var_dec_list <;> {var_dec.type = type.type}
+var_dec -> <;>
+var_dec_list -> {var_dec_init.type = var_dec_list.type} var_dec_init {var_dec_list2.type = var_dec_list.type} var_dec_list2
+var_dec_list -> <eps>
+var_dec_list2 -> <,> {var_dec_init.type = var_dec_list2.type} var_dec_init {var_dec_list2@.type = var_dec_list2} var_dec_list2@
+var_dec_list2 -> <eps>
 var_dec_init -> {var_id.type = var_dec_init.type} var_id initial  // assert var_id.type == initial.type or initial.type is void
 var_id -> {id.type = var_id.type} <id> sz
-sz -> <[> optexp <]> # <eps> // assert optexp is void or positive int
-optexp -> exp {optexp.type = exp.type} # <eps> {optexp.type = void}
+sz -> <[> optexp <]> // assert optexp is void or positive int
+sz -> <eps>
+optexp -> exp {optexp.type = exp.type}
+optexp -> <eps> {optexp.type = void}
 
-initial -> <=> eexp {initial.type = eexp.type} # <eps> {initial.type = void}
-eexp -> exp {eexp.type = exp.type} # <{> exp_list <}> {eexp.type = exp_list.type}
-exp_list -> exp exp_list2 {if (exp.type == exp_list2.type || exp_list2.type == void) exp_list.type = exp.type; else error, exp_list.type = void;} # <eps> {exp_list.type = void}
-exp_list2 -> <,> exp exp_list2 {if (exp.type == exp_list2.type || exp_list2.type == void) exp_list.type = exp.type; else error, exp_list.type = void;} # <eps> {exp_list.type = void}
-type -> <int> {type.type = int} # <bool> {type.type = bool} # <char> {type.type = char}
+initial -> <=> eexp {initial.type = eexp.type}
+initial -> <eps> {initial.type = void}
+eexp -> exp {eexp.type = exp.type}
+eexp -> <{> exp_list <}> {eexp.type = exp_list.type}
+exp_list -> exp exp_list2 {if (exp.type == exp_list2.type || exp_list2.type == void) exp_list.type = exp.type; else error, exp_list.type = void;}
+exp_list -> <eps> {exp_list.type = void}
+exp_list2 -> <,> exp exp_list2@ {if (exp.type == exp_list2@.type || exp_list2@.type == void) exp_list2.type = exp.type; else error, exp_list2.type = void;}
+exp_list2 -> <eps> {exp_list2.type = void}
+type -> <int> {type.type = int}
+type -> <bool> {type.type = bool}
+type -> <char> {type.type = char}
 
 func_dec -> <(> params <)> <{> stmt_list <}>
-params -> param params2 # <eps>
-params2 -> <,> param params2 # <eps>
+params -> param params2
+params -> <eps>
+params2 -> <,> param params2
+params2 -> <eps>
 param -> type {param_id.type = type.type} param_id {param.type = type.type}
 param_id -> {id.type = param_id.type} <id> bracket
-bracket -> <[> <]> # <eps>
+bracket -> <[> <]>
+bracket -> <eps>
 
-stmt_list -> stmt stmt_list # <eps>
-stmt -> var_dec # break_stmt # continue_stmt # return_stmt # if_stmt # for_stmt # print_stmt # expr_stmt # <{> stmt_list <}> # <;>
+stmt_list -> stmt stmt_list
+stmt_list -> <eps>
+stmt -> var_dec
+stmt -> break_stmt
+stmt -> continue_stmt
+stmt -> return_stmt
+stmt -> if_stmt
+stmt -> for_stmt
+stmt -> print_stmt
+stmt -> expr_stmt
+stmt -> <{> stmt_list <}>
+stmt -> <;>
 
 if_stmt -> <if> <(> exp <)> stmt else_stmt {if_stmt.type = exp.type}
-else_stmt -> <else> stmt # <eps>
+else_stmt -> <else> stmt
+else_stmt -> <eps>
 
 break_stmt -> <break> <;>
 continue_stmt -> <continue> <;>
@@ -39,40 +68,70 @@ return_stmt -> <return> exp <;> {return_stmt.type = exp.type}
 for_stmt -> <for> <(> var_dec exp <;> exp <)> stmt
 print_stmt -> <print> <(> context <)> <;>
 context -> <string> context2
-context2 -> <,> exp context2 # <eps>
+context2 -> <,> exp context2
+context2 -> <eps>
 expr_stmt -> exp <;>
 
 exp -> exp1 t1 {if (t1.type == void) exp.type = exp1.type; else exp.type = t1.type;}
-t1 -> <,> exp1 t1@ {if (t1@.type == void) t1.type = exp1.type; else t1.type = t1@.type;} # <eps> {t1.type = void}
+t1 -> <,> exp1 t1@ {if (t1@.type == void) t1.type = exp1.type; else t1.type = t1@.type;}
+t1 -> <eps> {t1.type = void}
 
-exp1 -> exp2 t2 {if (t2.type == void) exp1.type = exp2.type; else exp1.type = exp2.type;} // assert t2.type is void or exp2.type == t2.type
-t2 -> <=> exp1 {t2.type = exp1.type} # <eps> {t2.type = void}
+exp1 -> exp2 t2 {if (t2.type == void or t2.type == exp2.type) exp1.type = exp2.type; else error, exp1.type = exp2.type;}
+t2 -> <=> exp2 t2@ {if (t2@.type == void or t2@.type == exp2.type) t2.type = exp2.type; else error, t2.type = exp2.type;}
+t2 -> <eps> {t2.type = void}
 
-exp2 -> exp3 t3
-t3 -> <||> exp3 t3 # <eps>
+exp2 -> exp3 t3 {if (t3.type == void or t3.type == exp3.type) exp2.type = exp3.type; else error, exp2.type = bool;}
+t3 -> <||> exp3 t3@ {if (t3@.type == void or t3@.type == exp3.type) t3.type = exp3.type; else eroor, t3.type = bool;}
+t3 -> <eps> {t3.type = void}
 
-exp3 -> exp4 t4
-t4 -> <&&> exp4 t4 # <eps>
+exp3 -> exp4 t4 {if (t4.type == void or t4.type == exp4.type) exp3.type = exp4.type; else error, exp3.type = bool;}
+t4 -> <&&> exp4 t4@ {if (t4@.type == void or t4@.type == exp4.type) t4.type = exp4.type; else error, t4.type = bool;}
+t4 -> <eps> {t4.type = void}
 
-exp4 -> exp5 t5
-t5 -> <==> exp5 t5 # <!=> exp5 t5 # <eps>
+exp4 -> exp5 t5 {if (t5.type == void or t5.type == exp5.type) exp4.type = exp5.type; else error, exp4.type = bool;}
+t5 -> <==> exp5 t5@ {if (t5@.type == void or t5@.type == exp5.type) t5.type = exp5.type; else error, t5.type = bool;} 
+t5 -> <!=> exp5 t5@ {if (t5@.type == void or t5@.type == exp5.type) t5.type = exp5.type; else error, t5.type = bool;}
+t5 -> <eps> {t5.type = void}
 
-exp5 -> exp6 t6
-t6 -> <<> exp6 t6 # <>> exp6 t6 # <<=> exp6 t6 # <>=> exp6 t6 # <eps>
+exp5 -> exp6 t6 {if (t6.type == void or t6.type == exp6.type) exp5.type = exp6.type; else error, exp5.type = bool;}
+t6 -> <<> exp6 t6@ {if (t6@.type == void or t6@.type == exp6.type) t6.type = exp6.type; else error, t6.type = bool;}
+t6 -> <>> exp6 t6@ {if (t6@.type == void or t6@.type == exp6.type) t6.type = exp6.type; else error, t6.type = bool;}
+t6 -> <<=> exp6 t6@ {if (t6@.type == void or t6@.type == exp6.type) t6.type = exp6.type; else error, t6.type = bool;}
+t6 -> <>=> exp6 t6@ {if (t6@.type == void or t6@.type == exp6.type) t6.type = exp6.type; else error, t6.type = bool;}
+t6 -> <eps> {t6.type = void}
 
-exp6 -> exp7 t7
-t7 -> <+> exp7 t7 # <-> exp7 t7 # <eps>
+exp6 -> exp7 t7 {if (t7.type == void or t7.type == exp7.type) exp6.type = exp7.type; else error, exp6.type = int;}
+t7 -> <+> exp7 t7@ {if (t7@.type == void or t7@.type == exp7.type) t7.type = exp7.type; else error, t7.type = int;}
+t7 -> <-> exp7 t7@ {if (t7@.type == void or t7@.type == exp7.type) t7.type = exp7.type; else error, t7.type = int;}
+t7 -> <eps> {t7.type = void}
 
-exp7 -> exp8 t8
-t8 -> <*> exp8 t8 # </> exp8 t8 # <%> exp8 t8 # <eps>
+exp7 -> exp8 t8 {if (t8.type == void or t8.type == exp8.type) exp7.type = exp8.type; else error, exp7.type = int;}
+t8 -> <*> exp8 t8@ {if (t8@.type == void or t8@.type == exp8.type) t8.type = exp8.type; else error, t8.type = int;}
+t8 -> </> exp8 t8@ {if (t8@.type == void or t8@.type == exp8.type) t8.type = exp8.type; else error, t8.type = int;}
+t8 -> <%> exp8 t8@ {if (t8@.type == void or t8@.type == exp8.type) t8.type = exp8.type; else error, t8.type = int;}
+t8 -> <eps> {t8.type = void}
 
-exp8 -> <+> exp9 # <-> exp9 # exp9 # <!> exp9
+exp8 -> <+> exp9 {if (exp9.type == int) exp8.type = int; else error, exp8.type = int;}
+exp8 -> <-> exp9 {if (exp9.type == int) exp8.type = int; else error, exp8.type = int;}
+exp8 -> <!> exp9 {if (exp9.type == int) exp8.type = int; else error, exp8.type = int;}
+exp8 -> exp9 {exp8.type = exp9.type}
 
-exp9 -> <(> exp <)> # <id> func_call_or_id # constant
+exp9 -> <(> exp <)> {exp9.type = exp.type}
+exp9 -> <id> func_call_or_id {exp9.type = id.type}
+exp9 -> constant {exp9.type = constant.type}
 
-func_call_or_id -> <(> params_call <)> # ebracket 
-params_call -> exp1 params_call2 # <eps>
-params_call2 -> <,> exp1 params_call2 # <eps>
-ebracket -> <[> exp <]> # <eps> 
+func_call_or_id -> <(> params_call <)>
+func_call_or_id -> ebracket 
+params_call -> exp1 params_call2
+params_call -> <eps>
+params_call2 -> <,> exp1 params_call2
+params_call2 -> <eps>
+ebracket -> <[> exp <]> // exp.type == int and exp.value >= 0
+ebracket -> <eps> 
 
-constant -> <decimal> # <hexadecimal> # <string> # <character> # <false> # <true>
+constant -> <decimal> {constant.type = int}
+constant -> <hexadecimal> {constant.type = int}
+constant -> <string> {constant.type = char}
+constant -> <character> {constant.type = char}
+constant -> <false> {constant.type = bool}
+constant -> <true> {constant.type = bool}

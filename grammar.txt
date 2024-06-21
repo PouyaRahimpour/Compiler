@@ -3,7 +3,7 @@ dec_list -> dec dec_list # <eps>
 dec -> type <id> init_dec
 init_dec -> var_dec_global # func_dec
 
-var_dec_global -> sz more 
+var_dec_global -> sz initial more 
 more -> , var_dec_list <;> # <;>
 
 var_dec -> type var_dec_list <;> # <;>

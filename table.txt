@@ -980,6 +980,8 @@ init_dec -> func_dec
 init_dec -> var_dec_global 
 # init_dec <;>
 init_dec -> var_dec_global 
+# init_dec <=>
+init_dec -> var_dec_global 
 # init_dec <[>
 init_dec -> var_dec_global 
 # init_dec <bool>
@@ -1565,11 +1567,13 @@ SYNCH
 # var_dec_global <$>
 SYNCH
 # var_dec_global <,>
-var_dec_global -> sz more 
+var_dec_global -> sz initial more 
 # var_dec_global <;>
-var_dec_global -> sz more 
+var_dec_global -> sz initial more 
+# var_dec_global <=>
+var_dec_global -> sz initial more 
 # var_dec_global <[>
-var_dec_global -> sz more 
+var_dec_global -> sz initial more 
 # var_dec_global <bool>
 SYNCH
 # var_dec_global <char>
