@@ -45,6 +45,18 @@ class SemanticAnalyzer {
                 }
                 else if (head_name == "var_dec_global") {
                     if (child_name == "more") {
+                        if (symbol.get_stype() != children[1]->get_data().get_stype() && children[1]->get_data().get_stype() != VOID) {
+                            // TODO Error assign with different type
+                            int line_number = -1;
+                            std::string id = node->get_parent()->get_parent()->get_children()[1]->get_content();
+                            std::string left_type = semantic_type_to_string[symbol.get_stype()];
+                            std::string right_type = semantic_type_to_string[children[1]->get_data().get_stype()];
+
+                            std::cerr << RED << "Semantic Error: Assigning types don't match for id '" + id + "', line: " << line_number << WHITE << std::endl;
+                            std::cerr << RED << "id type is '" + left_type +  "', but assign value type is '" + right_type + "'." << WHITE << std::endl;
+                            std::cerr << "---------------------------------------------------------------" << std::endl;
+                        }
+
                         // more.type = var_dec_glabal.type
                         child->get_data().set_stype(symbol.get_stype());
                     }
@@ -119,6 +131,19 @@ class SemanticAnalyzer {
                 // dec.type = type.type
                 symbol.set_stype(children[0]->get_data().get_stype());
             }
+            else if (head_name == "var_dec_init") {
+                if (children[0]->get_data().get_stype() != children[1]->get_data().get_stype() && children[1]->get_data().get_stype() != VOID) {
+                    // TODO Error assign with different type
+                    int line_number = -1;
+                    std::string id = children[0]->get_children()[0]->get_content();
+                    std::string left_type = semantic_type_to_string[children[0]->get_data().get_stype()];
+                    std::string right_type = semantic_type_to_string[children[1]->get_data().get_stype()];
+
+                    std::cerr << RED << "Semantic Error: Assigning types don't match for id '" + id + "', line: " << line_number << WHITE << std::endl;
+                    std::cerr << RED << "id type is '" + left_type +  "', but assign value type is '" + right_type + "'." << WHITE << std::endl;
+                    std::cerr << "---------------------------------------------------------------" << std::endl;
+                }
+            }
             else if (head_name == "optexp") {
                 if (children[0]->get_data().get_name() == "exp") {
                     // optexp.type = exp.type
@@ -141,8 +166,8 @@ class SemanticAnalyzer {
                 }
             }
             else if (head_name == "eexp") {
-                if (children[0]->get_data().get_name() == "exp") {
-                    // eexp.type = exp.type
+                if (children[0]->get_data().get_name() == "exp1") {
+                    // eexp.type = exp1.type
                     symbol.set_stype(children[0]->get_data().get_stype());
                 }
                 else if (children[0]->get_data().get_name() == "{") {
@@ -151,9 +176,9 @@ class SemanticAnalyzer {
                 }
             }
             else if (head_name == "exp_list") {
-                if (children[0]->get_data().get_name() == "exp") {
+                if (children[0]->get_data().get_name() == "exp1") {
                     if (children[0]->get_data().get_stype() == children[1]->get_data().get_stype() || children[1]->get_data().get_stype() == VOID) {
-                        // exp_list.type = exp.type
+                        // exp_list.type = exp1.type
                         symbol.set_stype(children[0]->get_data().get_stype());
                     }
                     else {
@@ -170,7 +195,7 @@ class SemanticAnalyzer {
             else if (head_name == "exp_list2") {
                 if (children[0]->get_data().get_name() == ",") {
                     if (children[1]->get_data().get_stype() == children[2]->get_data().get_stype() || children[2]->get_data().get_stype() == VOID) {
-                        // exp_list2.type = exp.type
+                        // exp_list2.type = exp1.type
                         symbol.set_stype(children[0]->get_data().get_stype());
                     }
                     else {

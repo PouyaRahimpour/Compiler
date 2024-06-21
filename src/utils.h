@@ -140,6 +140,13 @@ enum semantic_type {
     CHAR
 };
 
+const std::string semantic_type_to_string[] = {
+    "void",
+    "int",
+    "bool",
+    "char"
+};
+
 class Symbol {
     private:
         std::string name;

@@ -4,7 +4,7 @@ dec -> type <id> init_dec
 init_dec -> var_dec_global # func_dec
 
 var_dec_global -> sz initial more 
-more -> , var_dec_list <;> # <;>
+more -> <,> var_dec_list <;> # <;>
 
 var_dec -> type var_dec_list <;> # <;>
 var_dec_list -> var_dec_init var_dec_list2 # <eps>
@@ -15,9 +15,9 @@ sz -> <[> optexp <]> # <eps>
 optexp -> exp # <eps>
 
 initial -> <=> eexp # <eps>
-eexp -> exp # <{> exp_list <}>
-exp_list -> exp exp_list2 # <eps>
-exp_list2 -> <,> exp exp_list2 # <eps>
+eexp -> exp1 # <{> exp_list <}>
+exp_list -> exp1 exp_list2 # <eps>
+exp_list2 -> <,> exp1 exp_list2 # <eps>
 type -> <int> # <bool> # <char>
 
 func_dec -> <(> params <)> <{> stmt_list <}>
