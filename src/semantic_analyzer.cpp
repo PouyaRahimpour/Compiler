@@ -46,7 +46,6 @@ class SemanticAnalyzer {
                 else if (head_name == "var_dec_global") {
                     if (child_name == "more") {
                         if (symbol.get_stype() != children[1]->get_data().get_stype() && children[1]->get_data().get_stype() != VOID) {
-                            // TODO Error assign with different type
                             int line_number = -1;
                             std::string id = node->get_parent()->get_parent()->get_children()[1]->get_content();
                             std::string left_type = semantic_type_to_string[symbol.get_stype()];
@@ -133,7 +132,6 @@ class SemanticAnalyzer {
             }
             else if (head_name == "var_dec_init") {
                 if (children[0]->get_data().get_stype() != children[1]->get_data().get_stype() && children[1]->get_data().get_stype() != VOID) {
-                    // TODO Error assign with different type
                     int line_number = -1;
                     std::string id = children[0]->get_children()[0]->get_content();
                     std::string left_type = semantic_type_to_string[children[0]->get_data().get_stype()];
@@ -182,12 +180,32 @@ class SemanticAnalyzer {
                         symbol.set_stype(children[0]->get_data().get_stype());
                     }
                     else {
+                        int line_number = -1;
+                        Node<Symbol>* tmp = node->get_parent();
+                        std::string id;
+                        while (true) {
+                            if (tmp->get_data().get_name() == "dec") {
+                                id = tmp->get_children()[1]->get_content();
+                                break;
+                            }
+                            else if (tmp->get_data().get_name() == "var_dec_init") {
+                                id = tmp->get_children()[0]->get_children()[0]->get_content();
+                                break;
+                            }
+                            tmp = tmp->get_parent();
+                        }
+                        std::string member_type1 = semantic_type_to_string[children[0]->get_data().get_stype()];
+                        std::string member_type2 = semantic_type_to_string[children[1]->get_data().get_stype()];
+
+                        std::cerr << RED << "Semantic Error: All array memebers must have the same type for array '" + id + "', line: " << line_number << WHITE << std::endl;
+                        std::cerr << RED << "'" + member_type1 +  "' and '" + member_type2 + "' types exist in array." << WHITE << std::endl;
+                        std::cerr << "---------------------------------------------------------------" << std::endl;
+
                         // exp_list.type = void
                         symbol.set_stype(VOID);
                     }
                 }
                 else if (children[0]->get_data().get_name() == "eps") {
-                    // TODO Error
                     // exp_list.type = void 
                     symbol.set_stype(VOID);
                 }
@@ -196,10 +214,30 @@ class SemanticAnalyzer {
                 if (children[0]->get_data().get_name() == ",") {
                     if (children[1]->get_data().get_stype() == children[2]->get_data().get_stype() || children[2]->get_data().get_stype() == VOID) {
                         // exp_list2.type = exp1.type
-                        symbol.set_stype(children[0]->get_data().get_stype());
+                        symbol.set_stype(children[1]->get_data().get_stype());
                     }
                     else {
-                        // TODO Error
+                        int line_number = -1;
+                        Node<Symbol>* tmp = node->get_parent();
+                        std::string id;
+                        while (true) {
+                            if (tmp->get_data().get_name() == "dec") {
+                                id = tmp->get_children()[1]->get_content();
+                                break;
+                            }
+                            else if (tmp->get_data().get_name() == "var_dec_init") {
+                                id = tmp->get_children()[0]->get_children()[0]->get_content();
+                                break;
+                            }
+                            tmp = tmp->get_parent();
+                        }
+                        std::string member_type1 = semantic_type_to_string[children[1]->get_data().get_stype()];
+                        std::string member_type2 = semantic_type_to_string[children[2]->get_data().get_stype()];
+
+                        std::cerr << RED << "Semantic Error: All array memebers must have the same type for array '" + id + "', line: " << line_number << WHITE << std::endl;
+                        std::cerr << RED << "'" + member_type1 +  "' and '" + member_type2 + "' types exist in array." << WHITE << std::endl;
+                        std::cerr << "---------------------------------------------------------------" << std::endl;
+
                         // exp_list2.type = void
                         symbol.set_stype(VOID);
                     }
