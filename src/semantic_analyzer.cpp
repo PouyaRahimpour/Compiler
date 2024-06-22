@@ -400,8 +400,8 @@ class SemanticAnalyzer {
                     std::string left_type = semantic_type_to_string[children[0]->get_data().get_stype()];
                     std::string right_type = semantic_type_to_string[children[1]->get_data().get_stype()];
 
-                    std::cerr << RED << "Semantic Error: Logical operator || takes 2 values of bool type, line: " << line_number << WHITE << std::endl;
-                    std::cerr << RED << "first valu type is '" + left_type +  "', but second value type is '" + right_type + "'." << WHITE << std::endl;
+                    std::cerr << RED << "Semantic Error: Logical operator || takes 2 values with the bool type, line: " << line_number << WHITE << std::endl;
+                    std::cerr << RED << "first value type is '" + left_type +  "', but second value type is '" + right_type + "'." << WHITE << std::endl;
                     std::cerr << "---------------------------------------------------------------" << std::endl;
 
                     // exp2.type = bool 
@@ -419,8 +419,8 @@ class SemanticAnalyzer {
                         std::string left_type = semantic_type_to_string[children[1]->get_data().get_stype()];
                         std::string right_type = semantic_type_to_string[children[2]->get_data().get_stype()];
 
-                        std::cerr << RED << "Semantic Error: Logical operator || takes 2 values of bool type, line: " << line_number << WHITE << std::endl;
-                        std::cerr << RED << "first valu type is '" + left_type +  "', but second value type is '" + right_type + "'." << WHITE << std::endl;
+                        std::cerr << RED << "Semantic Error: Logical operator || takes 2 values with the bool type, line: " << line_number << WHITE << std::endl;
+                        std::cerr << RED << "first value type is '" + left_type +  "', but second value type is '" + right_type + "'." << WHITE << std::endl;
                         std::cerr << "---------------------------------------------------------------" << std::endl;
 
                         // t3.type = bool 
@@ -442,8 +442,8 @@ class SemanticAnalyzer {
                     std::string left_type = semantic_type_to_string[children[0]->get_data().get_stype()];
                     std::string right_type = semantic_type_to_string[children[1]->get_data().get_stype()];
 
-                    std::cerr << RED << "Semantic Error: Logical operator || takes 2 values of bool type, line: " << line_number << WHITE << std::endl;
-                    std::cerr << RED << "first valu type is '" + left_type +  "', but second value type is '" + right_type + "'." << WHITE << std::endl;
+                    std::cerr << RED << "Semantic Error: Logical operator && takes 2 values with the bool type, line: " << line_number << WHITE << std::endl;
+                    std::cerr << RED << "first value type is '" + left_type +  "', but second value type is '" + right_type + "'." << WHITE << std::endl;
                     std::cerr << "---------------------------------------------------------------" << std::endl;
 
                     // exp3.type = bool 
@@ -453,7 +453,7 @@ class SemanticAnalyzer {
             else if (head_name == "t4") {
                 if (children[0]->get_data().get_name() == "&&") {
                     if (children[2]->get_data().get_stype() == VOID || (children[1]->get_data().get_stype() == BOOL && children[2]->get_data().get_stype() == BOOL)) {
-                        // t3.type = exp3.type
+                        // t4.type = exp4.type
                         symbol.set_stype(children[1]->get_data().get_stype());
                     }
                     else {
@@ -461,11 +461,11 @@ class SemanticAnalyzer {
                         std::string left_type = semantic_type_to_string[children[1]->get_data().get_stype()];
                         std::string right_type = semantic_type_to_string[children[2]->get_data().get_stype()];
 
-                        std::cerr << RED << "Semantic Error: Logical operator || takes 2 values of bool type, line: " << line_number << WHITE << std::endl;
-                        std::cerr << RED << "first valu type is '" + left_type +  "', but second value type is '" + right_type + "'." << WHITE << std::endl;
+                        std::cerr << RED << "Semantic Error: Logical operator && takes 2 values with the bool type, line: " << line_number << WHITE << std::endl;
+                        std::cerr << RED << "first value type is '" + left_type +  "', but second value type is '" + right_type + "'." << WHITE << std::endl;
                         std::cerr << "---------------------------------------------------------------" << std::endl;
 
-                        // t3.type = bool 
+                        // t4.type = bool 
                         symbol.set_stype(BOOL);
                     }
                 }
@@ -475,17 +475,18 @@ class SemanticAnalyzer {
                 }
             }
             else if (head_name == "exp4") {
-                if (children[1]->get_data().get_stype() == VOID || (children[0]->get_data().get_stype() == BOOL && children[1]->get_data().get_stype() == BOOL)) {
+                if (children[1]->get_data().get_stype() == VOID || children[0]->get_data().get_stype() == children[1]->get_data().get_stype()) {
                     // exp4.type = exp5.type
                     symbol.set_stype(children[0]->get_data().get_stype());
                 }
                 else {
                     int line_number = -1;
+                    std::string opt = children[1]->get_children()[0]->get_data().get_name();
                     std::string left_type = semantic_type_to_string[children[0]->get_data().get_stype()];
                     std::string right_type = semantic_type_to_string[children[1]->get_data().get_stype()];
 
-                    std::cerr << RED << "Semantic Error: Logical operator || takes 2 values of bool type, line: " << line_number << WHITE << std::endl;
-                    std::cerr << RED << "first valu type is '" + left_type +  "', but second value type is '" + right_type + "'." << WHITE << std::endl;
+                    std::cerr << RED << "Semantic Error: Logical operator " + opt + " takes 2 values with the same type, line: " << line_number << WHITE << std::endl;
+                    std::cerr << RED << "first value type is '" + left_type +  "', but second value type is '" + right_type + "'." << WHITE << std::endl;
                     std::cerr << "---------------------------------------------------------------" << std::endl;
 
                     // exp4.type = bool 
@@ -494,20 +495,21 @@ class SemanticAnalyzer {
             }
             else if (head_name == "t5") {
                 if (children[0]->get_data().get_name() == "==" || children[0]->get_data().get_name() == "!=") {
-                    if (children[2]->get_data().get_stype() == VOID || (children[1]->get_data().get_stype() == BOOL && children[2]->get_data().get_stype() == BOOL)) {
-                        // t3.type = exp3.type
+                    if (children[2]->get_data().get_stype() == VOID || children[1]->get_data().get_stype() == children[2]->get_data().get_stype()) {
+                        // t5.type = exp5.type
                         symbol.set_stype(children[1]->get_data().get_stype());
                     }
                     else {
                         int line_number = -1;
+                        std::string opt = children[2]->get_children()[0]->get_data().get_name();
                         std::string left_type = semantic_type_to_string[children[1]->get_data().get_stype()];
                         std::string right_type = semantic_type_to_string[children[2]->get_data().get_stype()];
 
-                        std::cerr << RED << "Semantic Error: Logical operator || takes 2 values of bool type, line: " << line_number << WHITE << std::endl;
-                        std::cerr << RED << "first valu type is '" + left_type +  "', but second value type is '" + right_type + "'." << WHITE << std::endl;
+                        std::cerr << RED << "Semantic Error: Logical operator " + opt + " takes 2 values with the same type, line: " << line_number << WHITE << std::endl;
+                        std::cerr << RED << "first value type is '" + left_type +  "', but second value type is '" + right_type + "'." << WHITE << std::endl;
                         std::cerr << "---------------------------------------------------------------" << std::endl;
 
-                        // t3.type = bool 
+                        // t5.type = bool 
                         symbol.set_stype(BOOL);
                     }
                 }
@@ -517,17 +519,18 @@ class SemanticAnalyzer {
                 }
             }
             else if (head_name == "exp5") {
-                if (children[1]->get_data().get_stype() == VOID || (children[0]->get_data().get_stype() == BOOL && children[1]->get_data().get_stype() == BOOL)) {
+                if (children[1]->get_data().get_stype() == VOID || children[0]->get_data().get_stype() == children[1]->get_data().get_stype()) {
                     // exp5.type = exp6.type
                     symbol.set_stype(children[0]->get_data().get_stype());
                 }
                 else {
                     int line_number = -1;
+                    std::string opt = children[1]->get_children()[0]->get_data().get_name();
                     std::string left_type = semantic_type_to_string[children[0]->get_data().get_stype()];
                     std::string right_type = semantic_type_to_string[children[1]->get_data().get_stype()];
 
-                    std::cerr << RED << "Semantic Error: Logical operator || takes 2 values of bool type, line: " << line_number << WHITE << std::endl;
-                    std::cerr << RED << "first valu type is '" + left_type +  "', but second value type is '" + right_type + "'." << WHITE << std::endl;
+                    std::cerr << RED << "Semantic Error: Logical operator " + opt + " takes 2 values with the same type, line: " << line_number << WHITE << std::endl;
+                    std::cerr << RED << "first value type is '" + left_type +  "', but second value type is '" + right_type + "'." << WHITE << std::endl;
                     std::cerr << "---------------------------------------------------------------" << std::endl;
 
                     // exp5.type = bool 
@@ -537,20 +540,21 @@ class SemanticAnalyzer {
             else if (head_name == "t6") {
                 if (children[0]->get_data().get_name() == "<" || children[0]->get_data().get_name() == ">"
                     || children[0]->get_data().get_name() == "<=" || children[0]->get_data().get_name() == ">=") {
-                    if (children[2]->get_data().get_stype() == VOID || (children[1]->get_data().get_stype() == BOOL && children[2]->get_data().get_stype() == BOOL)) {
-                        // t3.type = exp3.type
+                    if (children[2]->get_data().get_stype() == VOID || children[1]->get_data().get_stype() == children[2]->get_data().get_stype()) {
+                        // t6.type = exp6.type
                         symbol.set_stype(children[1]->get_data().get_stype());
                     }
                     else {
                         int line_number = -1;
+                        std::string opt = children[2]->get_children()[0]->get_data().get_name();
                         std::string left_type = semantic_type_to_string[children[1]->get_data().get_stype()];
                         std::string right_type = semantic_type_to_string[children[2]->get_data().get_stype()];
 
-                        std::cerr << RED << "Semantic Error: Logical operator || takes 2 values of bool type, line: " << line_number << WHITE << std::endl;
-                        std::cerr << RED << "first valu type is '" + left_type +  "', but second value type is '" + right_type + "'." << WHITE << std::endl;
+                        std::cerr << RED << "Semantic Error: Logical operator " + opt + " takes 2 values with the same type, line: " << line_number << WHITE << std::endl;
+                        std::cerr << RED << "first value type is '" + left_type +  "', but second value type is '" + right_type + "'." << WHITE << std::endl;
                         std::cerr << "---------------------------------------------------------------" << std::endl;
 
-                        // t3.type = bool 
+                        // t6.type = bool 
                         symbol.set_stype(BOOL);
                     }
                 }
@@ -565,7 +569,15 @@ class SemanticAnalyzer {
                     symbol.set_stype(children[0]->get_data().get_stype());
                 }
                 else {
-                    // TODO Error
+                    int line_number = -1;
+                    std::string opt = children[1]->get_children()[0]->get_data().get_name();
+                    std::string left_type = semantic_type_to_string[children[0]->get_data().get_stype()];
+                    std::string right_type = semantic_type_to_string[children[1]->get_data().get_stype()];
+
+                    std::cerr << RED << "Semantic Error: Computational operator " + opt + " takes 2 values with the int type, line: " << line_number << WHITE << std::endl;
+                    std::cerr << RED << "first value type is '" + left_type +  "', but second value type is '" + right_type + "'." << WHITE << std::endl;
+                    std::cerr << "---------------------------------------------------------------" << std::endl;
+
                     // exp6.type = int 
                     symbol.set_stype(INT);
                 }
@@ -577,7 +589,15 @@ class SemanticAnalyzer {
                         symbol.set_stype(children[1]->get_data().get_stype());
                     }
                     else {
-                        // TODO Error
+                        int line_number = -1;
+                        std::string opt = children[2]->get_children()[0]->get_data().get_name();
+                        std::string left_type = semantic_type_to_string[children[1]->get_data().get_stype()];
+                        std::string right_type = semantic_type_to_string[children[2]->get_data().get_stype()];
+
+                        std::cerr << RED << "Semantic Error: Computational operator " + opt + " takes 2 values with the int type, line: " << line_number << WHITE << std::endl;
+                        std::cerr << RED << "first value type is '" + left_type +  "', but second value type is '" + right_type + "'." << WHITE << std::endl;
+                        std::cerr << "---------------------------------------------------------------" << std::endl;
+
                         // t7.type = int 
                         symbol.set_stype(INT);
                     }
@@ -593,7 +613,15 @@ class SemanticAnalyzer {
                     symbol.set_stype(children[0]->get_data().get_stype());
                 }
                 else {
-                    // TODO Error
+                    int line_number = -1;
+                    std::string opt = children[1]->get_children()[0]->get_data().get_name();
+                    std::string left_type = semantic_type_to_string[children[0]->get_data().get_stype()];
+                    std::string right_type = semantic_type_to_string[children[1]->get_data().get_stype()];
+
+                    std::cerr << RED << "Semantic Error: Computational operator " + opt + " takes 2 values with the int type, line: " << line_number << WHITE << std::endl;
+                    std::cerr << RED << "first value type is '" + left_type +  "', but second value type is '" + right_type + "'." << WHITE << std::endl;
+                    std::cerr << "---------------------------------------------------------------" << std::endl;
+
                     // exp7.type = int 
                     symbol.set_stype(INT);
                 }
@@ -606,7 +634,15 @@ class SemanticAnalyzer {
                         symbol.set_stype(children[1]->get_data().get_stype());
                     }
                     else {
-                        // TODO Error
+                        int line_number = -1;
+                        std::string opt = children[2]->get_children()[0]->get_data().get_name();
+                        std::string left_type = semantic_type_to_string[children[1]->get_data().get_stype()];
+                        std::string right_type = semantic_type_to_string[children[2]->get_data().get_stype()];
+
+                        std::cerr << RED << "Semantic Error: Computational operator " + opt + " takes 2 values with the int type, line: " << line_number << WHITE << std::endl;
+                        std::cerr << RED << "first value type is '" + left_type +  "', but second value type is '" + right_type + "'." << WHITE << std::endl;
+                        std::cerr << "---------------------------------------------------------------" << std::endl;
+
                         // t8.type = int 
                         symbol.set_stype(INT);
                     }
@@ -617,20 +653,46 @@ class SemanticAnalyzer {
                 }
             }
             else if (head_name == "exp8") {
-                if (children[0]->get_data().get_name() == "exp9") {
-                    // exp8.type = exp9.type
-                    symbol.set_stype(children[0]->get_data().get_stype());
-                }
-                else {
+                if (children[0]->get_data().get_name() == "+" || children[0]->get_data().get_name() == "-") {
                     if (children[1]->get_data().get_stype() == INT) {
                         // exp8.type = int 
                         symbol.set_stype(INT);
                     }
                     else {
-                        // TODO Error
+                        int line_number = -1;
+                        std::string opt = children[0]->get_data().get_name();
+                        std::string right_type = semantic_type_to_string[children[1]->get_data().get_stype()];
+
+                        std::cerr << RED << "Semantic Error: Computational operator " + opt + " takes 1 value with the int type, line: " << line_number << WHITE << std::endl;
+                        std::cerr << RED << "value type is '" + right_type + "." << WHITE << std::endl;
+                        std::cerr << "---------------------------------------------------------------" << std::endl;
+
                         // exp8.type = int 
                         symbol.set_stype(INT);
                     }
+                }
+                else if (children[0]->get_data().get_name() == "!") {
+                    if (children[1]->get_data().get_stype() == BOOL) {
+                        // exp8.type = bool 
+                        symbol.set_stype(BOOL);
+                    }
+                    else {
+                        int line_number = -1;
+                        std::string opt = children[0]->get_data().get_name();
+                        std::string right_type = semantic_type_to_string[children[1]->get_data().get_stype()];
+
+                        std::cerr << RED << "Semantic Error: Computational operator " + opt + " takes 1 value with the bool type, line: " << line_number << WHITE << std::endl;
+                        std::cerr << RED << "value type is '" + right_type + "." << WHITE << std::endl;
+                        std::cerr << "---------------------------------------------------------------" << std::endl;
+
+                        // exp8.type = bool 
+                        symbol.set_stype(BOOL);
+                    }
+
+                }
+                else if (children[0]->get_data().get_name() == "exp9") {
+                    // exp8.type = exp9.type
+                    symbol.set_stype(children[0]->get_data().get_stype());
                 }
             }
             else if (head_name == "exp9") {
@@ -639,8 +701,8 @@ class SemanticAnalyzer {
                     symbol.set_stype(children[1]->get_data().get_stype());
                 }
                 else if (children[0]->get_data().get_name() == "id") {
-                    // exp9.type = symbol_tabel[id].type
                     // TODO this is wrong
+                    // exp9.type = symbol_tabel[id].type
                     symbol.set_stype(INT);
                 }
                 else if (children[0]->get_data().get_name() == "constant") {

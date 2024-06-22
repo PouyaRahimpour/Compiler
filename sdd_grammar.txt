@@ -80,12 +80,12 @@ exp1 -> exp2 t2 {if (t2.type == void or t2.type == exp2.type) exp1.type = exp2.t
 t2 -> <=> exp2 t2@ {if (t2@.type == void or t2@.type == exp2.type) t2.type = exp2.type; else error, t2.type = exp2.type;}
 t2 -> <eps> {t2.type = void}
 
-exp2 -> exp3 t3 {if (t3.type == void or (t3.type == bool and exp3.type == bool) exp2.type = exp3.type; else error, exp2.type = bool;}
-t3 -> <||> exp3 t3@ {if (t3@.type == void or (t3@.type == bool and exp3.type == bool) t3.type = exp3.type; else eroor, t3.type = bool;}
+exp2 -> exp3 t3 {if (t3.type == void or (t3.type == bool and exp3.type == bool)) exp2.type = exp3.type; else error, exp2.type = bool;}
+t3 -> <||> exp3 t3@ {if (t3@.type == void or (t3@.type == bool and exp3.type == bool)) t3.type = exp3.type; else eroor, t3.type = bool;}
 t3 -> <eps> {t3.type = void}
 
-exp3 -> exp4 t4 {if (t4.type == void or t4.type == exp4.type) exp3.type = exp4.type; else error, exp3.type = bool;}
-t4 -> <&&> exp4 t4@ {if (t4@.type == void or t4@.type == exp4.type) t4.type = exp4.type; else error, t4.type = bool;}
+exp3 -> exp4 t4 {if (t4.type == void or (t4.type == bool and exp4.type == bool)) exp3.type = exp4.type; else error, exp3.type = bool;}
+t4 -> <&&> exp4 t4@ {if (t4@.type == void or (t4@.type == bool and exp4.type == bool)) t4.type = exp4.type; else error, t4.type = bool;}
 t4 -> <eps> {t4.type = void}
 
 exp4 -> exp5 t5 {if (t5.type == void or t5.type == exp5.type) exp4.type = exp5.type; else error, exp4.type = bool;}
@@ -113,7 +113,7 @@ t8 -> <eps> {t8.type = void}
 
 exp8 -> <+> exp9 {if (exp9.type == int) exp8.type = int; else error, exp8.type = int;}
 exp8 -> <-> exp9 {if (exp9.type == int) exp8.type = int; else error, exp8.type = int;}
-exp8 -> <!> exp9 {if (exp9.type == int) exp8.type = int; else error, exp8.type = int;}
+exp8 -> <!> exp9 {if (exp9.type == bool) exp8.type = bool; else error, exp8.type = bool;}
 exp8 -> exp9 {exp8.type = exp9.type}
 
 exp9 -> <(> exp <)> {exp9.type = exp.type}
