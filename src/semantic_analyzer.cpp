@@ -114,9 +114,6 @@ class SemanticAnalyzer {
                             std::cerr << "---------------------------------------------------------------" << std::endl;
                         }
 
-                        if (current_func != "") {
-                            // TODO error cannot define funt into func
-                        }
                         current_func = id;
                     }
                 }
@@ -213,9 +210,14 @@ class SemanticAnalyzer {
 
                             std::cerr << RED << "Semantic Error: Use undefined function '" + id + "', line: " << line_number << WHITE << std::endl;
                             std::cerr << "---------------------------------------------------------------" << std::endl;
+                            symbol.set_stype(VOID);
                         }
                         else if (symbol_table[id].get_type() == VAR) {
-                            // TODO error use variable instead func
+                            int line_number = -1;
+
+                            std::cerr << RED << "Semantic Error: Id '" + id + "' is variable but used instead a function , line: " << line_number << WHITE << std::endl;
+                            std::cerr << "---------------------------------------------------------------" << std::endl;
+                            symbol.set_stype(VOID);
                         }
                         else {
                             symbol.set_stype(symbol_table[id].get_stype());
@@ -228,9 +230,14 @@ class SemanticAnalyzer {
 
                             std::cerr << RED << "Semantic Error: Use undefined variable '" + id + "', line: " << line_number << WHITE << std::endl;
                             std::cerr << "---------------------------------------------------------------" << std::endl;
+                            symbol.set_stype(VOID);
                         }
-                        else if (symbol_table[id].get_type() == VAR) {
-                            // TODO error use func instead variable
+                        else if (symbol_table[id].get_type() == FUNC) {
+                            int line_number = -1;
+
+                            std::cerr << RED << "Semantic Error: Id '" + id + "' is function but used instead a variable , line: " << line_number << WHITE << std::endl;
+                            std::cerr << "---------------------------------------------------------------" << std::endl;
+                            symbol.set_stype(VOID);
                         }
                         else {
                             symbol.set_stype(symbol_table[id].get_stype());
@@ -428,15 +435,7 @@ class SemanticAnalyzer {
                 // param.type = type.type
                 symbol.set_stype(children[0]->get_data().get_stype());
 
-                Node<Symbol>* tmp = node;
-                std::string id;
-                while (true) {
-                    if (tmp->get_data().get_name() == "dec") {
-                        id = tmp->get_children()[1]->get_content();
-                        break;
-                    }
-                    tmp = tmp->get_parent();
-                }
+                std::string id = children[1]->get_children()[0]->get_content();
                 symbol_table[current_func].add_to_parameters({id, symbol.get_stype()});
             }
             else if (head_name == "if_stmt") {
@@ -859,6 +858,48 @@ class SemanticAnalyzer {
                 else if (children[0]->get_data().get_name() == "constant") {
                     // exp9.type = constant.type
                     symbol.set_stype(children[0]->get_data().get_stype());
+                }
+            }
+            else if (head_name == "func_call_or_id") {
+                if (node->get_children()[0]->get_data().get_name() == "(") {
+                    std::string id = node->get_parent()->get_children()[0]->get_content();
+                    std::vector<std::pair<std::string, semantic_type>> &define_params = symbol_table[id].get_parameters();
+                    int len_define_params = define_params.size();
+                    std::vector<semantic_type> &used_params = children[1]->get_data().get_params_type();
+                    int len_used_params = used_params.size();
+
+                    int line_number = -1;
+                    if (len_define_params > len_used_params) {
+                        std::cerr << RED << "Semantic Error: Too few arguments for function '" + id + "', line: " << line_number << WHITE << std::endl;
+                        std::cerr << RED << "Expected " + std::to_string(len_define_params) + " arguments but found " + std::to_string(len_used_params) + " arguments." << WHITE << std::endl;
+                        std::cerr << "---------------------------------------------------------------" << std::endl;
+                    }
+                    else if (len_define_params < len_used_params) {
+                        std::cerr << RED << "Semantic Error: Too many arguments for function '" + id + "', line: " << line_number << WHITE << std::endl;
+                        std::cerr << RED << "Expected " + std::to_string(len_define_params) + " arguments but found " + std::to_string(len_used_params) + " arguments." << WHITE << std::endl;
+                        std::cerr << "---------------------------------------------------------------" << std::endl;
+                    }
+                    else {
+                        for (int i = 0; i < len_define_params; i++) {
+                            if (define_params[i].second != used_params[i]) {
+                                std::cerr << RED << "Semantic Error: Unmatched type for " + std::to_string(i + 1) + "th argument '" + define_params[i].first +  "' of function '" + id + "', line: " << line_number << WHITE << std::endl;
+                                std::cerr << RED << "Expected '" + semantic_type_to_string[define_params[i].second] + "' type but found '" + semantic_type_to_string[used_params[i]] + "' type." << WHITE << std::endl;
+                                std::cerr << "---------------------------------------------------------------" << std::endl;
+                            }
+                        }
+                    }
+                }
+            }
+            else if (head_name == "params_call") {
+                if (node->get_children()[0]->get_data().get_name() == "exp1") {
+                    symbol.add_to_params_type(children[0]->get_data().get_stype()); 
+                    symbol.add_to_params_type(children[1]->get_data().get_params_type()); 
+                }
+            }
+            else if (head_name == "params_call2") {
+                if (children[0]->get_data().get_name() == ",") {
+                    symbol.add_to_params_type(children[1]->get_data().get_stype()); 
+                    symbol.add_to_params_type(children[2]->get_data().get_params_type()); 
                 }
             }
             else if (head_name == "ebracket") {

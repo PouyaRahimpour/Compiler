@@ -152,6 +152,7 @@ class Symbol {
         std::string name;
         symbol_type type;
         semantic_type stype;
+        std::vector<semantic_type> params_type;
 
     public:
         Symbol() {}
@@ -178,6 +179,17 @@ class Symbol {
         }
         semantic_type get_stype() const {
             return stype;
+        }
+        void add_to_params_type(semantic_type _stype) {
+            params_type.push_back(_stype);
+        }
+        void add_to_params_type(std::vector<semantic_type> &_params_type) {
+            for (auto _stype : _params_type) {
+                params_type.push_back(_stype);
+            }
+        }
+        std::vector<semantic_type>& get_params_type() {
+            return params_type;
         }
 
         bool operator == (const Symbol &other) const {
