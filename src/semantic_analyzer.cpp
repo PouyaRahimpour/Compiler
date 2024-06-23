@@ -1,20 +1,67 @@
 #include "semantic_analyzer.h"
 #include "utils.h"
 
-// TODO shaw line number for errors
-class SymbolTableEntry {
-    private:
-        // variable function array
-        
-    public:
-
+enum id_type {
+    VAR, 
+    FUNC,
+    NONE
 };
 
+class SymbolTableEntry {
+    private:
+        id_type type;
+        semantic_type stype;
+        std::vector<std::pair<std::string, semantic_type>> parameters;
+        int def_area;
+        
+    public:
+        SymbolTableEntry() {
+            type = NONE;
+        }
+        SymbolTableEntry(id_type _type, semantic_type _stype, int _def_area) {
+            type = _type;
+            stype = _stype;
+            def_area = _def_area;
+        }
+
+        void set_type(id_type _type) {
+            type = _type;
+        }
+        id_type get_type() {
+            return type;
+        }
+        void set_stype(semantic_type _stype) {
+            stype = _stype;
+        }
+        semantic_type get_stype() {
+            return stype;
+        }
+        void add_to_parameters(std::pair<std::string, semantic_type> parameter) {
+            parameters.push_back(parameter);
+        }
+        std::vector<std::pair<std::string, semantic_type>>& get_parameters() {
+            return parameters;
+        }
+        void set_def_area(int _def_area) {
+            def_area = _def_area;
+        }
+        int get_def_area() {
+            return def_area;
+        }
+
+        void clear_parameters() {
+            parameters.clear();
+        }
+};
+
+// TODO show line number for errors
 class SemanticAnalyzer {
     private:
         std::string out_address;
         Tree<Symbol> parse_tree;
         std::map<std::string, SymbolTableEntry> symbol_table;
+        int def_area;
+        std::string current_func;
 
         void dfs(Node<Symbol>* node) {
             std::deque<Node<Symbol>*> children = node->get_children();
@@ -23,7 +70,7 @@ class SemanticAnalyzer {
 
             for (auto child : children) {
                 std::string child_name = child->get_data().get_name();
-                // Semantic rules for inherited attribute
+                // Semantic rules for inherited attributes
                 if (head_name == "dec") {
                     if (child_name == "id") {
                         // id.type = type.type
@@ -38,10 +85,39 @@ class SemanticAnalyzer {
                     if (child_name == "var_dec_global") {
                         // var_dec_glabal.type = init_dec_type
                         child->get_data().set_stype(symbol.get_stype());
+
+                        std::string id = node->get_parent()->get_children()[1]->get_content();
+                        semantic_type stype = node->get_parent()->get_children()[1]->get_data().get_stype();
+                        if (symbol_table[id].get_type() == NONE) {
+                            symbol_table[id] = SymbolTableEntry(VAR, stype, def_area);
+                        }
+                        else {
+                            int line_number = -1;
+
+                            std::cerr << RED << "Semantic Error: Redefinition of variable '" + id + "', line: " << line_number << WHITE << std::endl;
+                            std::cerr << "---------------------------------------------------------------" << std::endl;
+                        }
                     }
                     else if (child_name == "func_dec") {
                         // func_dec.type = init_dec_type
                         child->get_data().set_stype(symbol.get_stype());
+
+                        std::string id = node->get_parent()->get_children()[1]->get_content();
+                        semantic_type stype = node->get_parent()->get_children()[1]->get_data().get_stype();
+                        if (symbol_table[id].get_type() == NONE) {
+                            symbol_table[id] = SymbolTableEntry(FUNC, stype, def_area);
+                        }
+                        else {
+                            int line_number = -1;
+
+                            std::cerr << RED << "Semantic Error: Redefinition of function '" + id + "', line: " << line_number << WHITE << std::endl;
+                            std::cerr << "---------------------------------------------------------------" << std::endl;
+                        }
+
+                        if (current_func != "") {
+                            // TODO error cannot define funt into func
+                        }
+                        current_func = id;
                     }
                 }
                 else if (head_name == "var_dec_global") {
@@ -103,6 +179,18 @@ class SemanticAnalyzer {
                     if (child_name == "id") {
                         // id.type = var_id.type
                         child->get_data().set_stype(symbol.get_stype());
+
+                        std::string id = children[0]->get_content();
+                        semantic_type stype = children[0]->get_data().get_stype();
+                        if (symbol_table[id].get_type() == NONE) {
+                            symbol_table[id] = SymbolTableEntry(VAR, stype, def_area);
+                        }
+                        else {
+                            int line_number = -1;
+
+                            std::cerr << RED << "Semantic Error: Redefinition of variable '" + id + "', line: " << line_number << WHITE << std::endl;
+                            std::cerr << "---------------------------------------------------------------" << std::endl;
+                        }
                     }
                 }
                 else if (head_name == "param") {
@@ -117,12 +205,62 @@ class SemanticAnalyzer {
                         child->get_data().set_stype(symbol.get_stype());
                     }
                 }
+                else if (head_name == "func_call_or_id") {
+                    if (child_name == "(") {
+                        std::string id = node->get_parent()->get_children()[0]->get_content();
+                        if (symbol_table[id].get_type() == NONE) {
+                            int line_number = -1;
 
+                            std::cerr << RED << "Semantic Error: Use undefined function '" + id + "', line: " << line_number << WHITE << std::endl;
+                            std::cerr << "---------------------------------------------------------------" << std::endl;
+                        }
+                        else if (symbol_table[id].get_type() == VAR) {
+                            // TODO error use variable instead func
+                        }
+                        else {
+                            symbol.set_stype(symbol_table[id].get_stype());
+                        }
+                    }
+                    else if (child_name == "ebracket") {
+                        std::string id = node->get_parent()->get_children()[0]->get_content();
+                        if (symbol_table[id].get_type() == NONE) {
+                            int line_number = -1;
+
+                            std::cerr << RED << "Semantic Error: Use undefined variable '" + id + "', line: " << line_number << WHITE << std::endl;
+                            std::cerr << "---------------------------------------------------------------" << std::endl;
+                        }
+                        else if (symbol_table[id].get_type() == VAR) {
+                            // TODO error use func instead variable
+                        }
+                        else {
+                            symbol.set_stype(symbol_table[id].get_stype());
+                        }
+
+                    }
+                }
 
                 dfs(child);
             }
 
-            // Semantic rules for synthesizeⅾ attribute
+            if (head_name == "{") {
+                def_area++;
+            }
+            else if (head_name == "}") {
+                // TODO copy symbol_table or not?
+                for (auto &entry : symbol_table) {
+                    if (entry.second.get_def_area() == def_area) {
+                        symbol_table[entry.first].set_type(NONE); 
+                        symbol_table[entry.first].clear_parameters();
+                    }
+                }
+
+                def_area--;
+                if (def_area == 0) {
+                    current_func = "";
+                }
+            }
+
+            // Semantic rules for synthesized attributes
             if (head_name == "dec") {
                 // dec.type = type.type
                 symbol.set_stype(children[0]->get_data().get_stype());
@@ -286,9 +424,20 @@ class SemanticAnalyzer {
                     symbol.set_stype(CHAR);
                 }
             }
-            else if (head_name == "param_type") {
+            else if (head_name == "param") {
                 // param.type = type.type
                 symbol.set_stype(children[0]->get_data().get_stype());
+
+                Node<Symbol>* tmp = node;
+                std::string id;
+                while (true) {
+                    if (tmp->get_data().get_name() == "dec") {
+                        id = tmp->get_children()[1]->get_content();
+                        break;
+                    }
+                    tmp = tmp->get_parent();
+                }
+                symbol_table[current_func].add_to_parameters({id, symbol.get_stype()});
             }
             else if (head_name == "if_stmt") {
                 if (children[2]->get_data().get_stype() != VOID && children[2]->get_data().get_stype() != BOOL) {
@@ -701,9 +850,11 @@ class SemanticAnalyzer {
                     symbol.set_stype(children[1]->get_data().get_stype());
                 }
                 else if (children[0]->get_data().get_name() == "id") {
-                    // TODO this is wrong
-                    // exp9.type = symbol_tabel[id].type
-                    symbol.set_stype(INT);
+                    // id.type = func_call_or_id.type
+                    children[0]->get_data().set_stype(children[1]->get_data().get_stype());
+
+                    // exp9.type = id.type
+                    symbol.set_stype(children[0]->get_data().get_stype());
                 }
                 else if (children[0]->get_data().get_name() == "constant") {
                     // exp9.type = constant.type
@@ -755,9 +906,11 @@ class SemanticAnalyzer {
         SemanticAnalyzer(Tree<Symbol> _parse_tree, std::string output_file_name) {
             parse_tree = _parse_tree;
             out_address = output_file_name;
+            def_area = 0;
+            current_func = "";
             set_exp_types();
         }
-        // exp.type = int , bool
+
         void set_exp_types() {
             dfs(parse_tree.get_root());
         }

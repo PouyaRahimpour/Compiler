@@ -2,8 +2,8 @@ program -> dec_list
 dec_list -> dec dec_list
 dec_list -> <eps>
 dec -> type {id.type = type.type} <id> {init_dec.type = type.type} init_dec {dec.type = type.type}
-init_dec -> {var_dec_global.type = init_dec.type} var_dec_global
-init_dec -> {func_dec.type = init_dec.type} func_dec
+init_dec -> {var_dec_global.type = init_dec.type} {symbol_table[id] = type} var_dec_global
+init_dec -> {func_dec.type = init_dec.type} {symbol_table[id] = type} func_dec
 
 var_dec_global -> sz initial {if (var_id.type != initial.type and initial.type != void) error, more.type = var_dec_global.type} more
 more -> <,> {var_dec_list.type = more.type} var_dec_list <;>
@@ -16,7 +16,7 @@ var_dec_list -> <eps>
 var_dec_list2 -> <,> {var_dec_init.type = var_dec_list2.type} var_dec_init {var_dec_list2@.type = var_dec_list2} var_dec_list2@
 var_dec_list2 -> <eps>
 var_dec_init -> {var_id.type = var_dec_init.type} var_id initial {if (var_id.type != initial.type and initial.type != void) error}
-var_id -> {id.type = var_id.type} <id> sz
+var_id -> {id.type = var_id.type} {symbol_table[id] = type} <id> sz
 sz -> <[> optexp <]> {if (optexp.type != void and optexp.type != int} error;}
 sz -> <eps>
 optexp -> exp {optexp.type = exp.type}
@@ -117,11 +117,11 @@ exp8 -> <!> exp9 {if (exp9.type == bool) exp8.type = bool; else error, exp8.type
 exp8 -> exp9 {exp8.type = exp9.type}
 
 exp9 -> <(> exp <)> {exp9.type = exp.type}
-exp9 -> <id> func_call_or_id {exp9.type = symbol_table[id].type}
+exp9 -> <id> func_call_or_id {id.type = func_call_or_id.type, exp9.type = id.type}
 exp9 -> constant {exp9.type = constant.type}
 
-func_call_or_id -> <(> params_call <)>
-func_call_or_id -> ebracket 
+func_call_or_id -> {check symbol_table[id], func_call_or_id.type = symbol_table[id]} <(> params_call <)>
+func_call_or_id -> {check symbol_table[id], func_call_or_id.type = symbol_table[id]} ebracket 
 params_call -> exp1 params_call2
 params_call -> <eps>
 params_call2 -> <,> exp1 params_call2
