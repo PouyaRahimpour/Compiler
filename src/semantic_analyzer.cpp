@@ -1,12 +1,6 @@
 #include "semantic_analyzer.h"
 #include "utils.h"
 
-enum id_type {
-    VAR, 
-    FUNC,
-    NONE
-};
-
 class SymbolTableEntry {
     private:
         id_type type;
@@ -437,6 +431,19 @@ class SemanticAnalyzer {
 
                 std::string id = children[1]->get_children()[0]->get_content();
                 symbol_table[current_func].add_to_parameters({id, symbol.get_stype()});
+            }
+            else if (head_name == "stmt") {
+                if (children[0]->get_data().get_name() == "return_stmt") {
+                    if (children[0]->get_data().get_stype() != symbol_table[current_func].get_stype()) {
+                        int line_number = -1;
+                        std::string func_type = semantic_type_to_string[symbol_table[current_func].get_stype()];
+                        std::string return_type = semantic_type_to_string[children[0]->get_data().get_stype()];
+
+                        std::cerr << RED << "Semantic Error: Return stmt for function '" + current_func + "' have unmatched type, line: " << line_number << WHITE << std::endl;
+                        std::cerr << RED << "function type is '" + func_type + "' but return type is '" + return_type + "'." << WHITE << std::endl;
+                        std::cerr << "---------------------------------------------------------------" << std::endl;
+                    }
+                }
             }
             else if (head_name == "if_stmt") {
                 if (children[2]->get_data().get_stype() != VOID && children[2]->get_data().get_stype() != BOOL) {
@@ -954,5 +961,15 @@ class SemanticAnalyzer {
 
         void set_exp_types() {
             dfs(parse_tree.get_root());
+            if (symbol_table["main"].get_type() != FUNC) {
+                std::cerr << RED << "Semantic Error: There is no function called 'main' in code." << WHITE << std::endl;
+                std::cerr << "---------------------------------------------------------------" << std::endl;
+            }
+            else if (symbol_table["main"].get_stype() != INT) {
+                std::string main_type = semantic_type_to_string[symbol_table["main"].get_stype()];
+                std::cerr << RED << "Semantic Error: The type of main function is invalid." << WHITE << std::endl;
+                std::cerr << RED << "Expected 'int' type but found '" + main_type + "' type." << WHITE << std::endl;
+                std::cerr << "---------------------------------------------------------------" << std::endl;
+            }
         }
 };

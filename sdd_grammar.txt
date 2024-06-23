@@ -3,7 +3,7 @@ dec_list -> dec dec_list
 dec_list -> <eps>
 dec -> type {id.type = type.type} <id> {init_dec.type = type.type} init_dec {dec.type = type.type}
 init_dec -> {var_dec_global.type = init_dec.type} {symbol_table[id] = type} var_dec_global
-init_dec -> {func_dec.type = init_dec.type} {symbol_table[id] = type} func_dec
+init_dec -> {func_dec.type = init_dec.type} {symbol_table[id] = type} {current_function = id} func_dec
 
 var_dec_global -> sz initial {if (var_id.type != initial.type and initial.type != void) error, more.type = var_dec_global.type} more
 more -> <,> {var_dec_list.type = more.type} var_dec_list <;>
@@ -39,7 +39,7 @@ params -> param params2
 params -> <eps>
 params2 -> <,> param params2
 params2 -> <eps>
-param -> type {param_id.type = type.type} param_id {param.type = type.type}
+param -> type {param_id.type = type.type} param_id {param.type = type.type} {symbol_table[current_func].add_to_parmeters({id, param.type})}
 param_id -> {id.type = param_id.type} <id> bracket
 bracket -> <[> <]>
 bracket -> <eps>
@@ -49,7 +49,7 @@ stmt_list -> <eps>
 stmt -> var_dec
 stmt -> break_stmt
 stmt -> continue_stmt
-stmt -> return_stmt
+stmt -> return_stmt {if (return_stmt.type != symbol_table[current_func].type) error;}
 stmt -> if_stmt
 stmt -> for_stmt
 stmt -> print_stmt
@@ -120,11 +120,11 @@ exp9 -> <(> exp <)> {exp9.type = exp.type}
 exp9 -> <id> func_call_or_id {id.type = func_call_or_id.type, exp9.type = id.type}
 exp9 -> constant {exp9.type = constant.type}
 
-func_call_or_id -> {check symbol_table[id], func_call_or_id.type = symbol_table[id]} <(> params_call <)>
+func_call_or_id -> {check symbol_table[id], func_call_or_id.type = symbol_table[id]} <(> params_call <)> {check params_call.params_type}
 func_call_or_id -> {check symbol_table[id], func_call_or_id.type = symbol_table[id]} ebracket 
-params_call -> exp1 params_call2
+params_call -> exp1 params_call2 {params_call.params_type.push_back(exp1.type, params_call2.params_type)}
 params_call -> <eps>
-params_call2 -> <,> exp1 params_call2
+params_call2 -> <,> exp1 params_call2@ {params_call2.params_type.push_back(exp1, params_call2@.params_type)}
 params_call2 -> <eps>
 ebracket -> <[> exp <]> {if (exp.type != int) error;}
 ebracket -> <eps> 
