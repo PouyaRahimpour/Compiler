@@ -155,6 +155,7 @@ class Symbol {
         std::string content;
         semantic_type stype;
         std::vector<semantic_type> params_type;
+        std::string val;
 
     public:
         Symbol() {}
@@ -164,6 +165,7 @@ class Symbol {
             line_number = -1;
             content = "";
             stype = VOID;
+            val = "";
         }
  
         void set_name(std::string _name) {
@@ -206,6 +208,12 @@ class Symbol {
         }
         std::vector<semantic_type>& get_params_type() {
             return params_type;
+        }
+        void set_val(std::string _val) {
+            val = _val;
+        }
+        std::string get_val() {
+            return val;
         }
 
         bool operator == (const Symbol &other) const {

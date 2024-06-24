@@ -1,5 +1,65 @@
 #include "semantic_analyzer.h"
-#include "utils.h"
+
+std::vector<std::string> split(std::string s, std::vector<char> chs) {
+    int n = s.size();
+    std::vector<std::string> sp;
+
+    std::string tmp = "";
+    for (int i = 0; i < n; i++) {
+        bool f = 0;
+        for (char ch : chs) {
+            if (s[i] == ch) {
+                f = 1;
+                break;
+            }
+        }
+        if (!f) {
+            tmp += s[i];
+        }
+        else if (tmp != "") {
+            sp.push_back(tmp);
+            tmp = "";
+        }
+    }
+    if (tmp != "") {
+        sp.push_back(tmp);
+    }
+    return sp;
+}
+
+std::string eval(std::string exp, std::vector<char> chs) {
+    if (exp == "") {
+        return exp;
+    }
+
+    int64_t val = 1;
+    if (exp[0] == '-') {
+        exp = exp.substr(1, exp.size() - 1);
+        val = -1;
+    }
+    std::vector<std::string> sp = split(exp, chs);
+    int len = exp.size(), j = 1;
+    int64_t result = stoll(sp[0]) * val;
+    for (int i = 0; i < len; i++) {
+        if (exp[i] == '+') {
+            result += stoll(sp[j++]);
+        }
+        else if (exp[i] == '-') {
+            result -= stoll(sp[j++]);
+        }
+        else if (exp[i] == '*') {
+            result *= stoll(sp[j++]);
+        }
+        else if (exp[i] == '/') {
+            result /= stoll(sp[j++]);
+        }
+        if (exp[i] == '%') {
+            result %= stoll(sp[j++]);
+        }
+    }
+
+    return std::to_string(result);
+}
 
 class SymbolTableEntry {
     private:
@@ -295,6 +355,28 @@ class SemanticAnalyzer {
                 if (children[0]->get_data().get_name() == "exp") {
                     // optexp.type = exp.type
                     symbol.set_stype(children[0]->get_data().get_stype());
+
+
+                    if (stoi(children[0]->get_data().get_val()) < 0) {
+                        Node<Symbol>* tmp = node->get_parent();
+                        std::string id;
+                        while (true) {
+                            if (tmp->get_data().get_name() == "dec") {
+                                id = tmp->get_children()[1]->get_data().get_content();
+                                break;
+                            }
+                            else if (tmp->get_data().get_name() == "var_dec_init") {
+                                id = tmp->get_children()[0]->get_children()[0]->get_data().get_content();
+                                break;
+                            }
+                            tmp = tmp->get_parent();
+                        }
+                        int index_val = stoi(children[0]->get_data().get_val());
+
+                        std::cerr << RED << "Semantic Error: The array index value must be positive for '" + id + "', line: " << line_number << WHITE << std::endl;
+                        std::cerr << RED << "The array index value is '" + std::to_string(index_val) +  "'." << WHITE << std::endl;
+                        std::cerr << "---------------------------------------------------------------" << std::endl;
+                    }
                 }
                 else if (children[0]->get_data().get_name() == "eps") {
                     // optexp.type = void 
@@ -443,6 +525,9 @@ class SemanticAnalyzer {
                 if (children[1]->get_data().get_stype() == VOID) {
                     // exp.type = exp1.type
                     symbol.set_stype(children[0]->get_data().get_stype());
+
+                    // exp.val = exp1.val
+                    symbol.set_val(children[0]->get_data().get_val());
                 }
                 else {
                     // exp.type = t1.type
@@ -469,6 +554,9 @@ class SemanticAnalyzer {
                 if (children[1]->get_data().get_stype() == VOID || children[0]->get_data().get_stype() == children[1]->get_data().get_stype()) {
                     // exp1.type = exp2.type
                     symbol.set_stype(children[0]->get_data().get_stype());
+                    
+                    // exp1.val = exp2.val
+                    symbol.set_val(children[0]->get_data().get_val());
                 }
                 else {
                     Node<Symbol>* tmp = node;
@@ -527,6 +615,9 @@ class SemanticAnalyzer {
                 if (children[1]->get_data().get_stype() == VOID || (children[0]->get_data().get_stype() == BOOL && children[1]->get_data().get_stype() == BOOL)) {
                     // exp2.type = exp3.type
                     symbol.set_stype(children[0]->get_data().get_stype());
+
+                    // exp2.val = exp3.val
+                    symbol.set_val(children[0]->get_data().get_val());
                 }
                 else {
                     std::string left_type = semantic_type_to_string[children[0]->get_data().get_stype()];
@@ -567,6 +658,9 @@ class SemanticAnalyzer {
                 if (children[1]->get_data().get_stype() == VOID || (children[0]->get_data().get_stype() == BOOL && children[1]->get_data().get_stype() == BOOL)) {
                     // exp3.type = exp4.type
                     symbol.set_stype(children[0]->get_data().get_stype());
+
+                    //exp3.val = exp4.val
+                    symbol.set_val(children[0]->get_data().get_val());
                 }
                 else {
                     std::string left_type = semantic_type_to_string[children[0]->get_data().get_stype()];
@@ -607,6 +701,9 @@ class SemanticAnalyzer {
                 if (children[1]->get_data().get_stype() == VOID || children[0]->get_data().get_stype() == children[1]->get_data().get_stype()) {
                     // exp4.type = exp5.type
                     symbol.set_stype(children[0]->get_data().get_stype());
+
+                    // exp4.val = exp5.val
+                    symbol.set_val(children[0]->get_data().get_val());
                 }
                 else {
                     std::string opt = children[1]->get_children()[0]->get_data().get_name();
@@ -649,6 +746,9 @@ class SemanticAnalyzer {
                 if (children[1]->get_data().get_stype() == VOID || children[0]->get_data().get_stype() == children[1]->get_data().get_stype()) {
                     // exp5.type = exp6.type
                     symbol.set_stype(children[0]->get_data().get_stype());
+
+                    // exp5.val = exp6.val
+                    symbol.set_val(children[0]->get_data().get_val());
                 }
                 else {
                     std::string opt = children[1]->get_children()[0]->get_data().get_name();
@@ -692,6 +792,10 @@ class SemanticAnalyzer {
                 if (children[1]->get_data().get_stype() == VOID || children[0]->get_data().get_stype() == children[1]->get_data().get_stype()) {
                     // exp6.type = exp7.type
                     symbol.set_stype(children[0]->get_data().get_stype());
+
+                    // exp6.val = eval(exp7.val + t7.val)
+                    std::vector<char> chs = {'+', '-'};
+                    symbol.set_val(eval(children[0]->get_data().get_val() + children[1]->get_data().get_val(), chs));
                 }
                 else {
                     std::string opt = children[1]->get_children()[0]->get_data().get_name();
@@ -711,6 +815,9 @@ class SemanticAnalyzer {
                     if (children[2]->get_data().get_stype() == VOID || children[1]->get_data().get_stype() == children[2]->get_data().get_stype()) {
                         // t7.type = exp7.type
                         symbol.set_stype(children[1]->get_data().get_stype());
+
+                        // t7.val = "[+-]" + exp7.val + t7@.val
+                        symbol.set_val(children[0]->get_data().get_name() + children[1]->get_data().get_val() + children[2]->get_data().get_val());
                     }
                     else {
                         std::string opt = children[2]->get_children()[0]->get_data().get_name();
@@ -734,6 +841,10 @@ class SemanticAnalyzer {
                 if (children[1]->get_data().get_stype() == VOID || children[0]->get_data().get_stype() == children[1]->get_data().get_stype()) {
                     // exp7.type = exp8.type
                     symbol.set_stype(children[0]->get_data().get_stype());
+                     
+                    // exp7.val = eval(exp8.val + t8.val)
+                    std::vector<char> chs = {'*', '/', '%'};
+                    symbol.set_val(eval(children[0]->get_data().get_val() + children[1]->get_data().get_val(), chs));
                 }
                 else {
                     std::string opt = children[1]->get_children()[0]->get_data().get_name();
@@ -754,6 +865,9 @@ class SemanticAnalyzer {
                     if (children[2]->get_data().get_stype() == VOID || children[1]->get_data().get_stype() == children[2]->get_data().get_stype()) {
                         // t8.type = exp8.type
                         symbol.set_stype(children[1]->get_data().get_stype());
+
+                        // t8.val = "[*/%]" + exp8.val + t8@.val
+                        symbol.set_val(children[0]->get_data().get_name() + children[1]->get_data().get_val() + children[2]->get_data().get_val());
                     }
                     else {
                         std::string opt = children[2]->get_children()[0]->get_data().get_name();
@@ -778,6 +892,11 @@ class SemanticAnalyzer {
                     if (children[1]->get_data().get_stype() == INT) {
                         // exp8.type = int 
                         symbol.set_stype(INT);
+
+                        if (children[0]->get_data().get_name() == "-") {
+                            // exp8.val = "-" + exp9.val
+                            symbol.set_val("-" + children[1]->get_data().get_val());
+                        }
                     }
                     else {
                         std::string opt = children[0]->get_data().get_name();
@@ -812,12 +931,18 @@ class SemanticAnalyzer {
                 else if (children[0]->get_data().get_name() == "exp9") {
                     // exp8.type = exp9.type
                     symbol.set_stype(children[0]->get_data().get_stype());
+                    
+                    // exp8.val = exp9.val
+                    symbol.set_val(children[0]->get_data().get_val());
                 }
             }
             else if (head_name == "exp9") {
                 if (children[0]->get_data().get_name() == "(") {
                     // exp9.type = exp.type
                     symbol.set_stype(children[1]->get_data().get_stype());
+
+                    // exp9.val = exp.val
+                    symbol.set_val(children[1]->get_data().get_val());
                 }
                 else if (children[0]->get_data().get_name() == "id") {
                     // id.type = func_call_or_id.type
@@ -829,6 +954,9 @@ class SemanticAnalyzer {
                 else if (children[0]->get_data().get_name() == "constant") {
                     // exp9.type = constant.type
                     symbol.set_stype(children[0]->get_data().get_stype());
+                    
+                    // exp9.val = constant.val
+                    symbol.set_val(children[0]->get_data().get_val());
                 }
             }
             else if (head_name == "func_call_or_id") {
@@ -878,9 +1006,19 @@ class SemanticAnalyzer {
                         std::string id = node->get_parent()->get_parent()->get_children()[0]->get_data().get_content();
                         std::string index_type = semantic_type_to_string[children[1]->get_data().get_stype()];
 
-                        std::cerr << RED << "Semantic Error: The array index must have an int type for array '" + id + "', line: " << line_number << WHITE << std::endl;
+                        std::cerr << RED << "Semantic Error: The array index type must bet 'int' for '" + id + "', line: " << line_number << WHITE << std::endl;
                         std::cerr << RED << "The array index type is '" + index_type +  "'." << WHITE << std::endl;
                         std::cerr << "---------------------------------------------------------------" << std::endl;
+                    }
+
+                    if (stoi(children[1]->get_data().get_val()) < 0) {
+                        std::string id = node->get_parent()->get_parent()->get_children()[0]->get_data().get_content();
+                        int index_val = stoi(children[1]->get_data().get_val());
+
+                        std::cerr << RED << "Semantic Error: The array index value must be positive for '" + id + "', line: " << line_number << WHITE << std::endl;
+                        std::cerr << RED << "The array index value is '" + std::to_string(index_val) +  "'." << WHITE << std::endl;
+                        std::cerr << "---------------------------------------------------------------" << std::endl;
+
                     }
                 }
             }
@@ -888,10 +1026,16 @@ class SemanticAnalyzer {
                 if (children[0]->get_data().get_name() == "decimal") {
                     // constant.type = int
                     symbol.set_stype(INT);
+
+                    // constant.val = decimal.content
+                    symbol.set_val(children[0]->get_data().get_content());
                 }
                 else if (children[0]->get_data().get_name() == "hexadecimal") {
                     // constant.type = int
                     symbol.set_stype(INT);
+
+                    // constant.val = hexadecimal.content
+                    symbol.set_val(children[0]->get_data().get_content());
                 }
                 else if (children[0]->get_data().get_name() == "string") {
                     // constant.type = char 
@@ -931,6 +1075,10 @@ class SemanticAnalyzer {
                 std::string main_type = semantic_type_to_string[symbol_table["main"].get_stype()];
                 std::cerr << RED << "Semantic Error: The type of main function is invalid." << WHITE << std::endl;
                 std::cerr << RED << "Expected 'int' type but found '" + main_type + "' type." << WHITE << std::endl;
+                std::cerr << "---------------------------------------------------------------" << std::endl;
+            }
+            else if (symbol_table["main"].get_parameters().size()) {
+                std::cerr << RED << "Semantic Error: 'main' accepts no arguments." << WHITE << std::endl;
                 std::cerr << "---------------------------------------------------------------" << std::endl;
             }
         }
