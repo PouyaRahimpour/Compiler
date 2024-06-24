@@ -1,5 +1,4 @@
 #include "syntax_analyzer.h"
-#include <cstddef>
 
 std::vector<std::string> split(std::string s, char ch = ' ') {
     int n = s.size();
@@ -506,7 +505,7 @@ class SyntaxAnalyzer {
                 }
             }
             out << var << "\n";
-            if (node->get_content() != "") {
+            if (node->get_data().get_content() != "") {
                 for (int i = 0; i < num * TAB; i++) {
                     if (has_par[i]) {
                         out << "│";
@@ -515,7 +514,7 @@ class SyntaxAnalyzer {
                         out << " ";
                     }
                 }
-                out << "└── '" << node->get_content() << "'" << "\n";
+                out << "└── '" << node->get_data().get_content() << "'" << "\n";
             }
 
             has_par[num * TAB] = true;
@@ -568,8 +567,8 @@ class SyntaxAnalyzer {
             else {
                 read_table();
             }
-
             set_matches();
+
             std::stack<Node<Symbol>*> stack;
             int index = 0;
             tokens.push_back(Token(Eof));
@@ -593,7 +592,8 @@ class SyntaxAnalyzer {
                 if (top_var.get_type() == TERMINAL) {
                     if (term == top_var) {
                         std::string content = tokens[index].get_content();
-                        top_node->set_content(content);
+                        top_node->get_data().set_content(content);
+                        top_node->get_data().set_line_number(line_number);
                         index++;
                     } 
                     else {
@@ -606,6 +606,8 @@ class SyntaxAnalyzer {
                 else {
                     Rule rule = table[{top_var, term}];
                     if (rule.get_type() == VALID) {
+                        top_node->get_data().set_line_number(line_number);
+
                         std::vector<Symbol> body = rule.get_body();
                         std::reverse(body.begin(), body.end());
                         for (auto var : body) {

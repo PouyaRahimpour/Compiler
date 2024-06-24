@@ -151,6 +151,8 @@ class Symbol {
     private:
         std::string name;
         symbol_type type;
+        int line_number;
+        std::string content;
         semantic_type stype;
         std::vector<semantic_type> params_type;
 
@@ -159,6 +161,8 @@ class Symbol {
         Symbol(std::string _name, symbol_type _type) {
             name = _name;
             type = _type;
+            line_number = -1;
+            content = "";
             stype = VOID;
         }
  
@@ -173,6 +177,18 @@ class Symbol {
         }
         symbol_type get_type() const {
             return type;
+        }
+        void set_line_number(int _line_number) {
+            line_number = _line_number;
+        }
+        int get_line_number() {
+            return line_number;
+        }
+        void set_content(std::string _content) {
+            content = _content;
+        }
+        std::string get_content() {
+            return content;
         }
         void set_stype(semantic_type _stype) {
            stype = _stype; 
@@ -269,18 +285,15 @@ class Node {
         T data; 
         Node<T>* parent;
         std::deque<Node<T>*> children;
-        std::string content;
 
     public:
         Node() {
             data = T();
             parent = nullptr;
-            content = "";
         }
         Node(T _data, Node<T>* _parent = nullptr) {
             data = _data;
             parent = _parent;
-            content = "";
         }
 
         void set_date(T _data) {
@@ -303,12 +316,6 @@ class Node {
         }
         std::deque<Node<T>*> get_children() {
             return children;
-        }
-        void set_content(std::string _content) {
-            content = _content;
-        }
-        std::string get_content() {
-            return content;
         }
 };
 
@@ -337,7 +344,7 @@ class Tree {
                 }
             }
             std::cout << var << std::endl;
-            if (node->get_content() != "") {
+            if (node->get_data().get_content() != "") {
                 for (int i = 0; i < num * TAB; i++) {
                     if (has_par[i]) {
                         std::cout << "│";
@@ -346,7 +353,7 @@ class Tree {
                         std::cout << " ";
                     }
                 }
-                std::cout << "└── '" << node->get_content() << "'" << std::endl;
+                std::cout << "└── '" << node->get_data().get_content() << "'" << std::endl;
             }
 
             has_par[num * TAB] = true;

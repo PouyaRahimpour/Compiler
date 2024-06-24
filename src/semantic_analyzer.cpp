@@ -48,7 +48,6 @@ class SymbolTableEntry {
         }
 };
 
-// TODO show line number for errors
 class SemanticAnalyzer {
     private:
         std::string out_address;
@@ -64,6 +63,7 @@ class SemanticAnalyzer {
 
             for (auto child : children) {
                 std::string child_name = child->get_data().get_name();
+                int line_number = child->get_data().get_line_number();
                 // Semantic rules for inherited attributes
                 if (head_name == "dec") {
                     if (child_name == "id") {
@@ -80,14 +80,12 @@ class SemanticAnalyzer {
                         // var_dec_glabal.type = init_dec_type
                         child->get_data().set_stype(symbol.get_stype());
 
-                        std::string id = node->get_parent()->get_children()[1]->get_content();
+                        std::string id = node->get_parent()->get_children()[1]->get_data().get_content();
                         semantic_type stype = node->get_parent()->get_children()[1]->get_data().get_stype();
                         if (symbol_table[id].get_type() == NONE) {
                             symbol_table[id] = SymbolTableEntry(VAR, stype, def_area);
                         }
                         else {
-                            int line_number = -1;
-
                             std::cerr << RED << "Semantic Error: Redefinition of variable '" + id + "', line: " << line_number << WHITE << std::endl;
                             std::cerr << "---------------------------------------------------------------" << std::endl;
                         }
@@ -96,14 +94,12 @@ class SemanticAnalyzer {
                         // func_dec.type = init_dec_type
                         child->get_data().set_stype(symbol.get_stype());
 
-                        std::string id = node->get_parent()->get_children()[1]->get_content();
+                        std::string id = node->get_parent()->get_children()[1]->get_data().get_content();
                         semantic_type stype = node->get_parent()->get_children()[1]->get_data().get_stype();
                         if (symbol_table[id].get_type() == NONE) {
                             symbol_table[id] = SymbolTableEntry(FUNC, stype, def_area);
                         }
                         else {
-                            int line_number = -1;
-
                             std::cerr << RED << "Semantic Error: Redefinition of function '" + id + "', line: " << line_number << WHITE << std::endl;
                             std::cerr << "---------------------------------------------------------------" << std::endl;
                         }
@@ -114,8 +110,7 @@ class SemanticAnalyzer {
                 else if (head_name == "var_dec_global") {
                     if (child_name == "more") {
                         if (symbol.get_stype() != children[1]->get_data().get_stype() && children[1]->get_data().get_stype() != VOID) {
-                            int line_number = -1;
-                            std::string id = node->get_parent()->get_parent()->get_children()[1]->get_content();
+                            std::string id = node->get_parent()->get_parent()->get_children()[1]->get_data().get_content();
                             std::string left_type = semantic_type_to_string[symbol.get_stype()];
                             std::string right_type = semantic_type_to_string[children[1]->get_data().get_stype()];
 
@@ -171,14 +166,12 @@ class SemanticAnalyzer {
                         // id.type = var_id.type
                         child->get_data().set_stype(symbol.get_stype());
 
-                        std::string id = children[0]->get_content();
+                        std::string id = children[0]->get_data().get_content();
                         semantic_type stype = children[0]->get_data().get_stype();
                         if (symbol_table[id].get_type() == NONE) {
                             symbol_table[id] = SymbolTableEntry(VAR, stype, def_area);
                         }
                         else {
-                            int line_number = -1;
-
                             std::cerr << RED << "Semantic Error: Redefinition of variable '" + id + "', line: " << line_number << WHITE << std::endl;
                             std::cerr << "---------------------------------------------------------------" << std::endl;
                         }
@@ -198,17 +191,13 @@ class SemanticAnalyzer {
                 }
                 else if (head_name == "func_call_or_id") {
                     if (child_name == "(") {
-                        std::string id = node->get_parent()->get_children()[0]->get_content();
+                        std::string id = node->get_parent()->get_children()[0]->get_data().get_content();
                         if (symbol_table[id].get_type() == NONE) {
-                            int line_number = -1;
-
                             std::cerr << RED << "Semantic Error: Use undefined function '" + id + "', line: " << line_number << WHITE << std::endl;
                             std::cerr << "---------------------------------------------------------------" << std::endl;
                             symbol.set_stype(VOID);
                         }
                         else if (symbol_table[id].get_type() == VAR) {
-                            int line_number = -1;
-
                             std::cerr << RED << "Semantic Error: Id '" + id + "' is variable but used instead a function , line: " << line_number << WHITE << std::endl;
                             std::cerr << "---------------------------------------------------------------" << std::endl;
                             symbol.set_stype(VOID);
@@ -218,17 +207,13 @@ class SemanticAnalyzer {
                         }
                     }
                     else if (child_name == "ebracket") {
-                        std::string id = node->get_parent()->get_children()[0]->get_content();
+                        std::string id = node->get_parent()->get_children()[0]->get_data().get_content();
                         if (symbol_table[id].get_type() == NONE) {
-                            int line_number = -1;
-
                             std::cerr << RED << "Semantic Error: Use undefined variable '" + id + "', line: " << line_number << WHITE << std::endl;
                             std::cerr << "---------------------------------------------------------------" << std::endl;
                             symbol.set_stype(VOID);
                         }
                         else if (symbol_table[id].get_type() == FUNC) {
-                            int line_number = -1;
-
                             std::cerr << RED << "Semantic Error: Id '" + id + "' is function but used instead a variable , line: " << line_number << WHITE << std::endl;
                             std::cerr << "---------------------------------------------------------------" << std::endl;
                             symbol.set_stype(VOID);
@@ -262,6 +247,7 @@ class SemanticAnalyzer {
             }
 
             // Semantic rules for synthesized attributes
+            int line_number = symbol.get_line_number();
             if (head_name == "dec") {
                 // dec.type = type.type
                 symbol.set_stype(children[0]->get_data().get_stype());
@@ -272,8 +258,7 @@ class SemanticAnalyzer {
             }
             else if (head_name == "var_dec_init") {
                 if (children[0]->get_data().get_stype() != children[1]->get_data().get_stype() && children[1]->get_data().get_stype() != VOID) {
-                    int line_number = -1;
-                    std::string id = children[0]->get_children()[0]->get_content();
+                    std::string id = children[0]->get_children()[0]->get_data().get_content();
                     std::string left_type = semantic_type_to_string[children[0]->get_data().get_stype()];
                     std::string right_type = semantic_type_to_string[children[1]->get_data().get_stype()];
 
@@ -285,16 +270,15 @@ class SemanticAnalyzer {
             else if (head_name == "sz") {
                 if (children[0]->get_data().get_name() == "[") {
                     if (children[1]->get_data().get_stype() != VOID && children[1]->get_data().get_stype() != INT) {
-                        int line_number = -1;
                         Node<Symbol>* tmp = node->get_parent();
                         std::string id;
                         while (true) {
                             if (tmp->get_data().get_name() == "dec") {
-                                id = tmp->get_children()[1]->get_content();
+                                id = tmp->get_children()[1]->get_data().get_content();
                                 break;
                             }
                             else if (tmp->get_data().get_name() == "var_dec_init") {
-                                id = tmp->get_children()[0]->get_children()[0]->get_content();
+                                id = tmp->get_children()[0]->get_children()[0]->get_data().get_content();
                                 break;
                             }
                             tmp = tmp->get_parent();
@@ -344,16 +328,15 @@ class SemanticAnalyzer {
                         symbol.set_stype(children[0]->get_data().get_stype());
                     }
                     else {
-                        int line_number = -1;
                         Node<Symbol>* tmp = node->get_parent();
                         std::string id;
                         while (true) {
                             if (tmp->get_data().get_name() == "dec") {
-                                id = tmp->get_children()[1]->get_content();
+                                id = tmp->get_children()[1]->get_data().get_content();
                                 break;
                             }
                             else if (tmp->get_data().get_name() == "var_dec_init") {
-                                id = tmp->get_children()[0]->get_children()[0]->get_content();
+                                id = tmp->get_children()[0]->get_children()[0]->get_data().get_content();
                                 break;
                             }
                             tmp = tmp->get_parent();
@@ -381,16 +364,15 @@ class SemanticAnalyzer {
                         symbol.set_stype(children[1]->get_data().get_stype());
                     }
                     else {
-                        int line_number = -1;
                         Node<Symbol>* tmp = node->get_parent();
                         std::string id;
                         while (true) {
                             if (tmp->get_data().get_name() == "dec") {
-                                id = tmp->get_children()[1]->get_content();
+                                id = tmp->get_children()[1]->get_data().get_content();
                                 break;
                             }
                             else if (tmp->get_data().get_name() == "var_dec_init") {
-                                id = tmp->get_children()[0]->get_children()[0]->get_content();
+                                id = tmp->get_children()[0]->get_children()[0]->get_data().get_content();
                                 break;
                             }
                             tmp = tmp->get_parent();
@@ -429,13 +411,12 @@ class SemanticAnalyzer {
                 // param.type = type.type
                 symbol.set_stype(children[0]->get_data().get_stype());
 
-                std::string id = children[1]->get_children()[0]->get_content();
+                std::string id = children[1]->get_children()[0]->get_data().get_content();
                 symbol_table[current_func].add_to_parameters({id, symbol.get_stype()});
             }
             else if (head_name == "stmt") {
                 if (children[0]->get_data().get_name() == "return_stmt") {
                     if (children[0]->get_data().get_stype() != symbol_table[current_func].get_stype()) {
-                        int line_number = -1;
                         std::string func_type = semantic_type_to_string[symbol_table[current_func].get_stype()];
                         std::string return_type = semantic_type_to_string[children[0]->get_data().get_stype()];
 
@@ -447,7 +428,6 @@ class SemanticAnalyzer {
             }
             else if (head_name == "if_stmt") {
                 if (children[2]->get_data().get_stype() != VOID && children[2]->get_data().get_stype() != BOOL) {
-                    int line_number = -1;
                     std::string condition_type = semantic_type_to_string[children[2]->get_data().get_stype()];
 
                     std::cerr << RED << "Semantic Error: The condition type of if stmt must have a bool type, line: " << line_number << WHITE << std::endl;
@@ -491,12 +471,11 @@ class SemanticAnalyzer {
                     symbol.set_stype(children[0]->get_data().get_stype());
                 }
                 else {
-                    int line_number = -1;
                     Node<Symbol>* tmp = node;
                     std::string id;
                     while (true) {
                         if (tmp->get_data().get_name() == "exp9") {
-                            id = tmp->get_children()[0]->get_content();
+                            id = tmp->get_children()[0]->get_data().get_content();
                             break;
                         }
                         tmp = tmp->get_children()[0];
@@ -519,12 +498,11 @@ class SemanticAnalyzer {
                         symbol.set_stype(children[1]->get_data().get_stype());
                     }
                     else {
-                        int line_number = -1;
                         Node<Symbol>* tmp = node->get_children()[1];
                         std::string id;
                         while (true) {
                             if (tmp->get_data().get_name() == "exp9") {
-                                id = tmp->get_children()[0]->get_content();
+                                id = tmp->get_children()[0]->get_data().get_content();
                                 break;
                             }
                             tmp = tmp->get_children()[0];
@@ -551,7 +529,6 @@ class SemanticAnalyzer {
                     symbol.set_stype(children[0]->get_data().get_stype());
                 }
                 else {
-                    int line_number = -1;
                     std::string left_type = semantic_type_to_string[children[0]->get_data().get_stype()];
                     std::string right_type = semantic_type_to_string[children[1]->get_data().get_stype()];
 
@@ -570,7 +547,6 @@ class SemanticAnalyzer {
                         symbol.set_stype(children[1]->get_data().get_stype());
                     }
                     else {
-                        int line_number = -1;
                         std::string left_type = semantic_type_to_string[children[1]->get_data().get_stype()];
                         std::string right_type = semantic_type_to_string[children[2]->get_data().get_stype()];
 
@@ -593,7 +569,6 @@ class SemanticAnalyzer {
                     symbol.set_stype(children[0]->get_data().get_stype());
                 }
                 else {
-                    int line_number = -1;
                     std::string left_type = semantic_type_to_string[children[0]->get_data().get_stype()];
                     std::string right_type = semantic_type_to_string[children[1]->get_data().get_stype()];
 
@@ -612,7 +587,6 @@ class SemanticAnalyzer {
                         symbol.set_stype(children[1]->get_data().get_stype());
                     }
                     else {
-                        int line_number = -1;
                         std::string left_type = semantic_type_to_string[children[1]->get_data().get_stype()];
                         std::string right_type = semantic_type_to_string[children[2]->get_data().get_stype()];
 
@@ -635,7 +609,6 @@ class SemanticAnalyzer {
                     symbol.set_stype(children[0]->get_data().get_stype());
                 }
                 else {
-                    int line_number = -1;
                     std::string opt = children[1]->get_children()[0]->get_data().get_name();
                     std::string left_type = semantic_type_to_string[children[0]->get_data().get_stype()];
                     std::string right_type = semantic_type_to_string[children[1]->get_data().get_stype()];
@@ -655,7 +628,6 @@ class SemanticAnalyzer {
                         symbol.set_stype(children[1]->get_data().get_stype());
                     }
                     else {
-                        int line_number = -1;
                         std::string opt = children[2]->get_children()[0]->get_data().get_name();
                         std::string left_type = semantic_type_to_string[children[1]->get_data().get_stype()];
                         std::string right_type = semantic_type_to_string[children[2]->get_data().get_stype()];
@@ -679,7 +651,6 @@ class SemanticAnalyzer {
                     symbol.set_stype(children[0]->get_data().get_stype());
                 }
                 else {
-                    int line_number = -1;
                     std::string opt = children[1]->get_children()[0]->get_data().get_name();
                     std::string left_type = semantic_type_to_string[children[0]->get_data().get_stype()];
                     std::string right_type = semantic_type_to_string[children[1]->get_data().get_stype()];
@@ -700,7 +671,6 @@ class SemanticAnalyzer {
                         symbol.set_stype(children[1]->get_data().get_stype());
                     }
                     else {
-                        int line_number = -1;
                         std::string opt = children[2]->get_children()[0]->get_data().get_name();
                         std::string left_type = semantic_type_to_string[children[1]->get_data().get_stype()];
                         std::string right_type = semantic_type_to_string[children[2]->get_data().get_stype()];
@@ -724,7 +694,6 @@ class SemanticAnalyzer {
                     symbol.set_stype(children[0]->get_data().get_stype());
                 }
                 else {
-                    int line_number = -1;
                     std::string opt = children[1]->get_children()[0]->get_data().get_name();
                     std::string left_type = semantic_type_to_string[children[0]->get_data().get_stype()];
                     std::string right_type = semantic_type_to_string[children[1]->get_data().get_stype()];
@@ -744,7 +713,6 @@ class SemanticAnalyzer {
                         symbol.set_stype(children[1]->get_data().get_stype());
                     }
                     else {
-                        int line_number = -1;
                         std::string opt = children[2]->get_children()[0]->get_data().get_name();
                         std::string left_type = semantic_type_to_string[children[1]->get_data().get_stype()];
                         std::string right_type = semantic_type_to_string[children[2]->get_data().get_stype()];
@@ -768,7 +736,6 @@ class SemanticAnalyzer {
                     symbol.set_stype(children[0]->get_data().get_stype());
                 }
                 else {
-                    int line_number = -1;
                     std::string opt = children[1]->get_children()[0]->get_data().get_name();
                     std::string left_type = semantic_type_to_string[children[0]->get_data().get_stype()];
                     std::string right_type = semantic_type_to_string[children[1]->get_data().get_stype()];
@@ -789,7 +756,6 @@ class SemanticAnalyzer {
                         symbol.set_stype(children[1]->get_data().get_stype());
                     }
                     else {
-                        int line_number = -1;
                         std::string opt = children[2]->get_children()[0]->get_data().get_name();
                         std::string left_type = semantic_type_to_string[children[1]->get_data().get_stype()];
                         std::string right_type = semantic_type_to_string[children[2]->get_data().get_stype()];
@@ -814,7 +780,6 @@ class SemanticAnalyzer {
                         symbol.set_stype(INT);
                     }
                     else {
-                        int line_number = -1;
                         std::string opt = children[0]->get_data().get_name();
                         std::string right_type = semantic_type_to_string[children[1]->get_data().get_stype()];
 
@@ -832,7 +797,6 @@ class SemanticAnalyzer {
                         symbol.set_stype(BOOL);
                     }
                     else {
-                        int line_number = -1;
                         std::string opt = children[0]->get_data().get_name();
                         std::string right_type = semantic_type_to_string[children[1]->get_data().get_stype()];
 
@@ -869,13 +833,12 @@ class SemanticAnalyzer {
             }
             else if (head_name == "func_call_or_id") {
                 if (node->get_children()[0]->get_data().get_name() == "(") {
-                    std::string id = node->get_parent()->get_children()[0]->get_content();
+                    std::string id = node->get_parent()->get_children()[0]->get_data().get_content();
                     std::vector<std::pair<std::string, semantic_type>> &define_params = symbol_table[id].get_parameters();
                     int len_define_params = define_params.size();
                     std::vector<semantic_type> &used_params = children[1]->get_data().get_params_type();
                     int len_used_params = used_params.size();
 
-                    int line_number = -1;
                     if (len_define_params > len_used_params) {
                         std::cerr << RED << "Semantic Error: Too few arguments for function '" + id + "', line: " << line_number << WHITE << std::endl;
                         std::cerr << RED << "Expected " + std::to_string(len_define_params) + " arguments but found " + std::to_string(len_used_params) + " arguments." << WHITE << std::endl;
@@ -912,8 +875,7 @@ class SemanticAnalyzer {
             else if (head_name == "ebracket") {
                 if (children[0]->get_data().get_name() == "[") {
                     if (children[1]->get_data().get_stype() != INT) {
-                        int line_number = -1;
-                        std::string id = node->get_parent()->get_parent()->get_children()[0]->get_content();
+                        std::string id = node->get_parent()->get_parent()->get_children()[0]->get_data().get_content();
                         std::string index_type = semantic_type_to_string[children[1]->get_data().get_stype()];
 
                         std::cerr << RED << "Semantic Error: The array index must have an int type for array '" + id + "', line: " << line_number << WHITE << std::endl;
