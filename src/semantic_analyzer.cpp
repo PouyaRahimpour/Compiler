@@ -67,7 +67,7 @@ class SymbolTableEntry {
         semantic_type stype;
         std::vector<std::pair<std::string, semantic_type>> parameters;
         int def_area;
-        
+
     public:
         SymbolTableEntry() {
             type = NONE;
@@ -115,6 +115,7 @@ class SemanticAnalyzer {
         std::map<std::string, SymbolTableEntry> symbol_table;
         int def_area;
         std::string current_func;
+        std::string code;
 
         void dfs(Node<Symbol>* node) {
             std::deque<Node<Symbol>*> children = node->get_children();
@@ -295,6 +296,7 @@ class SemanticAnalyzer {
                 // TODO copy symbol_table or not?
                 for (auto &entry : symbol_table) {
                     if (entry.second.get_def_area() == def_area) {
+                        // TODO delete
                         symbol_table[entry.first].set_type(NONE); 
                         symbol_table[entry.first].clear_parameters();
                     }
@@ -1018,7 +1020,6 @@ class SemanticAnalyzer {
                         std::cerr << RED << "Semantic Error: The array index value must be positive for '" + id + "', line: " << line_number << WHITE << std::endl;
                         std::cerr << RED << "The array index value is '" + std::to_string(index_val) +  "'." << WHITE << std::endl;
                         std::cerr << "---------------------------------------------------------------" << std::endl;
-
                     }
                 }
             }
@@ -1056,6 +1057,21 @@ class SemanticAnalyzer {
             }
         }
 
+        void make_syntax_tree(Node<Symbol>* node) {
+            if (node->get_data().get_type() == TERMINAL && node->get_data().get_name() != "eps") {
+                if (node->get_data().get_name() == "string") {
+                    code += "\"" + node->get_data().get_content() + "\" ";
+                } 
+                else {
+                    code += node->get_data().get_content() + " ";
+                }
+                return;
+            }
+            for (auto child: node->get_children()) {
+                make_syntax_tree(child);
+            }
+        }
+
     public:
         SemanticAnalyzer(Tree<Symbol> _parse_tree, std::string output_file_name) {
             parse_tree = _parse_tree;
@@ -1063,6 +1079,22 @@ class SemanticAnalyzer {
             def_area = 0;
             current_func = "";
             set_exp_types();
+            // TODO if no errors
+            if (1) {
+                code = "#include <stdio.h>\n#include <stdbool.h>\n#define print printf\n";
+                make_syntax_tree(parse_tree.get_root());
+                std::ofstream out;
+                out.open(out_address);
+                if (!out.is_open()) {
+                    std::cerr << RED << "File error: couldn't open output file" << WHITE << std::endl;
+                    exit(FILE_ERROR);
+                }
+                out << code;
+                out.close();
+                
+                std::string command = "gcc " + output_file_name + " -o " + output_file_name + ".exe && ./" + output_file_name + ".exe";
+                std::system(command.c_str());
+            }
         }
 
         void set_exp_types() {
