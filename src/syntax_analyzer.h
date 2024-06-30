@@ -4,7 +4,6 @@
 #define TABLE_PATH "../table.txt"
 #define START_VAR "program"
 
-
 enum rule_type {
     VALID,
     SYNCH,

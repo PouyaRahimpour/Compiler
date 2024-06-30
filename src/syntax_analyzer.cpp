@@ -640,10 +640,10 @@ class SyntaxAnalyzer {
                 }
             }
             if (!has_error) {
-                std::cout << "Parsed tree successfully" << std::endl;
+                std::cout << GREEN << "Parsed tree successfully" << WHITE << std::endl;
             }
             else {
-                std::cout << "Parsed tree unsuccessfully" << std::endl;
+                std::cout << YELLOW << "Parsed tree unsuccessfully" << WHITE << std::endl;
             }
         }
 

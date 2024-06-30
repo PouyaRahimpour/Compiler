@@ -677,11 +677,9 @@ class LexicalAnalyzer {
                     continue;
                 }
                 
-                if (SHOW_LEXICAL_ERROR) {
-                    std::string error_message = "Lexical Error: character '" + std::to_string(line[index]) + "' is Invalid, " + "line:" + std::to_string(line_number); 
-                    std::cerr << RED << error_message << WHITE << std::endl; 
-                    std::cerr << "----------------------------------------------------------------" << std::endl;
-                }
+                std::string error_message = "Lexical Error: character '" + std::to_string(line[index]) + "' is invalid, " + "line:" + std::to_string(line_number); 
+                std::cerr << RED << error_message << WHITE << std::endl; 
+                std::cerr << "----------------------------------------------------------------" << std::endl;
                 index++;
             }
         }
@@ -720,7 +718,7 @@ class LexicalAnalyzer {
 
         void tokenize() {
             read_tokens();
-            std::cout << "Tokenize Complete!" << std::endl;
+            std::cout << GREEN << "Tokenize Complete" << WHITE << std::endl;
         }
         
         void write() {

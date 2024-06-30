@@ -4,4 +4,3 @@
 
 #define TOKENIZE_WHITESPACE false
 #define TOKENIZE_COMMENT false
-#define SHOW_LEXICAL_ERROR true

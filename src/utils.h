@@ -22,6 +22,8 @@
 
 const std::string WHITE = COLORED_ERRORS ? "\033[0;m" : "";
 const std::string RED = COLORED_ERRORS ? "\033[0;31m" : "";
+const std::string GREEN = COLORED_ERRORS ? "\033[0;32m" : "";
+const std::string YELLOW = COLORED_ERRORS ? "\033[0;33m" : "";
 
 enum token_type {
     T_Bool,
@@ -73,6 +75,18 @@ enum token_type {
 
     Invalid,
     Eof
+};
+
+enum symbol_type {
+    TERMINAL,
+    VARIABLE
+};
+
+enum semantic_type {
+    VOID,
+    INT,
+    BOOL,
+    CHAR
 };
 
 const std::string type_to_string[] = {
@@ -127,23 +141,55 @@ const std::string type_to_string[] = {
     "Eof"
 };
 
-enum symbol_type {
-    TERMINAL,
-    VARIABLE
-};
-
-enum semantic_type {
-    VOID,
-    INT,
-    BOOL,
-    CHAR
-};
-
 const std::string semantic_type_to_string[] = {
     "void",
     "int",
     "bool",
     "char"
+};
+
+
+class Token {
+    private:
+        token_type type;
+        int line_number;
+        std::string content;
+
+    public:
+        Token(token_type _type, int _line_number = -1, std::string _content = "") {
+            type = _type;
+            line_number = _line_number;
+            content = _content;
+        }
+
+        token_type get_type() {
+            return type;
+        }
+        void set_type(token_type _type) {
+            type = _type;
+        }
+        int get_line_number() {
+            return line_number;
+        }
+        void set_line_number(int _line_number) {
+            line_number = _line_number;
+        }
+        std::string get_content() {
+            return content;
+        }
+        void set_content(std::string _content) {
+            content = _content;
+        }
+
+        std::string toString() const {
+            if (content == "") {
+                return "< type: " + type_to_string[type] + ", line: " + std::to_string(line_number) + " >";
+            }
+            return "< type: " + type_to_string[type] + ", line: " + std::to_string(line_number) + ", content: " + content + " >";
+        }
+        friend std::ostream& operator << (std::ostream &out, const Token &token) {
+            return out << token.toString();
+        }
 };
 
 class Symbol {
@@ -240,49 +286,6 @@ class Symbol {
         }
         friend std::ostream& operator << (std::ostream &out, Symbol &var) {
             return out << var.toString();
-        }
-};
-
-class Token {
-    private:
-        token_type type;
-        int line_number;
-        std::string content;
-
-    public:
-        Token(token_type _type, int _line_number = -1, std::string _content = "") {
-            type = _type;
-            line_number = _line_number;
-            content = _content;
-        }
-
-        token_type get_type() {
-            return type;
-        }
-        void set_type(token_type _type) {
-            type = _type;
-        }
-        int get_line_number() {
-            return line_number;
-        }
-        void set_line_number(int _line_number) {
-            line_number = _line_number;
-        }
-        std::string get_content() {
-            return content;
-        }
-        void set_content(std::string _content) {
-            content = _content;
-        }
-
-        std::string toString() const {
-            if (content == "") {
-                return "< type: " + type_to_string[type] + ", line: " + std::to_string(line_number) + " >";
-            }
-            return "< type: " + type_to_string[type] + ", line: " + std::to_string(line_number) + ", content: " + content + " >";
-        }
-        friend std::ostream& operator << (std::ostream &out, const Token &token) {
-            return out << token.toString();
         }
 };
 
