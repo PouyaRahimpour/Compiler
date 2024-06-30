@@ -108,7 +108,7 @@ class SyntaxAnalyzer {
         std::map<token_type, std::string> match;
         Tree<Symbol> tree;
         bool has_par[200];
-        bool has_error;
+        int num_errors;
         Symbol eps;
 
         void extract(std::string line) {
@@ -535,7 +535,7 @@ class SyntaxAnalyzer {
             out_address = output_file;
             eps.set_name("eps");
             eps.set_type(TERMINAL);
-            has_error = false;
+            num_errors = 0;
         }
 
         void update_grammar() {
@@ -600,7 +600,7 @@ class SyntaxAnalyzer {
                         std::cerr << RED << "Syntax Error: Terminals don't match, line: " << line_number << WHITE << std::endl;
                         std::cerr << RED << "Expected '" + top_var.get_name() +  "' , but found '" + term.get_name() + "' instead." << WHITE << std::endl;
                         std::cerr << "---------------------------------------------------------------" << std::endl;
-                        has_error = true;
+                        num_errors++;
                     }
                 } 
                 else {
@@ -622,7 +622,7 @@ class SyntaxAnalyzer {
                         std::cerr << RED << "Syntax Error: Synch, line: " << line_number << WHITE << std::endl;
                         std::cerr << RED << "Synced by adding '" + top_var.get_name() + "' before '" + term.get_name() + "'." << WHITE << std::endl;
                         std::cerr << "---------------------------------------------------------------" << std::endl;
-                        has_error = true;
+                        num_errors++;
                     } 
                     else if (rule.get_type() == EMPTY) {
                         std::cerr << RED << "Syntax Error: Empty cell, line: " << line_number << WHITE << std::endl;
@@ -630,16 +630,16 @@ class SyntaxAnalyzer {
                         std::cerr << "---------------------------------------------------------------" << std::endl;
                         index++;
                         stack.push(top_node);
-                        has_error = true;
+                        num_errors++;
                     }
                     else {
                         std::cerr << "Unknown Error: ?, line: " << line_number << WHITE << std::endl;
                         std::cerr << "---------------------------------------------------------------" << std::endl;
-                        has_error = true;
+                        num_errors++;
                     }
                 }
             }
-            if (!has_error) {
+            if (num_errors == 0) {
                 std::cout << GREEN << "Parsed tree successfully" << WHITE << std::endl;
             }
             else {
@@ -648,7 +648,7 @@ class SyntaxAnalyzer {
         }
 
         void write() {
-            if (has_error) {
+            if (num_errors) {
                 return;
             }
 

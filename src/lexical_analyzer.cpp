@@ -1,4 +1,5 @@
 #include "lexical_analyzer.h"
+#include "utils.h"
 
 char spaces[] = {9, 10, 13, 32};
 
@@ -33,6 +34,7 @@ class LexicalAnalyzer {
         std::ifstream in;
         std::ofstream out;
         std::vector<Token> tokens;
+        int num_erros = 0;
 
         Token is_space(int &index, const std::string &line, const int &line_number) {
             int len = (int)line.size();
@@ -680,6 +682,7 @@ class LexicalAnalyzer {
                 std::string error_message = "Lexical Error: character '" + std::to_string(line[index]) + "' is invalid, " + "line:" + std::to_string(line_number); 
                 std::cerr << RED << error_message << WHITE << std::endl; 
                 std::cerr << "----------------------------------------------------------------" << std::endl;
+                num_erros++;
                 index++;
             }
         }
@@ -718,7 +721,12 @@ class LexicalAnalyzer {
 
         void tokenize() {
             read_tokens();
-            std::cout << GREEN << "Tokenize Complete" << WHITE << std::endl;
+            if (num_erros == 0) {
+                std::cout << GREEN << "Tokenize Complete" << WHITE << std::endl;
+            }
+            else {
+                std::cout << YELLOW << "Tokenize Complete" << WHITE << std::endl;
+            }
         }
         
         void write() {
