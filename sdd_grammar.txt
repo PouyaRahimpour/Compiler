@@ -65,7 +65,7 @@ break_stmt -> <break> <;>
 continue_stmt -> <continue> <;>
 return_stmt -> <return> exp <;> {return_stmt.type = exp.type}
 
-for_stmt -> <for> <(> var_dec exp <;> exp <)> stmt
+for_stmt -> <for> <(> var_dec exp <;> exp <)> {increase def_area of every id} stmt
 print_stmt -> <print> <(> context <)> <;>
 context -> <string> context2
 context2 -> <,> exp context2
@@ -117,11 +117,11 @@ exp8 -> <!> exp9 {if (exp9.type == bool) exp8.type = bool; else error, exp8.type
 exp8 -> exp9 {exp8.type = exp9.type, exp8.val = exp9.val}
 
 exp9 -> <(> exp <)> {exp9.type = exp.type, exp9.val = exp.val}
-exp9 -> <id> func_call_or_id {id.type = func_call_or_id.type, exp9.type = id.type}
+exp9 -> <id> func_call_or_id {id.type = func_call_or_id.type, exp9.type = id.type, exp9.val = 0}
 exp9 -> constant {exp9.type = constant.type, exp9.val = constant.val}
 
 func_call_or_id -> {check symbol_table[id], func_call_or_id.type = symbol_table[id].type} <(> params_call <)> {check params_call.params_type}
-func_call_or_id -> {check symbol_table[id], func_call_or_id.type = symbol_table[id].type} ebracket 
+func_call_or_id -> {check symbol_table[id], func_call_or_id.type = symbol_table[id].type} ebracket
 params_call -> exp1 params_call2 {params_call.params_type.push_back(exp1.type, params_call2.params_type)}
 params_call -> <eps>
 params_call2 -> <,> exp1 params_call2@ {params_call2.params_type.push_back(exp1, params_call2@.params_type)}

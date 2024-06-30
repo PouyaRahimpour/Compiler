@@ -116,6 +116,7 @@ class SemanticAnalyzer {
         int def_area;
         std::string current_func;
         std::string code;
+        int num_errors;
 
         void dfs(Node<Symbol>* node) {
             std::deque<Node<Symbol>*> children = node->get_children();
@@ -149,6 +150,7 @@ class SemanticAnalyzer {
                         else {
                             std::cerr << RED << "Semantic Error: Redefinition of variable '" + id + "', line: " << line_number << WHITE << std::endl;
                             std::cerr << "---------------------------------------------------------------" << std::endl;
+                            num_errors++;
                         }
                     }
                     else if (child_name == "func_dec") {
@@ -163,6 +165,7 @@ class SemanticAnalyzer {
                         else {
                             std::cerr << RED << "Semantic Error: Redefinition of function '" + id + "', line: " << line_number << WHITE << std::endl;
                             std::cerr << "---------------------------------------------------------------" << std::endl;
+                            num_errors++;
                         }
 
                         current_func = id;
@@ -178,6 +181,7 @@ class SemanticAnalyzer {
                             std::cerr << RED << "Semantic Error: Assigning types don't match for id '" + id + "', line: " << line_number << WHITE << std::endl;
                             std::cerr << RED << "id type is '" + left_type +  "', but assign value type is '" + right_type + "'." << WHITE << std::endl;
                             std::cerr << "---------------------------------------------------------------" << std::endl;
+                            num_errors++;
                         }
 
                         // more.type = var_dec_glabal.type
@@ -235,6 +239,7 @@ class SemanticAnalyzer {
                         else {
                             std::cerr << RED << "Semantic Error: Redefinition of variable '" + id + "', line: " << line_number << WHITE << std::endl;
                             std::cerr << "---------------------------------------------------------------" << std::endl;
+                            num_errors++;
                         }
                     }
                 }
@@ -250,17 +255,40 @@ class SemanticAnalyzer {
                         child->get_data().set_stype(symbol.get_stype());
                     }
                 }
+                else if (head_name == "for_stmt") {
+                    if (child_name == "stmt") {
+                        // increase def_area of every id
+                        Node<Symbol>* var_dec = node->get_children()[2];
+                        if (var_dec->get_children()[0]->get_data().get_name() == "type") {
+                            Node<Symbol>* var_dec_list = var_dec->get_children()[1];
+                            if (var_dec_list->get_children()[0]->get_data().get_name() == "var_dec_init") {
+                                std::string id = var_dec_list->get_children()[0]->get_children()[0]->get_children()[0]->get_data().get_content();
+                                symbol_table[id].set_def_area(symbol_table[id].get_def_area() + 1);
+
+                                Node<Symbol>* var_dec_list2 = var_dec_list->get_children()[1];
+                                while (var_dec_list2->get_children()[0]->get_data().get_name() != "eps") {
+                                    std::string id = var_dec_list2->get_children()[1]->get_children()[0]->get_children()[0]->get_data().get_content();
+                                    symbol_table[id].set_def_area(symbol_table[id].get_def_area() + 1);
+                                    var_dec_list2 = var_dec_list2->get_children()[2];
+                                }
+                            }
+
+                        }
+                    }
+                }
                 else if (head_name == "func_call_or_id") {
                     if (child_name == "(") {
                         std::string id = node->get_parent()->get_children()[0]->get_data().get_content();
                         if (symbol_table[id].get_type() == NONE) {
                             std::cerr << RED << "Semantic Error: Use undefined function '" + id + "', line: " << line_number << WHITE << std::endl;
                             std::cerr << "---------------------------------------------------------------" << std::endl;
+                            num_errors++;
                             symbol.set_stype(VOID);
                         }
                         else if (symbol_table[id].get_type() == VAR) {
                             std::cerr << RED << "Semantic Error: Id '" + id + "' is variable but used instead a function , line: " << line_number << WHITE << std::endl;
                             std::cerr << "---------------------------------------------------------------" << std::endl;
+                            num_errors++;
                             symbol.set_stype(VOID);
                         }
                         else {
@@ -272,11 +300,13 @@ class SemanticAnalyzer {
                         if (symbol_table[id].get_type() == NONE) {
                             std::cerr << RED << "Semantic Error: Use undefined variable '" + id + "', line: " << line_number << WHITE << std::endl;
                             std::cerr << "---------------------------------------------------------------" << std::endl;
+                            num_errors++;
                             symbol.set_stype(VOID);
                         }
                         else if (symbol_table[id].get_type() == FUNC) {
                             std::cerr << RED << "Semantic Error: Id '" + id + "' is function but used instead a variable , line: " << line_number << WHITE << std::endl;
                             std::cerr << "---------------------------------------------------------------" << std::endl;
+                            num_errors++;
                             symbol.set_stype(VOID);
                         }
                         else {
@@ -293,12 +323,12 @@ class SemanticAnalyzer {
                 def_area++;
             }
             else if (head_name == "}") {
-                // TODO copy symbol_table or not?
-                for (auto &entry : symbol_table) {
+                std::map<std::string, SymbolTableEntry> tmp_symbol_table = symbol_table;
+                for (auto &entry : tmp_symbol_table) {
                     if (entry.second.get_def_area() == def_area) {
-                        // TODO delete
-                        symbol_table[entry.first].set_type(NONE); 
-                        symbol_table[entry.first].clear_parameters();
+                        symbol_table.erase(entry.first);
+                        //symbol_table[entry.first].set_type(NONE); 
+                        //symbol_table[entry.first].clear_parameters();
                     }
                 }
 
@@ -327,6 +357,7 @@ class SemanticAnalyzer {
                     std::cerr << RED << "Semantic Error: Assigning types don't match for id '" + id + "', line: " << line_number << WHITE << std::endl;
                     std::cerr << RED << "id type is '" + left_type +  "', but assign value type is '" + right_type + "'." << WHITE << std::endl;
                     std::cerr << "---------------------------------------------------------------" << std::endl;
+                    num_errors++;
                 }
             }
             else if (head_name == "sz") {
@@ -350,6 +381,7 @@ class SemanticAnalyzer {
                         std::cerr << RED << "Semantic Error: The array size must have an int type for array '" + id + "', line: " << line_number << WHITE << std::endl;
                         std::cerr << RED << "The array size type is '" + size_type +  "'." << WHITE << std::endl;
                         std::cerr << "---------------------------------------------------------------" << std::endl;
+                        num_errors++;
                     }
                 }
             }
@@ -378,6 +410,7 @@ class SemanticAnalyzer {
                         std::cerr << RED << "Semantic Error: The array index value must be positive for '" + id + "', line: " << line_number << WHITE << std::endl;
                         std::cerr << RED << "The array index value is '" + std::to_string(index_val) +  "'." << WHITE << std::endl;
                         std::cerr << "---------------------------------------------------------------" << std::endl;
+                        num_errors++;
                     }
                 }
                 else if (children[0]->get_data().get_name() == "eps") {
@@ -431,6 +464,7 @@ class SemanticAnalyzer {
                         std::cerr << RED << "Semantic Error: All array memebers must have the same type for array '" + id + "', line: " << line_number << WHITE << std::endl;
                         std::cerr << RED << "'" + member_type1 +  "' and '" + member_type2 + "' types exist in array." << WHITE << std::endl;
                         std::cerr << "---------------------------------------------------------------" << std::endl;
+                        num_errors++;
 
                         // exp_list.type = void
                         symbol.set_stype(VOID);
@@ -467,6 +501,7 @@ class SemanticAnalyzer {
                         std::cerr << RED << "Semantic Error: All array memebers must have the same type for array '" + id + "', line: " << line_number << WHITE << std::endl;
                         std::cerr << RED << "'" + member_type1 +  "' and '" + member_type2 + "' types exist in array." << WHITE << std::endl;
                         std::cerr << "---------------------------------------------------------------" << std::endl;
+                        num_errors++;
 
                         // exp_list2.type = void
                         symbol.set_stype(VOID);
@@ -507,6 +542,7 @@ class SemanticAnalyzer {
                         std::cerr << RED << "Semantic Error: Return stmt for function '" + current_func + "' have unmatched type, line: " << line_number << WHITE << std::endl;
                         std::cerr << RED << "function type is '" + func_type + "' but return type is '" + return_type + "'." << WHITE << std::endl;
                         std::cerr << "---------------------------------------------------------------" << std::endl;
+                        num_errors++;
                     }
                 }
             }
@@ -517,6 +553,7 @@ class SemanticAnalyzer {
                     std::cerr << RED << "Semantic Error: The condition type of if stmt must have a bool type, line: " << line_number << WHITE << std::endl;
                     std::cerr << RED << "The condition type is '" + condition_type +  "'." << WHITE << std::endl;
                     std::cerr << "---------------------------------------------------------------" << std::endl;
+                    num_errors++;
                 }
             }
             else if (head_name == "return_stmt") {
@@ -576,6 +613,7 @@ class SemanticAnalyzer {
                     std::cerr << RED << "Semantic Error: Assigning types don't match for id '" + id + "', line: " << line_number << WHITE << std::endl;
                     std::cerr << RED << "id type is '" + left_type +  "', but assign value type is '" + right_type + "'." << WHITE << std::endl;
                     std::cerr << "---------------------------------------------------------------" << std::endl;
+                    num_errors++;
 
                     // exp1.type = exp2.type
                     symbol.set_stype(children[0]->get_data().get_stype());
@@ -603,6 +641,7 @@ class SemanticAnalyzer {
                         std::cerr << RED << "Semantic Error: Assigning types don't match for id '" + id + "', line: " << line_number << WHITE << std::endl;
                         std::cerr << RED << "id type is '" + left_type +  "', but assign value type is '" + right_type + "'." << WHITE << std::endl;
                         std::cerr << "---------------------------------------------------------------" << std::endl;
+                        num_errors++;
 
                         // t2.type = exp2.type
                         symbol.set_stype(children[1]->get_data().get_stype());
@@ -628,6 +667,7 @@ class SemanticAnalyzer {
                     std::cerr << RED << "Semantic Error: Logical operator || takes 2 values with the bool type, line: " << line_number << WHITE << std::endl;
                     std::cerr << RED << "first value type is '" + left_type +  "', but second value type is '" + right_type + "'." << WHITE << std::endl;
                     std::cerr << "---------------------------------------------------------------" << std::endl;
+                    num_errors++;
 
                     // exp2.type = bool 
                     symbol.set_stype(BOOL);
@@ -646,6 +686,7 @@ class SemanticAnalyzer {
                         std::cerr << RED << "Semantic Error: Logical operator || takes 2 values with the bool type, line: " << line_number << WHITE << std::endl;
                         std::cerr << RED << "first value type is '" + left_type +  "', but second value type is '" + right_type + "'." << WHITE << std::endl;
                         std::cerr << "---------------------------------------------------------------" << std::endl;
+                        num_errors++;
 
                         // t3.type = bool 
                         symbol.set_stype(BOOL);
@@ -671,6 +712,7 @@ class SemanticAnalyzer {
                     std::cerr << RED << "Semantic Error: Logical operator && takes 2 values with the bool type, line: " << line_number << WHITE << std::endl;
                     std::cerr << RED << "first value type is '" + left_type +  "', but second value type is '" + right_type + "'." << WHITE << std::endl;
                     std::cerr << "---------------------------------------------------------------" << std::endl;
+                    num_errors++;
 
                     // exp3.type = bool 
                     symbol.set_stype(BOOL);
@@ -689,6 +731,7 @@ class SemanticAnalyzer {
                         std::cerr << RED << "Semantic Error: Logical operator && takes 2 values with the bool type, line: " << line_number << WHITE << std::endl;
                         std::cerr << RED << "first value type is '" + left_type +  "', but second value type is '" + right_type + "'." << WHITE << std::endl;
                         std::cerr << "---------------------------------------------------------------" << std::endl;
+                        num_errors++;
 
                         // t4.type = bool 
                         symbol.set_stype(BOOL);
@@ -715,6 +758,7 @@ class SemanticAnalyzer {
                     std::cerr << RED << "Semantic Error: Logical operator " + opt + " takes 2 values with the same type, line: " << line_number << WHITE << std::endl;
                     std::cerr << RED << "first value type is '" + left_type +  "', but second value type is '" + right_type + "'." << WHITE << std::endl;
                     std::cerr << "---------------------------------------------------------------" << std::endl;
+                    num_errors++;
 
                     // exp4.type = bool 
                     symbol.set_stype(BOOL);
@@ -734,6 +778,7 @@ class SemanticAnalyzer {
                         std::cerr << RED << "Semantic Error: Logical operator " + opt + " takes 2 values with the same type, line: " << line_number << WHITE << std::endl;
                         std::cerr << RED << "first value type is '" + left_type +  "', but second value type is '" + right_type + "'." << WHITE << std::endl;
                         std::cerr << "---------------------------------------------------------------" << std::endl;
+                        num_errors++;
 
                         // t5.type = bool 
                         symbol.set_stype(BOOL);
@@ -760,6 +805,7 @@ class SemanticAnalyzer {
                     std::cerr << RED << "Semantic Error: Logical operator " + opt + " takes 2 values with the same type, line: " << line_number << WHITE << std::endl;
                     std::cerr << RED << "first value type is '" + left_type +  "', but second value type is '" + right_type + "'." << WHITE << std::endl;
                     std::cerr << "---------------------------------------------------------------" << std::endl;
+                    num_errors++;
 
                     // exp5.type = bool 
                     symbol.set_stype(BOOL);
@@ -780,6 +826,7 @@ class SemanticAnalyzer {
                         std::cerr << RED << "Semantic Error: Logical operator " + opt + " takes 2 values with the same type, line: " << line_number << WHITE << std::endl;
                         std::cerr << RED << "first value type is '" + left_type +  "', but second value type is '" + right_type + "'." << WHITE << std::endl;
                         std::cerr << "---------------------------------------------------------------" << std::endl;
+                        num_errors++;
 
                         // t6.type = bool 
                         symbol.set_stype(BOOL);
@@ -807,6 +854,7 @@ class SemanticAnalyzer {
                     std::cerr << RED << "Semantic Error: Computational operator " + opt + " takes 2 values with the int type, line: " << line_number << WHITE << std::endl;
                     std::cerr << RED << "first value type is '" + left_type +  "', but second value type is '" + right_type + "'." << WHITE << std::endl;
                     std::cerr << "---------------------------------------------------------------" << std::endl;
+                    num_errors++;
 
                     // exp6.type = int 
                     symbol.set_stype(INT);
@@ -829,6 +877,7 @@ class SemanticAnalyzer {
                         std::cerr << RED << "Semantic Error: Computational operator " + opt + " takes 2 values with the int type, line: " << line_number << WHITE << std::endl;
                         std::cerr << RED << "first value type is '" + left_type +  "', but second value type is '" + right_type + "'." << WHITE << std::endl;
                         std::cerr << "---------------------------------------------------------------" << std::endl;
+                        num_errors++;
 
                         // t7.type = int 
                         symbol.set_stype(INT);
@@ -856,6 +905,7 @@ class SemanticAnalyzer {
                     std::cerr << RED << "Semantic Error: Computational operator " + opt + " takes 2 values with the int type, line: " << line_number << WHITE << std::endl;
                     std::cerr << RED << "first value type is '" + left_type +  "', but second value type is '" + right_type + "'." << WHITE << std::endl;
                     std::cerr << "---------------------------------------------------------------" << std::endl;
+                    num_errors++;
 
                     // exp7.type = int 
                     symbol.set_stype(INT);
@@ -879,6 +929,7 @@ class SemanticAnalyzer {
                         std::cerr << RED << "Semantic Error: Computational operator " + opt + " takes 2 values with the int type, line: " << line_number << WHITE << std::endl;
                         std::cerr << RED << "first value type is '" + left_type +  "', but second value type is '" + right_type + "'." << WHITE << std::endl;
                         std::cerr << "---------------------------------------------------------------" << std::endl;
+                        num_errors++;
 
                         // t8.type = int 
                         symbol.set_stype(INT);
@@ -907,6 +958,7 @@ class SemanticAnalyzer {
                         std::cerr << RED << "Semantic Error: Computational operator " + opt + " takes 1 value with the int type, line: " << line_number << WHITE << std::endl;
                         std::cerr << RED << "value type is '" + right_type + "." << WHITE << std::endl;
                         std::cerr << "---------------------------------------------------------------" << std::endl;
+                        num_errors++;
 
                         // exp8.type = int 
                         symbol.set_stype(INT);
@@ -924,6 +976,7 @@ class SemanticAnalyzer {
                         std::cerr << RED << "Semantic Error: Computational operator " + opt + " takes 1 value with the bool type, line: " << line_number << WHITE << std::endl;
                         std::cerr << RED << "value type is '" + right_type + "." << WHITE << std::endl;
                         std::cerr << "---------------------------------------------------------------" << std::endl;
+                        num_errors++;
 
                         // exp8.type = bool 
                         symbol.set_stype(BOOL);
@@ -952,6 +1005,9 @@ class SemanticAnalyzer {
 
                     // exp9.type = id.type
                     symbol.set_stype(children[0]->get_data().get_stype());
+
+                    // ex9.val = 0
+                    symbol.set_val("0");
                 }
                 else if (children[0]->get_data().get_name() == "constant") {
                     // exp9.type = constant.type
@@ -973,11 +1029,13 @@ class SemanticAnalyzer {
                         std::cerr << RED << "Semantic Error: Too few arguments for function '" + id + "', line: " << line_number << WHITE << std::endl;
                         std::cerr << RED << "Expected " + std::to_string(len_define_params) + " arguments but found " + std::to_string(len_used_params) + " arguments." << WHITE << std::endl;
                         std::cerr << "---------------------------------------------------------------" << std::endl;
+                        num_errors++;
                     }
                     else if (len_define_params < len_used_params) {
                         std::cerr << RED << "Semantic Error: Too many arguments for function '" + id + "', line: " << line_number << WHITE << std::endl;
                         std::cerr << RED << "Expected " + std::to_string(len_define_params) + " arguments but found " + std::to_string(len_used_params) + " arguments." << WHITE << std::endl;
                         std::cerr << "---------------------------------------------------------------" << std::endl;
+                        num_errors++;
                     }
                     else {
                         for (int i = 0; i < len_define_params; i++) {
@@ -985,6 +1043,7 @@ class SemanticAnalyzer {
                                 std::cerr << RED << "Semantic Error: Unmatched type for " + std::to_string(i + 1) + "th argument '" + define_params[i].first +  "' of function '" + id + "', line: " << line_number << WHITE << std::endl;
                                 std::cerr << RED << "Expected '" + semantic_type_to_string[define_params[i].second] + "' type but found '" + semantic_type_to_string[used_params[i]] + "' type." << WHITE << std::endl;
                                 std::cerr << "---------------------------------------------------------------" << std::endl;
+                                num_errors++;
                             }
                         }
                     }
@@ -1011,6 +1070,7 @@ class SemanticAnalyzer {
                         std::cerr << RED << "Semantic Error: The array index type must bet 'int' for '" + id + "', line: " << line_number << WHITE << std::endl;
                         std::cerr << RED << "The array index type is '" + index_type +  "'." << WHITE << std::endl;
                         std::cerr << "---------------------------------------------------------------" << std::endl;
+                        num_errors++;
                     }
 
                     if (stoi(children[1]->get_data().get_val()) < 0) {
@@ -1020,6 +1080,7 @@ class SemanticAnalyzer {
                         std::cerr << RED << "Semantic Error: The array index value must be positive for '" + id + "', line: " << line_number << WHITE << std::endl;
                         std::cerr << RED << "The array index value is '" + std::to_string(index_val) +  "'." << WHITE << std::endl;
                         std::cerr << "---------------------------------------------------------------" << std::endl;
+                        num_errors++;
                     }
                 }
             }
@@ -1062,6 +1123,9 @@ class SemanticAnalyzer {
                 if (node->get_data().get_name() == "string") {
                     code += "\"" + node->get_data().get_content() + "\" ";
                 } 
+                else if (node->get_data().get_name() == "print") {
+                    code += "printf ";
+                }
                 else {
                     code += node->get_data().get_content() + " ";
                 }
@@ -1078,10 +1142,40 @@ class SemanticAnalyzer {
             out_address = output_file_name;
             def_area = 0;
             current_func = "";
-            set_exp_types();
-            // TODO if no errors
-            if (1) {
-                code = "#include <stdio.h>\n#include <stdbool.h>\n#define print printf\n";
+            num_errors = 0;
+        }
+
+        void analyse() {
+            dfs(parse_tree.get_root());
+            if (symbol_table["main"].get_type() != FUNC) {
+                std::cerr << RED << "Semantic Error: There is no function called 'main' in code." << WHITE << std::endl;
+                std::cerr << "---------------------------------------------------------------" << std::endl;
+                num_errors++;
+            }
+            else if (symbol_table["main"].get_stype() != INT) {
+                std::string main_type = semantic_type_to_string[symbol_table["main"].get_stype()];
+                std::cerr << RED << "Semantic Error: The type of main function is invalid." << WHITE << std::endl;
+                std::cerr << RED << "Expected 'int' type but found '" + main_type + "' type." << WHITE << std::endl;
+                std::cerr << "---------------------------------------------------------------" << std::endl;
+                num_errors++;
+            }
+            else if (symbol_table["main"].get_parameters().size()) {
+                std::cerr << RED << "Semantic Error: 'main' accepts no arguments." << WHITE << std::endl;
+                std::cerr << "---------------------------------------------------------------" << std::endl;
+                num_errors++;
+            }
+
+            if (num_errors == 0) {
+                std::cerr << GREEN << "Semantic analyse complete" << WHITE << std::endl;
+            }
+            else {
+                std::cerr << YELLOW << "Semantic analyse complete" << WHITE << std::endl;
+            }
+        }
+
+        void run_code() {
+            if (num_errors == 0) {
+                code = "#include <stdio.h>\n#include <stdbool.h>\n";
                 make_syntax_tree(parse_tree.get_root());
                 std::ofstream out;
                 out.open(out_address);
@@ -1092,26 +1186,8 @@ class SemanticAnalyzer {
                 out << code;
                 out.close();
                 
-                std::string command = "gcc " + output_file_name + " -o " + output_file_name + ".exe && ./" + output_file_name + ".exe";
+                std::string command = "gcc " + out_address + " -o " + out_address + ".exe && ./" + out_address + ".exe";
                 std::system(command.c_str());
-            }
-        }
-
-        void set_exp_types() {
-            dfs(parse_tree.get_root());
-            if (symbol_table["main"].get_type() != FUNC) {
-                std::cerr << RED << "Semantic Error: There is no function called 'main' in code." << WHITE << std::endl;
-                std::cerr << "---------------------------------------------------------------" << std::endl;
-            }
-            else if (symbol_table["main"].get_stype() != INT) {
-                std::string main_type = semantic_type_to_string[symbol_table["main"].get_stype()];
-                std::cerr << RED << "Semantic Error: The type of main function is invalid." << WHITE << std::endl;
-                std::cerr << RED << "Expected 'int' type but found '" + main_type + "' type." << WHITE << std::endl;
-                std::cerr << "---------------------------------------------------------------" << std::endl;
-            }
-            else if (symbol_table["main"].get_parameters().size()) {
-                std::cerr << RED << "Semantic Error: 'main' accepts no arguments." << WHITE << std::endl;
-                std::cerr << "---------------------------------------------------------------" << std::endl;
             }
         }
 };
