@@ -1,7 +1,3 @@
-# , <;>
-SYNCH
-# , <}>
-SYNCH
 # bracket <)>
 bracket -> <eps> 
 # bracket <,>
@@ -239,31 +235,31 @@ ebracket -> <eps>
 # ebracket <}>
 ebracket -> <eps> 
 # eexp <!>
-eexp -> exp 
+eexp -> exp1 
 # eexp <(>
-eexp -> exp 
+eexp -> exp1 
 # eexp <+>
-eexp -> exp 
+eexp -> exp1 
 # eexp <,>
 SYNCH
 # eexp <->
-eexp -> exp 
+eexp -> exp1 
 # eexp <;>
 SYNCH
 # eexp <character>
-eexp -> exp 
+eexp -> exp1 
 # eexp <decimal>
-eexp -> exp 
+eexp -> exp1 
 # eexp <false>
-eexp -> exp 
+eexp -> exp1 
 # eexp <hexadecimal>
-eexp -> exp 
+eexp -> exp1 
 # eexp <id>
-eexp -> exp 
+eexp -> exp1 
 # eexp <string>
-eexp -> exp 
+eexp -> exp1 
 # eexp <true>
-eexp -> exp 
+eexp -> exp1 
 # eexp <{>
 eexp -> <{> exp_list <}> 
 # eexp <}>
@@ -741,33 +737,33 @@ SYNCH
 # exp9 <}>
 SYNCH
 # exp_list <!>
-exp_list -> exp exp_list2 
+exp_list -> exp1 exp_list2 
 # exp_list <(>
-exp_list -> exp exp_list2 
+exp_list -> exp1 exp_list2 
 # exp_list <+>
-exp_list -> exp exp_list2 
+exp_list -> exp1 exp_list2 
 # exp_list <->
-exp_list -> exp exp_list2 
+exp_list -> exp1 exp_list2 
 # exp_list <;>
 SYNCH
 # exp_list <character>
-exp_list -> exp exp_list2 
+exp_list -> exp1 exp_list2 
 # exp_list <decimal>
-exp_list -> exp exp_list2 
+exp_list -> exp1 exp_list2 
 # exp_list <false>
-exp_list -> exp exp_list2 
+exp_list -> exp1 exp_list2 
 # exp_list <hexadecimal>
-exp_list -> exp exp_list2 
+exp_list -> exp1 exp_list2 
 # exp_list <id>
-exp_list -> exp exp_list2 
+exp_list -> exp1 exp_list2 
 # exp_list <string>
-exp_list -> exp exp_list2 
+exp_list -> exp1 exp_list2 
 # exp_list <true>
-exp_list -> exp exp_list2 
+exp_list -> exp1 exp_list2 
 # exp_list <}>
 exp_list -> <eps> 
 # exp_list2 <,>
-exp_list2 -> <,> exp exp_list2 
+exp_list2 -> <,> exp1 exp_list2 
 # exp_list2 <;>
 SYNCH
 # exp_list2 <}>
@@ -1003,7 +999,7 @@ SYNCH
 # more <$>
 SYNCH
 # more <,>
-more -> , var_dec_list <;> 
+more -> <,> var_dec_list <;> 
 # more <;>
 more -> <;> 
 # more <bool>
@@ -1343,7 +1339,7 @@ t1 -> <eps>
 # t1 <]>
 t1 -> <eps> 
 # t1 <}>
-t1 -> <eps> 
+SYNCH
 # t2 <)>
 t2 -> <eps> 
 # t2 <,>
@@ -1351,7 +1347,7 @@ t2 -> <eps>
 # t2 <;>
 t2 -> <eps> 
 # t2 <=>
-t2 -> <=> exp1 
+t2 -> <=> exp2 t2 
 # t2 <]>
 t2 -> <eps> 
 # t2 <}>

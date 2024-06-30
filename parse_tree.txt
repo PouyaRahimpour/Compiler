@@ -1,0 +1,2 @@
+#include <stdio.h>
+int a = 12 ; bool b , a , a , b ; char gg [ 4 - 6 ] ; int cc ( int a , bool b ) { } int main ( char pouya ) { int c = 12 , x = 18 ; cc ( x , x ) ; int arr [ 10 ] ; arr [ 6 - 3 - 4 ] ; return aa ; } 

@@ -39,7 +39,7 @@ params -> param params2
 params -> <eps>
 params2 -> <,> param params2
 params2 -> <eps>
-param -> type {param_id.type = type.type} param_id {param.type = type.type} {symbol_table[current_func].add_to_parmeters({id, param.type})}
+param -> type {param_id.type = type.type} param_id {param.type = type.type} {symbol_table[current_func].add_to_parmeters({id, param.type})} {symbel_table[id].type = type}
 param_id -> {id.type = param_id.type} <id> bracket
 bracket -> <[> <]>
 bracket -> <eps>
@@ -88,12 +88,12 @@ exp3 -> exp4 t4 {if (t4.type == void or (t4.type == bool and exp4.type == bool))
 t4 -> <&&> exp4 t4@ {if (t4@.type == void or (t4@.type == bool and exp4.type == bool)) t4.type = exp4.type; else error, t4.type = bool;}
 t4 -> <eps> {t4.type = void}
 
-exp4 -> exp5 t5 {if (t5.type == void or t5.type == exp5.type) exp4.type = exp5.type; else error, exp4.type = bool;} {exp4.val = exp5.val}
+exp4 -> exp5 t5 {if (t5.type == void) exp4.type = exp5.type; else if (t5.type == exp5.type) exp4.type = bool; else error, exp4.type = bool;} {exp4.val = exp5.val}
 t5 -> <==> exp5 t5@ {if (t5@.type == void or t5@.type == exp5.type) t5.type = exp5.type; else error, t5.type = bool;} 
 t5 -> <!=> exp5 t5@ {if (t5@.type == void or t5@.type == exp5.type) t5.type = exp5.type; else error, t5.type = bool;}
 t5 -> <eps> {t5.type = void}
 
-exp5 -> exp6 t6 {if (t6.type == void or t6.type == exp6.type) exp5.type = exp6.type; else error, exp5.type = bool;} {exp5.val = exp6.val}
+exp5 -> exp6 t6 {if (t6.type == void) exp5.type = exp6.type; else if (t6.type == exp6.type) exp5.type = bool; else error, exp5.type = bool;} {exp5.val = exp6.val}
 t6 -> <<> exp6 t6@ {if (t6@.type == void or t6@.type == exp6.type) t6.type = exp6.type; else error, t6.type = bool;}
 t6 -> <>> exp6 t6@ {if (t6@.type == void or t6@.type == exp6.type) t6.type = exp6.type; else error, t6.type = bool;}
 t6 -> <<=> exp6 t6@ {if (t6@.type == void or t6@.type == exp6.type) t6.type = exp6.type; else error, t6.type = bool;}
