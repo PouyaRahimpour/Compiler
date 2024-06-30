@@ -39,22 +39,34 @@ std::string eval(std::string exp, std::vector<char> chs) {
     }
     std::vector<std::string> sp = split(exp, chs);
     int len = exp.size(), j = 1;
-    int64_t result = stoll(sp[0]) * val;
-    for (int i = 0; i < len; i++) {
-        if (exp[i] == '+') {
-            result += stoll(sp[j++]);
+    int64_t result = stoi(sp[0]) * val;
+    if (chs.size() == 2) {
+        for (int i = 0; i < len; i++) {
+            if (exp[i] == '+') {
+                result += stoi(sp[j++]);
+            }
+            else if (exp[i] == '-') {
+                result -= stoi(sp[j++]);
+            }
         }
-        else if (exp[i] == '-') {
-            result -= stoll(sp[j++]);
-        }
-        else if (exp[i] == '*') {
-            result *= stoll(sp[j++]);
-        }
-        else if (exp[i] == '/') {
-            result /= stoll(sp[j++]);
-        }
-        if (exp[i] == '%') {
-            result %= stoll(sp[j++]);
+    }
+    else if (chs.size() == 3) {
+        for (int i = 0; i < len; i++) {
+            if (exp[i] == '*') {
+                result *= stoi(sp[j++]);
+            }
+            else if (exp[i] == '/') {
+                if (stoi(sp[j]) != 0) {
+                    result /= stoi(sp[j]);
+                }
+                j++;
+            }
+            else if (exp[i] == '%') {
+                if (stoi(sp[j]) != 0) {
+                    result %= stoi(sp[j]);
+                }
+                j++;
+            }
         }
     }
 
@@ -532,6 +544,16 @@ class SemanticAnalyzer {
 
                 std::string id = children[1]->get_children()[0]->get_data().get_content();
                 symbol_table[current_func].add_to_parameters({id, symbol.get_stype()});
+
+                semantic_type stype = children[0]->get_data().get_stype();
+                if (symbol_table[id].get_type() == NONE) {
+                    symbol_table[id] = SymbolTableEntry(VAR, stype, def_area + 1);
+                }
+                else {
+                    std::cerr << RED << "Semantic Error: Redefinition of variable '" + id + "', line: " << line_number << WHITE << std::endl;
+                    std::cerr << "---------------------------------------------------------------" << std::endl;
+                    num_errors++;
+                }
             }
             else if (head_name == "stmt") {
                 if (children[0]->get_data().get_name() == "return_stmt") {
@@ -593,7 +615,7 @@ class SemanticAnalyzer {
                 if (children[1]->get_data().get_stype() == VOID || children[0]->get_data().get_stype() == children[1]->get_data().get_stype()) {
                     // exp1.type = exp2.type
                     symbol.set_stype(children[0]->get_data().get_stype());
-                    
+
                     // exp1.val = exp2.val
                     symbol.set_val(children[0]->get_data().get_val());
                 }
@@ -743,9 +765,16 @@ class SemanticAnalyzer {
                 }
             }
             else if (head_name == "exp4") {
-                if (children[1]->get_data().get_stype() == VOID || children[0]->get_data().get_stype() == children[1]->get_data().get_stype()) {
+                if (children[1]->get_data().get_stype() == VOID) {
                     // exp4.type = exp5.type
                     symbol.set_stype(children[0]->get_data().get_stype());
+
+                    // exp4.val = exp5.val
+                    symbol.set_val(children[0]->get_data().get_val());
+                }
+                else if (children[0]->get_data().get_stype() == children[1]->get_data().get_stype()) {
+                    // exp4.type = bool 
+                    symbol.set_stype(BOOL);
 
                     // exp4.val = exp5.val
                     symbol.set_val(children[0]->get_data().get_val());
@@ -790,9 +819,16 @@ class SemanticAnalyzer {
                 }
             }
             else if (head_name == "exp5") {
-                if (children[1]->get_data().get_stype() == VOID || children[0]->get_data().get_stype() == children[1]->get_data().get_stype()) {
+                if (children[1]->get_data().get_stype() == VOID) {
                     // exp5.type = exp6.type
                     symbol.set_stype(children[0]->get_data().get_stype());
+
+                    // exp5.val = exp6.val
+                    symbol.set_val(children[0]->get_data().get_val());
+                }
+                else if (children[0]->get_data().get_stype() == children[1]->get_data().get_stype()) {
+                    // exp5.type = bool 
+                    symbol.set_stype(BOOL);
 
                     // exp5.val = exp6.val
                     symbol.set_val(children[0]->get_data().get_val());
@@ -892,7 +928,7 @@ class SemanticAnalyzer {
                 if (children[1]->get_data().get_stype() == VOID || children[0]->get_data().get_stype() == children[1]->get_data().get_stype()) {
                     // exp7.type = exp8.type
                     symbol.set_stype(children[0]->get_data().get_stype());
-                     
+
                     // exp7.val = eval(exp8.val + t8.val)
                     std::vector<char> chs = {'*', '/', '%'};
                     symbol.set_val(eval(children[0]->get_data().get_val() + children[1]->get_data().get_val(), chs));
@@ -1096,7 +1132,7 @@ class SemanticAnalyzer {
                     // constant.type = int
                     symbol.set_stype(INT);
 
-                    // constant.val = hexadecimal.content
+                    // constant.val = hexadecimal.content.toint
                     symbol.set_val(children[0]->get_data().get_content());
                 }
                 else if (children[0]->get_data().get_name() == "string") {
@@ -1120,10 +1156,7 @@ class SemanticAnalyzer {
 
         void make_syntax_tree(Node<Symbol>* node) {
             if (node->get_data().get_type() == TERMINAL && node->get_data().get_name() != "eps") {
-                if (node->get_data().get_name() == "string") {
-                    code += "\"" + node->get_data().get_content() + "\" ";
-                } 
-                else if (node->get_data().get_name() == "print") {
+                if (node->get_data().get_name() == "print") {
                     code += "printf ";
                 }
                 else {

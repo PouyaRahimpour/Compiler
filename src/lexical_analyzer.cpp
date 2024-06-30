@@ -1,5 +1,4 @@
 #include "lexical_analyzer.h"
-#include "utils.h"
 
 char spaces[] = {9, 10, 13, 32};
 
@@ -428,6 +427,7 @@ class LexicalAnalyzer {
                 if (state == 0) {
                     if (line[index] == '0') {
                         state = 1;
+                        content += line[index];
                     }
                     else {
                         state = 5;
@@ -436,6 +436,7 @@ class LexicalAnalyzer {
                 else if (state == 1) {
                     if (std::tolower(line[index]) == 'x') {
                         state = 2;
+                        content += line[index];
                     }
                     else {
                         state = 5;
@@ -523,14 +524,20 @@ class LexicalAnalyzer {
                 if (state == 0) {
                     if (line[index] == '"') {
                         state = 1;
+                        content += line[index];
                     }
                     else {
-                        state = 3;
+                        state = 4;
                     }
                 }
                 else if (state == 1) {
-                    if (line[index] == '"') {
+                    if (line[index] == '\\') {
                         state = 2;
+                        content += line[index];
+                    }
+                    else if (line[index] == '"') {
+                        state = 3;
+                        content += line[index];
                     } 
                     else {
                         state = 1;
@@ -538,9 +545,13 @@ class LexicalAnalyzer {
                     }
                 }
                 else if (state == 2) {
-                    return Token(T_String, line_number, content);
+                    state = 1;
+                    content += line[index];
                 }
                 else if (state == 3) {
+                    return Token(T_String, line_number, content);
+                }
+                else if (state == 4) {
                     index = perv_index;
                     return Token(Invalid, line_number);
                 }
@@ -560,6 +571,7 @@ class LexicalAnalyzer {
                 if (state == 0) {
                     if (line[index] == '\'') {
                         state = 1;
+                        content += line[index];
                     }
                     else {
                         state = 6;
@@ -568,9 +580,11 @@ class LexicalAnalyzer {
                 else if (state == 1) {
                     if (line[index] == '\\') {
                         state = 2;
+                        content += line[index];
                     }
                     else {
                         state = 5;
+                        content += line[index];
                     }
                 }
                 else if (state == 2) {
@@ -580,6 +594,7 @@ class LexicalAnalyzer {
                 else if (state == 3) {
                     if (line[index] == '\'') {
                         state = 4;
+                        content += line[index];
                     }
                     else {
                         state = 6;
@@ -591,6 +606,7 @@ class LexicalAnalyzer {
                 else if (state == 5) {
                     if (line[index] == '\'') {
                         state = 4;
+                        content += line[index];
                     }
                     else {
                         state = 6;
