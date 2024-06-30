@@ -525,15 +525,12 @@ class LexicalAnalyzer {
                         state = 1;
                     }
                     else {
-                        state = 4;
+                        state = 3;
                     }
                 }
                 else if (state == 1) {
-                    if (line[index] == '\\') {
+                    if (line[index] == '"') {
                         state = 2;
-                    }
-                    else if (line[index] == '"') {
-                        state = 3;
                     } 
                     else {
                         state = 1;
@@ -541,13 +538,9 @@ class LexicalAnalyzer {
                     }
                 }
                 else if (state == 2) {
-                    state = 1;
-                    content += line[index];
-                }
-                else if (state == 3) {
                     return Token(T_String, line_number, content);
                 }
-                else if (state == 4) {
+                else if (state == 3) {
                     index = perv_index;
                     return Token(Invalid, line_number);
                 }
@@ -722,10 +715,10 @@ class LexicalAnalyzer {
         void tokenize() {
             read_tokens();
             if (num_erros == 0) {
-                std::cout << GREEN << "Tokenize Complete" << WHITE << std::endl;
+                std::cout << GREEN << "Tokenize complete" << WHITE << std::endl;
             }
             else {
-                std::cout << YELLOW << "Tokenize Complete" << WHITE << std::endl;
+                std::cout << YELLOW << "Tokenize complete" << WHITE << std::endl;
             }
         }
         
